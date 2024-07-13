@@ -1001,5 +1001,7 @@ private class BuildVulkan: ZipBaseBuild {
                 }
             }
         }
+
+        try generatePackageManagerFile()
     }
 }

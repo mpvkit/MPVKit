@@ -116,7 +116,7 @@ class BaseBuild {
             try! FileManager.default.createDirectory(atPath: directoryURL.path, withIntermediateDirectories: true, attributes: nil)
 
             if !FileManager.default.fileExists(atPath: outputFile.path) {
-                try! Utility.launch(path: "wget", arguments: ["-O", outputFileName, library.url], currentDirectoryURL: directoryURL)
+                try! Utility.launch(path: "wget", arguments: ["-q", "-O", outputFileName, library.url], currentDirectoryURL: directoryURL)
                 try! Utility.launch(path: "/usr/bin/unzip", arguments: ["-o",outputFileName], currentDirectoryURL: directoryURL)
             }
         } else if !FileManager.default.fileExists(atPath: directoryURL.path) {
@@ -656,6 +656,8 @@ class BaseBuild {
                 """
                 try? FileManager.default.removeItem(at: tmpChecksum)
             }
+            print("1111111")
+            print(dependencyTargetContent)
         } else {
             for target in library.targets {
                 let checksumFile = releaseDirPath + [target.name + ".xcframework.checksum.txt"]
@@ -669,12 +671,14 @@ class BaseBuild {
                         ),
                 """
             }
+            print("2222222")
         }
 
         if dependencyTargetContent.isEmpty {
             return
         }
 
+        print("33333333")
         if let data = FileManager.default.contents(atPath: packageFile.path), var str = String(data: data, encoding: .utf8) {
             let placeholderChars = "//DEPENDENCY_TARGETS_END//"
             str = str.replacingOccurrences(of: 
@@ -685,8 +689,10 @@ class BaseBuild {
             \(dependencyTargetContent)
                     \(placeholderChars)
             """)
+            print("444444")
             try! str.write(toFile: packageFile.path, atomically: true, encoding: .utf8)
         }
+        print("555555")
     }
 
     func getFirstSuccessPlatform() -> PlatformType {
