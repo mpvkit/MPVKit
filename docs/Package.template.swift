@@ -28,7 +28,7 @@ let package = Package(
             name: "FFmpegKit",
             dependencies: [
                 "Libavcodec", "Libavfilter", "Libavformat", "Libavutil", "Libswresample", "Libswscale",
-                "Libssl", "Libcrypto", "Libass", "Libfreetype", "Libfribidi", "Libharfbuzz",
+                "Libass", "Libfreetype", "Libfribidi", "Libharfbuzz",
                 "MoltenVK", "Libshaderc_combined", "lcms2", "Libplacebo", "Libfontconfig", "Libdovi", "Libunibreak",
                 "libsmbclient", "gmp", "nettle", "hogweed", "gnutls", "Libdav1d"
             ],
