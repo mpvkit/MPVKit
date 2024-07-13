@@ -48,10 +48,6 @@ let package = Package(
                 .linkedLibrary("c++"),
             ]
         ),
-        .executableTarget(
-            name: "mpv",
-            path: "scripts/RunCPlayer"
-        ),
         //DEPENDENCY_TARGETS_BEGIN//
         //DEPENDENCY_TARGETS_END//
     ]
