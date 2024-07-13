@@ -1,0 +1,173 @@
+diff --git forkSrcPrefix/video/out/vulkan/context_moltenvk.m forkDstPrefix/video/out/vulkan/context_moltenvk.m
+new file mode 100644
+index 0000000000000000000000000000000000000000..e24572375775622c9e00f11f200bafb4bc38c4b4
+--- /dev/null
++++ forkDstPrefix/video/out/vulkan/context_moltenvk.m
+@@ -0,0 +1,96 @@
++/*
++ * This file is part of mpv.
++ *
++ * mpv is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * mpv is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with mpv.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <CoreGraphics/CoreGraphics.h>
++#include <QuartzCore/CAMetalLayer.h>
++#include <MoltenVK/mvk_vulkan.h>
++
++#include "common.h"
++#include "context.h"
++#include "utils.h"
++
++struct priv {
++    struct mpvk_ctx vk;
++    CAMetalLayer *layer;
++};
++
++static void moltenvk_uninit(struct ra_ctx *ctx)
++{
++    struct priv *p = ctx->priv;
++    ra_vk_ctx_uninit(ctx);
++    mpvk_uninit(&p->vk);
++}
++
++static bool moltenvk_init(struct ra_ctx *ctx)
++{
++    struct priv *p = ctx->priv = talloc_zero(ctx, struct priv);
++    struct mpvk_ctx *vk = &p->vk;
++    int msgl = ctx->opts.probing ? MSGL_V : MSGL_ERR;
++
++    if (ctx->vo->opts->WinID == -1) {
++        MP_MSG(ctx, msgl, "WinID missing\n");
++        goto fail;
++    }
++
++    if (!mpvk_init(vk, ctx, VK_EXT_METAL_SURFACE_EXTENSION_NAME))
++        goto fail;
++
++    p->layer = (__bridge CAMetalLayer *)(intptr_t)ctx->vo->opts->WinID;
++    VkMetalSurfaceCreateInfoEXT info = {
++         .sType = VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT,
++         .pLayer = p->layer,
++    };
++
++    struct ra_vk_ctx_params params = {0};
++
++    VkInstance inst = vk->vkinst->instance;
++    VkResult res = vkCreateMetalSurfaceEXT(inst, &info, NULL, &vk->surface);
++    if (res != VK_SUCCESS) {
++        MP_MSG(ctx, msgl, "Failed creating MoltenVK surface\n");
++        goto fail;
++    }
++
++    if (!ra_vk_ctx_init(ctx, vk, params, VK_PRESENT_MODE_FIFO_KHR))
++        goto fail;
++
++    return true;
++fail:
++    moltenvk_uninit(ctx);
++    return false;
++}
++
++static bool moltenvk_reconfig(struct ra_ctx *ctx)
++{
++    struct priv *p = ctx->priv;
++    CGSize s = p->layer.drawableSize;
++    ra_vk_ctx_resize(ctx, s.width, s.height);
++    return true;
++}
++
++static int moltenvk_control(struct ra_ctx *ctx, int *events, int request, void *arg)
++{
++    return VO_NOTIMPL;
++}
++
++const struct ra_ctx_fns ra_ctx_vulkan_moltenvk = {
++    .type           = "vulkan",
++    .name           = "moltenvk",
++    .reconfig       = moltenvk_reconfig,
++    .control        = moltenvk_control,
++    .init           = moltenvk_init,
++    .uninit         = moltenvk_uninit,
++};
+\ No newline at end of file
+diff --git forkSrcPrefix/video/out/gpu/context.c forkDstPrefix/video/out/gpu/context.c
+index 88d4f4232ddd3886e42ddf23dd2970b13bdd1e92..df9bd99de126d2e2371544248d528b21b99be263 100644
+--- forkSrcPrefix/video/out/gpu/context.c
++++ forkDstPrefix/video/out/gpu/context.c
+@@ -50,6 +50,7 @@ extern const struct ra_ctx_fns ra_ctx_vulkan_xlib;
+ extern const struct ra_ctx_fns ra_ctx_vulkan_android;
+ extern const struct ra_ctx_fns ra_ctx_vulkan_display;
+ extern const struct ra_ctx_fns ra_ctx_vulkan_mac;
++extern const struct ra_ctx_fns ra_ctx_vulkan_moltenvk;
+ 
+ /* Direct3D 11 */
+ extern const struct ra_ctx_fns ra_ctx_d3d11;
+@@ -91,6 +92,9 @@ static const struct ra_ctx_fns *contexts[] = {
+ // Vulkan contexts:
+ #if HAVE_VULKAN
+ 
++#if HAVE_MOLTENVK
++     &ra_ctx_vulkan_moltenvk,
++#endif
+ #if HAVE_ANDROID
+     &ra_ctx_vulkan_android,
+ #endif
+diff --git forkSrcPrefix/video/out/vulkan/common.h forkDstPrefix/video/out/vulkan/common.h
+index e75cb228f8d99462ccecf7780098ea97ae7cfe02..afc17284773204563f4c90b4860758e61068d460 100644
+--- forkSrcPrefix/video/out/vulkan/common.h
++++ forkDstPrefix/video/out/vulkan/common.h
+@@ -22,6 +22,9 @@
+ #if HAVE_WIN32_DESKTOP
+ #define VK_USE_PLATFORM_WIN32_KHR
+ #endif
++#if HAVE_MOLTENVK
++#include <MoltenVK/mvk_vulkan.h>
++#endif
+ #if HAVE_COCOA
+ #define VK_USE_PLATFORM_METAL_EXT
+ #endif
+diff --git forkSrcPrefix/meson.build forkDstPrefix/meson.build
+index 2c2246ba232a603d67e68dc14df51caf0faf2f9a..c516c42df77163aa9d525d56ccb82972b40d010c 100644
+--- forkSrcPrefix/meson.build
++++ forkDstPrefix/meson.build
+@@ -1288,6 +1288,17 @@ if features['vulkan'] and features['x11']
+      sources += files('video/out/vulkan/context_xlib.c')
+ endif
+ 
++if host_machine.system() == 'darwin'
++    moltenvk = get_option('moltenvk').require(
++        features['vulkan'],
++        error_message: 'vulkan or moltenvk header could not be found!',
++    )
++    features += {'moltenvk': moltenvk.allowed()}
++    if features['vulkan'] and features['moltenvk']
++        sources += files('video/out/vulkan/context_moltenvk.m')
++    endif
++endif
++
+ features += {'vk-khr-display': cc.has_function('vkCreateDisplayPlaneSurfaceKHR', prefix: '#include <vulkan/vulkan_core.h>',
+                                                dependencies: [vulkan])}
+ if features['vk-khr-display']
+diff --git forkSrcPrefix/meson_options.txt forkDstPrefix/meson_options.txt
+index e488f6ee881f89eb453916adf13846849b52d60b..e4ee27aab17d7bc9d4e39a29d6674dd09ffc46c7 100644
+--- forkSrcPrefix/meson_options.txt
++++ forkDstPrefix/meson_options.txt
+@@ -103,6 +103,7 @@ option('ios-gl', type: 'feature', value: 'auto', description: 'iOS OpenGL ES int
+ option('videotoolbox-gl', type: 'feature', value: 'auto', description: 'Videotoolbox with OpenGL')
+ option('videotoolbox-pl', type: 'feature', value: 'auto', description: 'Videotoolbox with libplacebo')
+ option('vulkan-interop', type: 'feature', value: 'auto', description: 'Vulkan graphics interop')
++option('moltenvk', type: 'feature', value: 'auto', description: 'Moltenvk context')
+ 
+ # macOS features
+ option('macos-cocoa-cb', type: 'feature', value: 'auto', description: 'macOS libmpv backend')

@@ -1,0 +1,208 @@
+From a8401f5dda66cdb491b2f940855d14eb52b73de2 Mon Sep 17 00:00:00 2001
+From: Robert Kopaczewski <rk@23doors.com>
+Date: Thu, 18 Apr 2024 18:52:16 +0200
+Subject: [PATCH 1/2] ao: fix ios audiounit build
+
+---
+ audio/out/ao_coreaudio_chmap.h      | 2 +-
+ audio/out/ao_coreaudio_properties.h | 2 +-
+ audio/out/ao_coreaudio_utils.h      | 2 +-
+ meson.build                         | 7 +++++--
+ 4 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/audio/out/ao_coreaudio_chmap.h b/audio/out/ao_coreaudio_chmap.h
+index 0b21e8330cfd..8dd9ab70018b 100644
+--- a/audio/out/ao_coreaudio_chmap.h
++++ b/audio/out/ao_coreaudio_chmap.h
+@@ -21,7 +21,7 @@
+ #include "config.h"
+ #include <AudioToolbox/AudioToolbox.h>
+ 
+-#if HAVE_AVFOUNDATION || HAVE_AUDIOUNIT
++#if HAVE_AVFOUNDATION
+ #undef HAVE_COREAUDIO
+ #define HAVE_COREAUDIO 1
+ #endif
+diff --git a/audio/out/ao_coreaudio_properties.h b/audio/out/ao_coreaudio_properties.h
+index 2c9c5657bb65..07c12400c5f2 100644
+--- a/audio/out/ao_coreaudio_properties.h
++++ b/audio/out/ao_coreaudio_properties.h
+@@ -23,7 +23,7 @@
+ 
+ #include "internal.h"
+ 
+-#if HAVE_AVFOUNDATION || HAVE_AUDIOUNIT
++#if HAVE_AVFOUNDATION
+ #undef HAVE_COREAUDIO
+ #define HAVE_COREAUDIO 1
+ #endif
+diff --git a/audio/out/ao_coreaudio_utils.h b/audio/out/ao_coreaudio_utils.h
+index 699ffde9a7f2..c199bb70a8f1 100644
+--- a/audio/out/ao_coreaudio_utils.h
++++ b/audio/out/ao_coreaudio_utils.h
+@@ -29,7 +29,7 @@
+ #include "internal.h"
+ #include "osdep/utils-mac.h"
+ 
+-#if HAVE_AVFOUNDATION || HAVE_AUDIOUNIT
++#if HAVE_AVFOUNDATION
+ #undef HAVE_COREAUDIO
+ #define HAVE_COREAUDIO 1
+ #endif
+diff --git a/meson.build b/meson.build
+index 2c2246ba232a..8dd7251c26b0 100644
+--- a/meson.build
++++ b/meson.build
+@@ -819,8 +819,11 @@ endif
+ 
+ if features['audiounit'] or features['coreaudio'] or features['avfoundation']
+     sources += files('audio/out/ao_coreaudio_chmap.c',
+-                     'audio/out/ao_coreaudio_utils.c',
+-                     'audio/out/ao_coreaudio_properties.c')
++                     'audio/out/ao_coreaudio_utils.c')
++endif
++
++if features['avfoundation']
++    sources += files('audio/out/ao_coreaudio_properties.c')
+ endif
+ 
+ jack_opt = get_option('jack').require(
+
+From 263718673ad777a0a640aacd1a1f9863c1e94325 Mon Sep 17 00:00:00 2001
+From: Robert Kopaczewski <rk@23doors.com>
+Date: Thu, 18 Apr 2024 21:10:33 +0200
+Subject: [PATCH 2/2] ao: avfoundation implies coreaudio currently
+
+---
+ audio/out/ao_coreaudio_chmap.c      | 2 +-
+ audio/out/ao_coreaudio_chmap.h      | 7 +------
+ audio/out/ao_coreaudio_properties.h | 5 -----
+ audio/out/ao_coreaudio_utils.c      | 8 ++++----
+ audio/out/ao_coreaudio_utils.h      | 9 ++-------
+ 5 files changed, 8 insertions(+), 23 deletions(-)
+
+diff --git a/audio/out/ao_coreaudio_chmap.c b/audio/out/ao_coreaudio_chmap.c
+index 5a129c4e6724..b45cf7799cd5 100644
+--- a/audio/out/ao_coreaudio_chmap.c
++++ b/audio/out/ao_coreaudio_chmap.c
+@@ -195,7 +195,7 @@ AudioChannelLabel mp_speaker_id_to_ca_label(int speaker_id)
+     return -1; // kAudioChannelLabel_Unknown
+ }
+ 
+-#if HAVE_COREAUDIO
++#if HAVE_COREAUDIO || HAVE_AVFOUNDATION
+ void ca_log_layout(struct ao *ao, int l, AudioChannelLayout *layout)
+ {
+     if (!mp_msg_test(ao->log, l))
+diff --git a/audio/out/ao_coreaudio_chmap.h b/audio/out/ao_coreaudio_chmap.h
+index 8dd9ab70018b..5286f98e6333 100644
+--- a/audio/out/ao_coreaudio_chmap.h
++++ b/audio/out/ao_coreaudio_chmap.h
+@@ -21,17 +21,12 @@
+ #include "config.h"
+ #include <AudioToolbox/AudioToolbox.h>
+ 
+-#if HAVE_AVFOUNDATION
+-#undef HAVE_COREAUDIO
+-#define HAVE_COREAUDIO 1
+-#endif
+-
+ struct mp_chmap;
+ 
+ int ca_label_to_mp_speaker_id(AudioChannelLabel label);
+ AudioChannelLabel mp_speaker_id_to_ca_label(int speaker_id);
+ 
+-#if HAVE_COREAUDIO
++#if HAVE_COREAUDIO || HAVE_AVFOUNDATION
+ AudioChannelLayout *ca_find_standard_layout(void *talloc_ctx, AudioChannelLayout *l);
+ void ca_log_layout(struct ao *ao, int l, AudioChannelLayout *layout);
+ bool ca_init_chmap(struct ao *ao, AudioDeviceID device);
+diff --git a/audio/out/ao_coreaudio_properties.h b/audio/out/ao_coreaudio_properties.h
+index 07c12400c5f2..f29396883dbb 100644
+--- a/audio/out/ao_coreaudio_properties.h
++++ b/audio/out/ao_coreaudio_properties.h
+@@ -23,11 +23,6 @@
+ 
+ #include "internal.h"
+ 
+-#if HAVE_AVFOUNDATION
+-#undef HAVE_COREAUDIO
+-#define HAVE_COREAUDIO 1
+-#endif
+-
+ // CoreAudio names are way too verbose
+ #define ca_sel    AudioObjectPropertySelector
+ #define ca_scope  AudioObjectPropertyScope
+diff --git a/audio/out/ao_coreaudio_utils.c b/audio/out/ao_coreaudio_utils.c
+index e74092a8d29f..44604e6df268 100644
+--- a/audio/out/ao_coreaudio_utils.c
++++ b/audio/out/ao_coreaudio_utils.c
+@@ -28,14 +28,14 @@
+ #include "osdep/semaphore.h"
+ #include "audio/format.h"
+ 
+-#if HAVE_COREAUDIO
++#if HAVE_COREAUDIO || HAVE_AVFOUNDATION
+ #include "audio/out/ao_coreaudio_properties.h"
+ #include <CoreAudio/HostTime.h>
+ #else
+ #include <mach/mach_time.h>
+ #endif
+ 
+-#if HAVE_COREAUDIO
++#if HAVE_COREAUDIO || HAVE_AVFOUNDATION
+ static bool ca_is_output_device(struct ao *ao, AudioDeviceID dev)
+ {
+     size_t n_buffers;
+@@ -300,7 +300,7 @@ int64_t ca_frames_to_ns(struct ao *ao, uint32_t frames)
+ 
+ int64_t ca_get_latency(const AudioTimeStamp *ts)
+ {
+-#if HAVE_COREAUDIO
++#if HAVE_COREAUDIO || HAVE_AVFOUNDATION
+     uint64_t out = AudioConvertHostTimeToNanos(ts->mHostTime);
+     uint64_t now = AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
+ 
+@@ -323,7 +323,7 @@ int64_t ca_get_latency(const AudioTimeStamp *ts)
+ #endif
+ }
+ 
+-#if HAVE_COREAUDIO
++#if HAVE_COREAUDIO || HAVE_AVFOUNDATION
+ bool ca_stream_supports_compressed(struct ao *ao, AudioStreamID stream)
+ {
+     AudioStreamRangedDescription *formats = NULL;
+diff --git a/audio/out/ao_coreaudio_utils.h b/audio/out/ao_coreaudio_utils.h
+index c199bb70a8f1..d11506c059b5 100644
+--- a/audio/out/ao_coreaudio_utils.h
++++ b/audio/out/ao_coreaudio_utils.h
+@@ -29,11 +29,6 @@
+ #include "internal.h"
+ #include "osdep/utils-mac.h"
+ 
+-#if HAVE_AVFOUNDATION
+-#undef HAVE_COREAUDIO
+-#define HAVE_COREAUDIO 1
+-#endif
+-
+ bool check_ca_st(struct ao *ao, int level, OSStatus code, const char *message);
+ 
+ #define CHECK_CA_ERROR_L(label, message) \
+@@ -52,7 +47,7 @@ bool check_ca_st(struct ao *ao, int level, OSStatus code, const char *message);
+     } while (0)
+ 
+ void ca_get_device_list(struct ao *ao, struct ao_device_list *list);
+-#if HAVE_COREAUDIO
++#if HAVE_COREAUDIO || HAVE_AVFOUNDATION
+ OSStatus ca_select_device(struct ao *ao, char* name, AudioDeviceID *device);
+ #endif
+ 
+@@ -70,7 +65,7 @@ bool ca_asbd_is_better(AudioStreamBasicDescription *req,
+ int64_t ca_frames_to_ns(struct ao *ao, uint32_t frames);
+ int64_t ca_get_latency(const AudioTimeStamp *ts);
+ 
+-#if HAVE_COREAUDIO
++#if HAVE_COREAUDIO || HAVE_AVFOUNDATION
+ bool ca_stream_supports_compressed(struct ao *ao, AudioStreamID stream);
+ OSStatus ca_lock_device(AudioDeviceID device, pid_t *pid);
+ OSStatus ca_unlock_device(AudioDeviceID device, pid_t *pid);

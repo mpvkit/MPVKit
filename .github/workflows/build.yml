@@ -1,0 +1,55 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: true
+        default: '7.349.0'
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: macos-14
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        brew install autoconf
+        brew install automake
+        brew install libtool
+        brew install meson
+        brew install ninja
+
+    - name: Build
+      run: |
+        make build version=${{ github.event.inputs.version }}
+    
+    - name: Update Package.swift
+      run: |
+        rm -rf ./Package.swift
+        cp -f ./dist/release/Package.swift ./Package.swift
+
+    - name: Push Package.swift
+      uses: EndBug/add-and-commit@v9
+      with:
+        default_author: github_actions
+        add: |
+          - Package.swift
+          - Sources
+        message: "chore: release version ${{ github.event.inputs.version }}"
+        push: "origin HEAD:${{ github.ref_name }}"
+        
+    - name: Upload binary to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: ${{ github.event.inputs.version }}
+        tag_name: ${{ github.event.inputs.version }}
+        files: |
+          ./dist/release/*.txt
+          ./dist/release/*.zip
+        prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
+        fail_on_unmatched_files: true
