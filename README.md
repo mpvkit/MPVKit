@@ -39,8 +39,8 @@ make help
 ## Run default mpv player
 
 ```bash
-swift run mpv --input-commands='script-message display-stats-toggle' [url]
-swift run mpv --list-options
+./player.sh --input-commands='script-message display-stats-toggle' [url]
+./player.sh --list-options
 ```
 
 > Use <kbd>Shift</kbd>+<kbd>i</kbd> to show stats overlay

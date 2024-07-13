@@ -162,6 +162,11 @@ enum Library: String, CaseIterable {
                     checksum: ""
                 ),
                 .target(
+                    name: "Libavfilter",
+                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavfilter.xcframework.zip",
+                    checksum: ""
+                ),
+                .target(
                     name: "Libavutil",
                     url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavutil.xcframework.zip",
                     checksum: ""
@@ -465,6 +470,19 @@ private class BuildMPV: BaseBuild {
             }
         }
         return array
+    }
+
+    override func buildALL() throws {
+        try super.buildALL()
+
+        // copy headers
+        let firstPlatform = getFirstSuccessPlatform()
+        let firstArch = architectures(firstPlatform).first!
+        let includePath = thinDir(platform: firstPlatform, arch: firstArch) + ["include"]
+        let destIncludePath = URL.currentDirectory + "../Sources/MPVKit/include"
+        print("Copy headers to path: \(destIncludePath.path)")
+        try? FileManager.default.removeItem(at: destIncludePath)
+        try FileManager.default.copyItem(at: includePath, to: destIncludePath)
     }
 
 }
@@ -832,6 +850,19 @@ private class BuildFFMPEG: BaseBuild {
         "--enable-filter=hflip_vulkan", "--enable-filter=nlmeans_vulkan", "--enable-filter=overlay_vulkan",
         "--enable-filter=vflip_vulkan", "--enable-filter=xfade_vulkan",
     ]
+
+    override func buildALL() throws {
+        try super.buildALL()
+
+        // copy headers
+        let firstPlatform = getFirstSuccessPlatform()
+        let firstArch = architectures(firstPlatform).first!
+        let includePath = thinDir(platform: firstPlatform, arch: firstArch) + ["include"]
+        let destIncludePath = URL.currentDirectory + "../Sources/FFmpegKit/include"
+        print("Copy headers to path: \(destIncludePath.path)")
+        try? FileManager.default.removeItem(at: destIncludePath)
+        try FileManager.default.copyItem(at: includePath, to: destIncludePath)
+    }
 }
 
 private class BuildPlacebo: ZipBaseBuild {

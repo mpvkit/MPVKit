@@ -671,6 +671,10 @@ class BaseBuild {
             }
         }
 
+        if dependencyTargetContent.isEmpty {
+            return
+        }
+
         if let data = FileManager.default.contents(atPath: packageFile.path), var str = String(data: data, encoding: .utf8) {
             let placeholderChars = "//DEPENDENCY_TARGETS_END//"
             str = str.replacingOccurrences(of: 
