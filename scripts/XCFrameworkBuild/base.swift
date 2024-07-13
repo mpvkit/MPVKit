@@ -634,6 +634,7 @@ class BaseBuild {
         let packageFile = releaseDirPath + "Package.swift"
 
         if !FileManager.default.fileExists(atPath: packageFile.path) {
+            try? FileManager.default.createDirectory(at: releaseDirPath, withIntermediateDirectories: true, attributes: nil)
             try? FileManager.default.copyItem(at: template, to: packageFile)
         }
 
@@ -661,6 +662,9 @@ class BaseBuild {
         } else {
             for target in library.targets {
                 let checksumFile = releaseDirPath + [target.name + ".xcframework.checksum.txt"]
+                if !FileManager.default.fileExists(atPath: checksumFile.path) {
+                    continue
+                }
                 let checksum = try String(contentsOf: checksumFile, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
                 dependencyTargetContent += """
 
