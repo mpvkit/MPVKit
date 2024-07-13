@@ -190,7 +190,7 @@ enum Library: String, CaseIterable {
                     checksum: "https://github.com/mpvkit/openssl-build/releases/download/\(self.version)/Libcrypto.xcframework.checksum.txt"
                 ),
                 .target(
-                    name: "Libcrypto",
+                    name: "Libssl",
                     url: "https://github.com/mpvkit/openssl-build/releases/download/\(self.version)/Libssl.xcframework.zip",
                     checksum: "https://github.com/mpvkit/openssl-build/releases/download/\(self.version)/Libssl.xcframework.checksum.txt"
                 ),
