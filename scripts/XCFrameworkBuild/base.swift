@@ -647,6 +647,7 @@ class BaseBuild {
                 try! Utility.launch(path: "wget", arguments: ["-q", "-O", tmpChecksum.path, target.checksum], currentDirectoryURL: FileManager.default.temporaryDirectory)
                 let checksum = try String(contentsOf: tmpChecksum, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
                 dependencyTargetContent += """
+                
                         .binaryTarget(
                             name: "\(target.name)",
                             url: "\(target.url)",
@@ -660,6 +661,7 @@ class BaseBuild {
                 let checksumFile = releaseDirPath + [target.name + ".xcframework.checksum.txt"]
                 let checksum = try String(contentsOf: checksumFile, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
                 dependencyTargetContent += """
+
                         .binaryTarget(
                             name: "\(target.name)",
                             url: "\(target.url)",
