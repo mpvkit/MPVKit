@@ -29,7 +29,7 @@ https://github.com/mpvkit/MPVKit.git
 ```bash
 make build
 # or specified platforms 
-make build platforms=ios,macos
+make build platform=ios,macos
 # or build LGPL version
 make build disable-gpl
 # or see help
@@ -39,8 +39,8 @@ make help
 ## Run default mpv player
 
 ```bash
-./player.sh --input-commands='script-message display-stats-toggle' [url]
-./player.sh --list-options
+./play.sh --input-commands='script-message display-stats-toggle' [url]
+./play.sh --list-options
 ```
 
 > Use <kbd>Shift</kbd>+<kbd>i</kbd> to show stats overlay
