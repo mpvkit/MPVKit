@@ -41,6 +41,8 @@ jobs:
     - name: Build LGPL version
       run: |
         make build platform=tvos version=${{ github.event.inputs.version }}
+        cp ./gpl/release/*.xcframework.zip ./dist/release/
+        cp ./gpl/release/*.xcframework.checksum.txt ./dist/release/
     
     - name: Update Package.swift
       run: |
@@ -48,37 +50,37 @@ jobs:
         cp -f ./dist/release/Package.swift ./Package.swift
 
         Libmpv-GPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libmpv-GPL.xcframework.zip"
-        Libmpv-GPL_checksum=$(cat ./gpl/release/Libmpv-GPL.xcframework.checksum.txt)
+        Libmpv-GPL_checksum=$(cat ./dist/release/Libmpv-GPL.xcframework.checksum.txt)
         sed -i '' "s#\\\(Libmpv-GPL_url)#${Libmpv-GPL_url}#g" ./Package.swift
         sed -i '' "s#\\\(Libmpv-GPL_checksum)#${Libmpv-GPL_checksum}#g" ./Package.swift
 
         Libavcodec-GPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libavcodec-GPL.xcframework.zip"
-        Libavcodec-GPL_checksum=$(cat ./gpl/release/Libavcodec-GPL.xcframework.checksum.txt)
+        Libavcodec-GPL_checksum=$(cat ./dist/release/Libavcodec-GPL.xcframework.checksum.txt)
         sed -i '' "s#\\\(Libavcodec-GPL_url)#${Libavcodec-GPL_url}#g" ./Package.swift
         sed -i '' "s#\\\(Libavcodec-GPL_checksum)#${Libavcodec-GPL_checksum}#g" ./Package.swift
 
         Libavformat-GPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libavformat-GPL.xcframework.zip"
-        Libavformat-GPL_checksum=$(cat ./gpl/release/Libavformat-GPL.xcframework.checksum.txt)
+        Libavformat-GPL_checksum=$(cat ./dist/release/Libavformat-GPL.xcframework.checksum.txt)
         sed -i '' "s#\\\(Libavformat-GPL_url)#${Libavformat-GPL_url}#g" ./Package.swift
         sed -i '' "s#\\\(Libavformat-GPL_checksum)#${Libavformat-GPL_checksum}#g" ./Package.swift
 
         Libavfilter-GPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libavfilter-GPL.xcframework.zip"
-        Libavfilter-GPL_checksum=$(cat ./gpl/release/Libavfilter-GPL.xcframework.checksum.txt)
+        Libavfilter-GPL_checksum=$(cat ./dist/release/Libavfilter-GPL.xcframework.checksum.txt)
         sed -i '' "s#\\\(Libavfilter-GPL_url)#${Libavfilter-GPL_url}#g" ./Package.swift
         sed -i '' "s#\\\(Libavfilter-GPL_checksum)#${Libavfilter-GPL_checksum}#g" ./Package.swift
 
         Libavutil-GPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libavutil-GPL.xcframework.zip"
-        Libavutil-GPL_checksum=$(cat ./gpl/release/Libavutil-GPL.xcframework.checksum.txt)
+        Libavutil-GPL_checksum=$(cat ./dist/release/Libavutil-GPL.xcframework.checksum.txt)
         sed -i '' "s#\\\(Libavutil-GPL_url)#${Libavutil-GPL_url}#g" ./Package.swift
         sed -i '' "s#\\\(Libavutil-GPL_checksum)#${Libavutil-GPL_checksum}#g" ./Package.swift
 
         Libswresample-GPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libswresample-GPL.xcframework.zip"
-        Libswresample-GPL_checksum=$(cat ./gpl/release/Libswresample-GPL.xcframework.checksum.txt)
+        Libswresample-GPL_checksum=$(cat ./dist/release/Libswresample-GPL.xcframework.checksum.txt)
         sed -i '' "s#\\\(Libswresample-GPL_url)#${Libswresample-GPL_url}#g" ./Package.swift
         sed -i '' "s#\\\(Libswresample-GPL_checksum)#${Libswresample-GPL_checksum}#g" ./Package.swift
 
         Libswscale-GPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libswscale-GPL.xcframework.zip"
-        Libswscale-GPL_checksum=$(cat ./gpl/release/Libswscale-GPL.xcframework.checksum.txt)
+        Libswscale-GPL_checksum=$(cat ./dist/release/Libswscale-GPL.xcframework.checksum.txt)
         sed -i '' "s#\\\(Libswscale-GPL_url)#${Libswscale-GPL_url}#g" ./Package.swift
         sed -i '' "s#\\\(Libswscale-GPL_checksum)#${Libswscale-GPL_checksum}#g" ./Package.swift
 
