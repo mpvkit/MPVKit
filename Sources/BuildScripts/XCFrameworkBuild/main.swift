@@ -148,11 +148,6 @@ enum Library: String, CaseIterable {
                     url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libmpv.xcframework.zip",
                     checksum: ""
                 ),
-                .target(
-                    name: "Libmpv-GPL",
-                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libmpv-GPL.xcframework.zip",
-                    checksum: ""
-                ),
             ]
         case .FFmpeg:
             return  [
@@ -162,18 +157,8 @@ enum Library: String, CaseIterable {
                     checksum: ""
                 ),
                 .target(
-                    name: "Libavcodec-GPL",
-                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavcodec-GPL.xcframework.zip",
-                    checksum: ""
-                ),
-                .target(
                     name: "Libavformat",
                     url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavformat.xcframework.zip",
-                    checksum: ""
-                ),
-                .target(
-                    name: "Libavformat-GPL",
-                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavformat-GPL.xcframework.zip",
                     checksum: ""
                 ),
                 .target(
@@ -182,18 +167,8 @@ enum Library: String, CaseIterable {
                     checksum: ""
                 ),
                 .target(
-                    name: "Libavfilter-GPL",
-                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavfilter-GPL.xcframework.zip",
-                    checksum: ""
-                ),
-                .target(
                     name: "Libavutil",
                     url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavutil.xcframework.zip",
-                    checksum: ""
-                ),
-                .target(
-                    name: "Libavutil-GPL",
-                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavutil-GPL.xcframework.zip",
                     checksum: ""
                 ),
                 .target(
@@ -202,18 +177,8 @@ enum Library: String, CaseIterable {
                     checksum: ""
                 ),
                 .target(
-                    name: "Libswresample-GPL",
-                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libswresample-GPL.xcframework.zip",
-                    checksum: ""
-                ),
-                .target(
                     name: "Libswscale",
                     url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libswscale.xcframework.zip",
-                    checksum: ""
-                ),
-                .target(
-                    name: "Libswscale-GPL",
-                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libswscale-GPL.xcframework.zip",
                     checksum: ""
                 ),
             ]

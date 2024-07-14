@@ -349,6 +349,10 @@ class BaseBuild {
     }
 
     private func buildXCFramework(name: String, paths: [String]) throws {
+        if paths.isEmpty {
+            return
+        }
+        
         var arguments = ["-create-xcframework"]
         for frameworkPath in paths {
             arguments.append("-framework")
