@@ -38,16 +38,26 @@ jobs:
         rename 's/\.xcframework\.zip/-GPL\.xcframework\.zip/' *.xcframework.zip
         rename 's/\.xcframework\.checksum\.txt/-GPL\.xcframework\.checksum\.txt/' *.xcframework.checksum.txt
 
+    - name: Print
+      run: ls -al ./gpl/release/
+    
+
     - name: Build LGPL version
       run: |
         make build platform=tvos version=${{ github.event.inputs.version }}
         cp ./gpl/release/*.xcframework.zip ./dist/release/
         cp ./gpl/release/*.xcframework.checksum.txt ./dist/release/
+
+    - name: Print
+      run: ls -al ./dist/release/
+    
     
     - name: Update Package.swift
       run: |
         rm -rf ./Package.swift
         cp -f ./dist/release/Package.swift ./Package.swift
+
+        cat ./Package.swift
 
         Libmpv-GPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libmpv-GPL.xcframework.zip"
         Libmpv-GPL_checksum=$(cat ./dist/release/Libmpv-GPL.xcframework.checksum.txt)
