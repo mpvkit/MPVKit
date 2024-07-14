@@ -470,6 +470,8 @@ private class BuildMPV: BaseBuild {
             if platform == .maccatalyst {
                 array.append("-Dcocoa=disabled")
                 array.append("-Dcoreaudio=disabled")
+            } else if platform == .xros || platform == .xrsimulator {
+                array.append("-Dios-gl=disabled")
             } else {
                 array.append("-Dios-gl=enabled")
             }
