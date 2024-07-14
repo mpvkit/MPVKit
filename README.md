@@ -30,8 +30,8 @@ https://github.com/mpvkit/MPVKit.git
 make build
 # or specified platforms 
 make build platform=ios,macos
-# or build LGPL version
-make build disable-gpl
+# or build GPL version
+make build enable-gpl
 # or see help
 make help
 ```
