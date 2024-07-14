@@ -340,9 +340,7 @@ class BaseBuild {
                             frameworkPaths.append(frameworkPath)
                         }
                     }
-                    if !frameworkPaths.isEmpty {
-                        try buildXCFramework(name: "\(framework)-\(group)", paths: frameworkPaths)
-                    }
+                    try buildXCFramework(name: "\(framework)-\(group)", paths: frameworkPaths)
                 }
             }
         }
@@ -352,7 +350,7 @@ class BaseBuild {
         if paths.isEmpty {
             return
         }
-        
+
         var arguments = ["-create-xcframework"]
         for frameworkPath in paths {
             arguments.append("-framework")
@@ -368,6 +366,10 @@ class BaseBuild {
     }
 
     func createFramework(framework: String, platform: PlatformType) throws -> String? {
+        let platformDir = URL.currentDirectory + [library.rawValue, platform.rawValue]
+        if !FileManager.default.fileExists(atPath: platformDir.path) {
+            return nil
+        }
         let frameworkDir = URL.currentDirectory + [library.rawValue, platform.rawValue, "\(framework).framework"]
         if !platforms().contains(platform) {
             if FileManager.default.fileExists(atPath: frameworkDir.path) {
@@ -553,7 +555,7 @@ class BaseBuild {
         }
 
         // copy includes
-        let firstPlatform = getFirstSuccessPlatform()
+        guard let firstPlatform = getFirstSuccessPlatform() else { return }
         let firstArch = architectures(firstPlatform).first!
         let includePath = thinDir(platform: firstPlatform, arch: firstArch) + ["include"]
         let destIncludePath = releaseDirPath + [library.rawValue, "include"]
@@ -700,7 +702,7 @@ class BaseBuild {
         }
     }
 
-    func getFirstSuccessPlatform() -> PlatformType {
+    func getFirstSuccessPlatform() -> PlatformType? {
         for platform in BaseBuild.platforms {
             let firstArch = architectures(platform).first!
             let thinPath = thinDir(platform: platform, arch: firstArch)
@@ -709,7 +711,7 @@ class BaseBuild {
             }
         }
 
-        return BaseBuild.platforms.first!
+        return nil
     }
 }
 
