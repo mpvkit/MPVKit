@@ -665,64 +665,6 @@ private class BuildFFMPEG: BaseBuild {
     }
 
 
-    private func makeFFmpegSourece() throws {
-        guard let platform = BaseBuild.platforms.first, let arch = architectures(platform).first else {
-            return
-        }
-        let target = URL.currentDirectory + ["../Sources", "FFmpeg"]
-        try? FileManager.default.removeItem(at: target)
-        try? FileManager.default.createDirectory(at: target, withIntermediateDirectories: true, attributes: nil)
-        let thin = thinDir(platform: platform, arch: arch)
-        try? FileManager.default.copyItem(at: thin + "include", to: target + "include")
-        let scratchURL = scratch(platform: platform, arch: arch)
-        try? FileManager.default.createDirectory(at: target + "include", withIntermediateDirectories: true, attributes: nil)
-        try? FileManager.default.copyItem(at: scratchURL + "config.h", to: target + "include" + "config.h")
-        let fileNames = try FileManager.default.contentsOfDirectory(atPath: scratchURL.path)
-        for fileName in fileNames where fileName.hasPrefix("lib") {
-            var url = scratchURL + fileName
-            var isDir: ObjCBool = false
-            if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue {
-                // copy .c
-                if let subpaths = FileManager.default.enumerator(atPath: url.path) {
-                    let dstDir = target + fileName
-                    while let subpath = subpaths.nextObject() as? String {
-                        if subpath.hasSuffix(".c") {
-                            let srcURL = url + subpath
-                            let dstURL = target + "include" + fileName + subpath
-                            try? FileManager.default.copyItem(at: srcURL, to: dstURL)
-                        } else if subpath.hasSuffix(".o") {
-                            let subpath = subpath.replacingOccurrences(of: ".o", with: ".c")
-                            let srcURL = scratchURL + "src" + fileName + subpath
-                            let dstURL = dstDir + subpath
-                            let dstURLDir = dstURL.deletingLastPathComponent()
-                            if !FileManager.default.fileExists(atPath: dstURLDir.path) {
-                                try? FileManager.default.createDirectory(at: dstURLDir, withIntermediateDirectories: true, attributes: nil)
-                            }
-                            try? FileManager.default.copyItem(at: srcURL, to: dstURL)
-                        }
-                    }
-                }
-                url = scratchURL + "src" + fileName
-                // copy .h
-                try? FileManager.default.copyItem(at: scratchURL + "src" + "compat", to: target + "compat")
-                if let subpaths = FileManager.default.enumerator(atPath: url.path) {
-                    let dstDir = target + "include" + fileName
-                    while let subpath = subpaths.nextObject() as? String {
-                        if subpath.hasSuffix(".h") || subpath.hasSuffix("_template.c") {
-                            let srcURL = url + subpath
-                            let dstURL = dstDir + subpath
-                            let dstURLDir = dstURL.deletingLastPathComponent()
-                            if !FileManager.default.fileExists(atPath: dstURLDir.path) {
-                                try? FileManager.default.createDirectory(at: dstURLDir, withIntermediateDirectories: true, attributes: nil)
-                            }
-                            try? FileManager.default.copyItem(at: srcURL, to: dstURL)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     override func frameworkExcludeHeaders(_ framework: String) -> [String] {
         if framework == "Libavcodec" {
             return ["xvmc", "vdpau", "qsv", "dxva2", "d3d11va"]

@@ -1136,6 +1136,13 @@ enum Utility {
                     if let content = String(data: try Data(contentsOf: logURL), encoding: .utf8) {
                         print(content)
                     }
+                    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+                    let configLog = URL(string: "/Users/runner/work/MPVKit/MPVKit/dist/FFmpeg/xros/scratch/arm64.log")!
+                    if FileManager.default.fileExists(atPath: configLog.path) {
+                        if let content = String(data: try Data(contentsOf: configLog), encoding: .utf8) {
+                            print(content)
+                        }
+                    }
                 }
                 print("please view log file for detail: \(logURL)\n")
             }
