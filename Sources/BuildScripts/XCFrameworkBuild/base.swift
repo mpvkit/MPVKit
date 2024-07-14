@@ -1137,7 +1137,7 @@ enum Utility {
                         print(content)
                     }
                     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-                    let configLog = URL(string: "/Users/runner/work/MPVKit/MPVKit/dist/FFmpeg/xros/scratch/arm64.log")!
+                    let configLog = URL(string: "/Users/runner/work/MPVKit/MPVKit/dist/FFmpeg/xros/scratch/arm64/ffbuild/config.log")!
                     if FileManager.default.fileExists(atPath: configLog.path) {
                         if let content = String(data: try Data(contentsOf: configLog), encoding: .utf8) {
                             print(content)
