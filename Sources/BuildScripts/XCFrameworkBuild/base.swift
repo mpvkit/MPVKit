@@ -1142,6 +1142,7 @@ enum Utility {
                         print("###################")
                         if let content = try? String(contentsOfFile: configLog.path, encoding: .utf8) {
                             print(content)
+                            print("###################")
                         }
                     }
                 }
