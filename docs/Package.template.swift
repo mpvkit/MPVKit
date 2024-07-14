@@ -8,24 +8,25 @@ let package = Package(
     products: [
         .library(
             name: "MPVKit",
-            targets: ["MPVKit"]
+            targets: ["_MPVKit"]
         ),
     ],
     targets: [
         .target(
-            name: "MPVKit",
+            name: "_MPVKit",
             dependencies: [
-                "FFmpegKit", "Libuchardet", "Libmpv",
+                "_FFmpegKit", "Libuchardet", "Libmpv",
                 .target(name: "Libbluray", condition: .when(platforms: [.macOS, .macCatalyst])),
                 .target(name: "Libluajit", condition: .when(platforms: [.macOS])),
             ],
             linkerSettings: [
                 .linkedFramework("AVFoundation"),
                 .linkedFramework("CoreAudio"),
-            ]
+            ],
+            path: "Sources/_MPVKit"
         ),
         .target(
-            name: "FFmpegKit",
+            name: "_FFmpegKit",
             dependencies: [
                 "Libavcodec", "Libavfilter", "Libavformat", "Libavutil", "Libswresample", "Libswscale",
                 "Libass", "Libfreetype", "Libfribidi", "Libharfbuzz",
@@ -46,9 +47,10 @@ let package = Package(
                 .linkedLibrary("xml2"),
                 .linkedLibrary("z"),
                 .linkedLibrary("c++"),
-            ]
+            ],
+            path: "Sources/_FFmpegKit"
         ),
-        //DEPENDENCY_TARGETS_BEGIN//
-        //DEPENDENCY_TARGETS_END//
+        //AUTO_GENERATE_TARGETS_BEGIN//
+        //AUTO_GENERATE_TARGETS_END//
     ]
 )
