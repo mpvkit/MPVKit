@@ -477,19 +477,6 @@ private class BuildMPV: BaseBuild {
         return array
     }
 
-    override func buildALL() throws {
-        try super.buildALL()
-
-        // copy headers
-        let firstPlatform = getFirstSuccessPlatform()
-        let firstArch = architectures(firstPlatform).first!
-        let includePath = thinDir(platform: firstPlatform, arch: firstArch) + ["include"]
-        let destIncludePath = URL.currentDirectory + "../Sources/MPVKit/include"
-        print("Copy headers to path: \(destIncludePath.path)")
-        try? FileManager.default.removeItem(at: destIncludePath)
-        try FileManager.default.copyItem(at: includePath, to: destIncludePath)
-    }
-
 }
 
 
@@ -856,18 +843,6 @@ private class BuildFFMPEG: BaseBuild {
         "--enable-filter=vflip_vulkan", "--enable-filter=xfade_vulkan",
     ]
 
-    override func buildALL() throws {
-        try super.buildALL()
-
-        // copy headers
-        let firstPlatform = getFirstSuccessPlatform()
-        let firstArch = architectures(firstPlatform).first!
-        let includePath = thinDir(platform: firstPlatform, arch: firstArch) + ["include"]
-        let destIncludePath = URL.currentDirectory + "../Sources/FFmpegKit/include"
-        print("Copy headers to path: \(destIncludePath.path)")
-        try? FileManager.default.removeItem(at: destIncludePath)
-        try FileManager.default.copyItem(at: includePath, to: destIncludePath)
-    }
 }
 
 private class BuildPlacebo: ZipBaseBuild {
