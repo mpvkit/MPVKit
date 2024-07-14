@@ -30,23 +30,23 @@ jobs:
         sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
         xcodebuild -showsdks
 
-    #- name: Build GPL version
-    # run: |
-    #    make build enable-gpl platform=tvos version=${{ github.event.inputs.version }}
-     #   mv ./dist ./gpl
-     #   cd ./gpl/release
-    #    rename 's/\.xcframework\.zip/-GPL\.xcframework\.zip/' *.xcframework.zip
-     #   rename 's/\.xcframework\.checksum\.txt/-GPL\.xcframework\.checksum\.txt/' *.xcframework.checksum.txt
+    - name: Build GPL version
+      run: |
+         make build enable-gpl version=${{ github.event.inputs.version }}
+         mv ./dist ./gpl
+         cd ./gpl/release
+         rename 's/\.xcframework\.zip/-GPL\.xcframework\.zip/' *.xcframework.zip
+         rename 's/\.xcframework\.checksum\.txt/-GPL\.xcframework\.checksum\.txt/' *.xcframework.checksum.txt
 
-    #- name: Print
-     # run: ls -al ./gpl/release/
+    - name: Print
+      run: ls -al ./gpl/release/
     
 
     - name: Build LGPL version
       run: |
-        make build platform=xros version=${{ github.event.inputs.version }}
-        #cp ./gpl/release/*.xcframework.zip ./dist/release/
-        #cp ./gpl/release/*.xcframework.checksum.txt ./dist/release/
+        make build version=${{ github.event.inputs.version }}
+        cp ./gpl/release/*.xcframework.zip ./dist/release/
+        cp ./gpl/release/*.xcframework.checksum.txt ./dist/release/
 
     - name: Print
       run: ls -al ./dist/release/
