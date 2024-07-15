@@ -3,7 +3,7 @@ name: Check new version
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 1 * *'
+    - cron: '0 0 * * 1'
 
 jobs:
   build:
@@ -63,10 +63,10 @@ jobs:
             with open(file_path, 'r', encoding='utf-8') as file:
               content = file.read()
             mpvOldVersion = re.search(r'(case .libmpv[^"]+?)"(.+?)"', content).group(2)
-            print(mpvOldVersion)
+            print("mpv old version:", mpvOldVersion)
             mpvNewVersion = '${{ env.MPV_LATEST_VERSION }}'
             ffmpegOldVersion = re.search(r'(case .FFmpeg[^"]+?)"(.+?)"', content).group(2)
-            print(ffmpegOldVersion)
+            print("ffmpeg old version:", ffmpegOldVersion)
             ffmpegNewVersion = '${{ env.FFMPEG_LATEST_VERSION }}'
             if parse_version(mpvNewVersion) > parse_version(mpvOldVersion):
               content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"${{ env.MPV_LATEST_VERSION }}"', content, count=1)
