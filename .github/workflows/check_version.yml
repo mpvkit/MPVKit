@@ -18,6 +18,7 @@ jobs:
         with:
           repository: "mpv-player/mpv"
           path: 'ffmpeg'
+          fetch-depth: 0
           fetch-tags: true
 
       - name: Checkout mpv
@@ -25,13 +26,14 @@ jobs:
         with:
           repository: "FFmpeg/FFmpeg"
           path: 'mpv'
+          fetch-depth: 0
           fetch-tags: true
 
       - name: check
-        run: cd ./ffmpeg && git tag
+        run: cd ./ffmpeg && echo $(git tag)
 
       - name: check
-        run: cd ./mpv && git tag
+        run: cd ./mpv && echo $(git tag)
 
       - name: Get latest verion
         id: version
