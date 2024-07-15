@@ -19,7 +19,6 @@ jobs:
         with:
           repository: "FFmpeg/FFmpeg"
           path: 'ffmpeg'
-          ref: 'release/7.0'
           fetch-depth: 0
 
       - name: Checkout mpv
@@ -33,15 +32,15 @@ jobs:
         id: version
         run: |
           cd ./ffmpeg
-          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1 release/7.0`)
           echo "ffmpeg latest tag: $latest_tag"
-          echo "::set-output name=ffmpeg::$latest_tag"
+          echo "FFMPEG_LATEST_VERSION=$latest_tag" >> $GITHUB_ENV
           cd ..
 
           cd ./mpv
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "mpv latest tag: $latest_tag"
-          echo "::set-output name=mpv::$latest_tag"
+          echo "MPV_LATEST_VERSION=$latest_tag" >> $GITHUB_ENV
           cd ..
 
           rm -rf ./ffmpeg
@@ -56,16 +55,16 @@ jobs:
             file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
             with open(file_path, 'r', encoding='utf-8') as file:
               content = file.read()
-            content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"${{ steps.version.outputs.mpv }}"', content, count=1)
-            content = re.sub(r'(case .FFmpeg[^"]+?)"(.+?)"', r'\1"${{ steps.version.outputs.ffmpeg }}"', content, count=1)
+            content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"$MPV_LATEST_VERSION"', content, count=1)
+            content = re.sub(r'(case .FFmpeg[^"]+?)"(.+?)"', r'\1"$FFMPEG_LATEST_VERSION"', content, count=1)
             with open(file_path, 'w', encoding='utf-8') as file:
               file.write(content)
 
             file_path = './README.md'
             with open(file_path, 'r', encoding='utf-8') as file:
               content = file.read()
-            content = re.sub(r'mpv-.*-blue', r'mpv-${{ steps.version.outputs.mpv }}-blue', content, count=1)
-            content = re.sub(r'ffmpeg-.*-blue', r'ffmpeg-${{ steps.version.outputs.ffmpeg }}-blue', content, count=1)
+            content = re.sub(r'mpv-.*-blue', r'mpv-$MPV_LATEST_VERSION-blue', content, count=1)
+            content = re.sub(r'ffmpeg-.*-blue', r'ffmpeg-$FFMPEG_LATEST_VERSION-blue', content, count=1)
             with open(file_path, 'w', encoding='utf-8') as file:
               file.write(content)
 
