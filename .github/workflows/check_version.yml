@@ -19,6 +19,7 @@ jobs:
         with:
           repository: "FFmpeg/FFmpeg"
           path: 'ffmpeg'
+          ref: 'release/7.0'
           fetch-depth: 0
 
       - name: Checkout mpv
@@ -46,16 +47,28 @@ jobs:
           rm -rf ./ffmpeg
           rm -rf ./mpv
 
-
       - name: update to new version
-        run: |
-          sed -i '' '/case .libmpv:/,/case/s/\(return "\)[^"]*\("\)/\1${{ steps.version.outputs.mpv }}\2/' ./Sources/BuildScripts/XCFrameworkBuild/main.swift
-          sed -i '' '/case .FFmpeg:/,/case/s/\(return "\)[^"]*\("\)/\1${{ steps.version.outputs.ffmpeg }}\2/' ./Sources/BuildScripts/XCFrameworkBuild/main.swift
-          sed -i '' 's/mpv-.*-blue/mpv-${{ steps.version.outputs.mpv }}-blue/' ./README.md
-          sed -i '' 's/ffmpeg-.*-blue/ffmpeg-${{ steps.version.outputs.ffmpeg }}-blue/' ./README.md
+        uses: jannekem/run-python-script-action@v1
+        with:
+          fail-on-error: false
+          script: |
+            import re
+            file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
+            with open(file_path, 'r', encoding='utf-8') as file:
+              content = file.read()
+            content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"${{ steps.version.outputs.mpv }}"', content, count=1)
+            content = re.sub(r'(case .FFmpeg[^"]+?)"(.+?)"', r'\1"${{ steps.version.outputs.ffmpeg }}"', content, count=1)
+            with open(file_path, 'w', encoding='utf-8') as file:
+              file.write(content)
 
-      - name: Uncommitted change
-        run: date +%s > ./report.txt
+            file_path = './README.md'
+            with open(file_path, 'r', encoding='utf-8') as file:
+              content = file.read()
+            content = re.sub(r'mpv-.*-blue', r'mpv-${{ steps.version.outputs.mpv }}-blue', content, count=1)
+            content = re.sub(r'ffmpeg-.*-blue', r'ffmpeg-${{ steps.version.outputs.ffmpeg }}-blue', content, count=1)
+            with open(file_path, 'w', encoding='utf-8') as file:
+              file.write(content)
+
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
@@ -63,4 +76,3 @@ jobs:
           add-paths: |
             ./Sources/BuildScripts/XCFrameworkBuild/main.swift
             ./README.md
-            ./report.txt
