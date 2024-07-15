@@ -382,6 +382,7 @@ private class BuildMPV: BaseBuild {
     override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
         var array = [
             "-Dlibmpv=true",
+            "-Dgl=enabled",
             "-Dplain-gl=enabled",
             "-Diconv=enabled",
             "-Duchardet=enabled",
@@ -395,7 +396,9 @@ private class BuildMPV: BaseBuild {
             "-Drubberband=disabled",
         ]
         if BaseBuild.options.enableGPL {
-            array.append("-Dgl=enabled")
+            array.append("-Dgpl=true")
+        } else {
+            array.append("-Dgpl=false")
         }
         let blurayLibPath = URL.currentDirectory + [Library.libbluray.rawValue, platform.rawValue, "thin", arch.rawValue]
         if FileManager.default.fileExists(atPath: blurayLibPath.path) {

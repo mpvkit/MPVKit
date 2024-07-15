@@ -6,7 +6,7 @@
 
 > MPVKit is only suitable for learning `libmpv` and will not be maintained too frequently.
 
-`MPVKit` is a collection of tools to use `mpv` in `iOS`, `macOS`, `tvOS` applications.
+`MPVKit` is a collection of tools to use `mpv` in `iOS`, `macOS`, `tvOS`, `visionOS` applications.
 
 It includes scripts to build `mpv` native libraries.
 
@@ -23,6 +23,14 @@ Metal support only a patch version ([#7857](https://github.com/mpv-player/mpv/pu
 ```
 https://github.com/mpvkit/MPVKit.git
 ```
+
+### Choose which version
+
+| Version | License | Note |
+|---|---|---|
+| MPVKit | LGPL | [FFmpeg details](https://github.com/FFmpeg/FFmpeg/blob/master/LICENSE.md) , [mpv details](https://github.com/mpv-player/mpv/blob/master/Copyright) |
+| MPVKit-GPL | GPL | Support samba protocol, same as old MPVKit version |
+
 
 ## How to build
 

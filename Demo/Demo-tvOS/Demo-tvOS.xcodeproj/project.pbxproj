@@ -1,0 +1,421 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F4850CAA2BEE59C900ABB79A /* MPVProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4850CA82BEE59C900ABB79A /* MPVProperty.swift */; };
+		F4850CAB2BEE59C900ABB79A /* MPVPlayerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4850CA92BEE59C900ABB79A /* MPVPlayerDelegate.swift */; };
+		F4B91D9D2C45527300DE563F /* MPVKit-GPL in Frameworks */ = {isa = PBXBuildFile; productRef = F4B91D9C2C45527300DE563F /* MPVKit-GPL */; };
+		F4D8D7962BD7553E00246C75 /* MPVMetalPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D8D7952BD7553E00246C75 /* MPVMetalPlayerView.swift */; };
+		F4D8D7982BD7559700246C75 /* MetalLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D8D7972BD7559700246C75 /* MetalLayer.swift */; };
+		F4EB5D162B61E45000486E3F /* Demo_tvOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D152B61E45000486E3F /* Demo_tvOSApp.swift */; };
+		F4EB5D182B61E45000486E3F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D172B61E45000486E3F /* ContentView.swift */; };
+		F4EB5D1A2B61E45200486E3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4EB5D192B61E45200486E3F /* Assets.xcassets */; };
+		F4EB5D1D2B61E45200486E3F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4EB5D1C2B61E45200486E3F /* Preview Assets.xcassets */; };
+		F4EB5D292B61E48A00486E3F /* MPVMetalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D242B61E48A00486E3F /* MPVMetalViewController.swift */; };
+		F4EB5D2A2B61E48A00486E3F /* MPVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D252B61E48A00486E3F /* MPVViewController.swift */; };
+		F4EB5D2C2B61E48A00486E3F /* MPVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D272B61E48A00486E3F /* MPVPlayerView.swift */; };
+		F4EB5D2D2B61E48A00486E3F /* MPVOGLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D282B61E48A00486E3F /* MPVOGLView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F4850CA82BEE59C900ABB79A /* MPVProperty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVProperty.swift; sourceTree = "<group>"; };
+		F4850CA92BEE59C900ABB79A /* MPVPlayerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVPlayerDelegate.swift; sourceTree = "<group>"; };
+		F4D8D7952BD7553E00246C75 /* MPVMetalPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVMetalPlayerView.swift; sourceTree = "<group>"; };
+		F4D8D7972BD7559700246C75 /* MetalLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalLayer.swift; sourceTree = "<group>"; };
+		F4EB5D122B61E45000486E3F /* Demo-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Demo-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4EB5D152B61E45000486E3F /* Demo_tvOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Demo_tvOSApp.swift; sourceTree = "<group>"; };
+		F4EB5D172B61E45000486E3F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F4EB5D192B61E45200486E3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F4EB5D1C2B61E45200486E3F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F4EB5D242B61E48A00486E3F /* MPVMetalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVMetalViewController.swift; sourceTree = "<group>"; };
+		F4EB5D252B61E48A00486E3F /* MPVViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVViewController.swift; sourceTree = "<group>"; };
+		F4EB5D272B61E48A00486E3F /* MPVPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVPlayerView.swift; sourceTree = "<group>"; };
+		F4EB5D282B61E48A00486E3F /* MPVOGLView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVOGLView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F4EB5D0F2B61E45000486E3F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4B91D9D2C45527300DE563F /* MPVKit-GPL in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F4BA11AB2BCCFD9C00B472DE /* OpenGL */ = {
+			isa = PBXGroup;
+			children = (
+				F4EB5D282B61E48A00486E3F /* MPVOGLView.swift */,
+				F4EB5D272B61E48A00486E3F /* MPVPlayerView.swift */,
+				F4EB5D252B61E48A00486E3F /* MPVViewController.swift */,
+			);
+			path = OpenGL;
+			sourceTree = "<group>";
+		};
+		F4BA11AC2BCCFE3A00B472DE /* Metal */ = {
+			isa = PBXGroup;
+			children = (
+				F4D8D7952BD7553E00246C75 /* MPVMetalPlayerView.swift */,
+				F4EB5D242B61E48A00486E3F /* MPVMetalViewController.swift */,
+				F4D8D7972BD7559700246C75 /* MetalLayer.swift */,
+			);
+			path = Metal;
+			sourceTree = "<group>";
+		};
+		F4EB5D092B61E45000486E3F = {
+			isa = PBXGroup;
+			children = (
+				F4EB5D142B61E45000486E3F /* Demo-tvOS */,
+				F4EB5D132B61E45000486E3F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F4EB5D132B61E45000486E3F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F4EB5D122B61E45000486E3F /* Demo-tvOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F4EB5D142B61E45000486E3F /* Demo-tvOS */ = {
+			isa = PBXGroup;
+			children = (
+				F4EB5D232B61E48A00486E3F /* Player */,
+				F4EB5D152B61E45000486E3F /* Demo_tvOSApp.swift */,
+				F4EB5D172B61E45000486E3F /* ContentView.swift */,
+				F4EB5D192B61E45200486E3F /* Assets.xcassets */,
+				F4EB5D1B2B61E45200486E3F /* Preview Content */,
+			);
+			path = "Demo-tvOS";
+			sourceTree = "<group>";
+		};
+		F4EB5D1B2B61E45200486E3F /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				F4EB5D1C2B61E45200486E3F /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		F4EB5D232B61E48A00486E3F /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				F4850CA92BEE59C900ABB79A /* MPVPlayerDelegate.swift */,
+				F4850CA82BEE59C900ABB79A /* MPVProperty.swift */,
+				F4BA11AB2BCCFD9C00B472DE /* OpenGL */,
+				F4BA11AC2BCCFE3A00B472DE /* Metal */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F4EB5D112B61E45000486E3F /* Demo-tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F4EB5D202B61E45200486E3F /* Build configuration list for PBXNativeTarget "Demo-tvOS" */;
+			buildPhases = (
+				F4EB5D0E2B61E45000486E3F /* Sources */,
+				F4EB5D0F2B61E45000486E3F /* Frameworks */,
+				F4EB5D102B61E45000486E3F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Demo-tvOS";
+			packageProductDependencies = (
+				F4B91D9C2C45527300DE563F /* MPVKit-GPL */,
+			);
+			productName = "Demo-tvOS";
+			productReference = F4EB5D122B61E45000486E3F /* Demo-tvOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F4EB5D0A2B61E45000486E3F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					F4EB5D112B61E45000486E3F = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+				};
+			};
+			buildConfigurationList = F4EB5D0D2B61E45000486E3F /* Build configuration list for PBXProject "Demo-tvOS" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F4EB5D092B61E45000486E3F;
+			packageReferences = (
+				F4B91D9B2C45527300DE563F /* XCRemoteSwiftPackageReference "MPVKit" */,
+			);
+			productRefGroup = F4EB5D132B61E45000486E3F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F4EB5D112B61E45000486E3F /* Demo-tvOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F4EB5D102B61E45000486E3F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4EB5D1D2B61E45200486E3F /* Preview Assets.xcassets in Resources */,
+				F4EB5D1A2B61E45200486E3F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F4EB5D0E2B61E45000486E3F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4EB5D2A2B61E48A00486E3F /* MPVViewController.swift in Sources */,
+				F4D8D7962BD7553E00246C75 /* MPVMetalPlayerView.swift in Sources */,
+				F4EB5D292B61E48A00486E3F /* MPVMetalViewController.swift in Sources */,
+				F4D8D7982BD7559700246C75 /* MetalLayer.swift in Sources */,
+				F4EB5D182B61E45000486E3F /* ContentView.swift in Sources */,
+				F4850CAA2BEE59C900ABB79A /* MPVProperty.swift in Sources */,
+				F4EB5D162B61E45000486E3F /* Demo_tvOSApp.swift in Sources */,
+				F4EB5D2D2B61E48A00486E3F /* MPVOGLView.swift in Sources */,
+				F4EB5D2C2B61E48A00486E3F /* MPVPlayerView.swift in Sources */,
+				F4850CAB2BEE59C900ABB79A /* MPVPlayerDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F4EB5D1E2B61E45200486E3F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = appletvos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TVOS_DEPLOYMENT_TARGET = 16.4;
+			};
+			name = Debug;
+		};
+		F4EB5D1F2B61E45200486E3F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = appletvos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				TVOS_DEPLOYMENT_TARGET = 16.4;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F4EB5D212B61E45200486E3F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Demo-tvOS/Preview Content\"";
+				DEVELOPMENT_TEAM = 733599CLJU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mpvkit.Demo-tvOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Debug;
+		};
+		F4EB5D222B61E45200486E3F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Demo-tvOS/Preview Content\"";
+				DEVELOPMENT_TEAM = 733599CLJU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mpvkit.Demo-tvOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F4EB5D0D2B61E45000486E3F /* Build configuration list for PBXProject "Demo-tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4EB5D1E2B61E45200486E3F /* Debug */,
+				F4EB5D1F2B61E45200486E3F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F4EB5D202B61E45200486E3F /* Build configuration list for PBXNativeTarget "Demo-tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4EB5D212B61E45200486E3F /* Debug */,
+				F4EB5D222B61E45200486E3F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F4B91D9B2C45527300DE563F /* XCRemoteSwiftPackageReference "MPVKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mpvkit/MPVKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.38.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F4B91D9C2C45527300DE563F /* MPVKit-GPL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4B91D9B2C45527300DE563F /* XCRemoteSwiftPackageReference "MPVKit" */;
+			productName = "MPVKit-GPL";
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = F4EB5D0A2B61E45000486E3F /* Project object */;
+}
