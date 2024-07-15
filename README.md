@@ -36,7 +36,7 @@ https://github.com/mpvkit/MPVKit.git
 
 ```bash
 make build
-# or specified platforms 
+# or specified platforms (ios,macos,tvos,tvsimulator,isimulator,maccatalyst,xros,xrsimulator)
 make build platform=ios,macos
 # or build GPL version
 make build enable-gpl
@@ -47,8 +47,8 @@ make help
 ## Run default mpv player
 
 ```bash
-./play.sh --input-commands='script-message display-stats-toggle' [url]
-./play.sh --list-options
+./mpv.sh --input-commands='script-message display-stats-toggle' [url]
+./mpv.sh --list-options
 ```
 
 > Use <kbd>Shift</kbd>+<kbd>i</kbd> to show stats overlay
