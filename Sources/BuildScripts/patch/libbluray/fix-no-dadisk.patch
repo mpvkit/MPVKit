@@ -1,0 +1,29 @@
+diff --git a/src/file/mount_darwin.c b/src/file/mount_darwin.c
+index 5b13450..930df04 100644
+--- a/src/file/mount_darwin.c
++++ b/src/file/mount_darwin.c
+@@ -30,13 +30,12 @@
+ #define _DARWIN_C_SOURCE
+ #include <sys/stat.h>
+ 
+-#include <DiskArbitration/DADisk.h>
++//#include <DiskArbitration/DADisk.h>
+ 
+ static char *bsdname_get_mountpoint(const char *device_path)
+ {
+     char *result = NULL;
+-
+-    DASessionRef session = DASessionCreate(kCFAllocatorDefault);
++    /*DASessionRef session = DASessionCreate(kCFAllocatorDefault);
+     if (session) {
+         DADiskRef disk = DADiskCreateFromBSDName(kCFAllocatorDefault, session, device_path);
+         if (disk) {
+@@ -56,7 +55,7 @@ static char *bsdname_get_mountpoint(const char *device_path)
+             CFRelease(disk);
+         }
+         CFRelease(session);
+-    }
++    }*/
+ 
+     return result;
+ }

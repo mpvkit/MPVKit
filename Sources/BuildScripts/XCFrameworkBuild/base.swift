@@ -101,42 +101,34 @@ class BaseBuild {
     ]
     let library: Library
     let directoryURL: URL
+    let xcframeworkDirectoryURL: URL
     init(library: Library) {
         self.library = library
         directoryURL = URL.currentDirectory + "\(library.rawValue)-\(library.version)"
+        xcframeworkDirectoryURL = URL.currentDirectory + ["release", "xcframework"]
+    }
 
-        if library.url.hasSuffix(".zip") {
-            // unzip builded static library
-            let outputFileName = "\(library.rawValue).zip"
-            let outputFile = directoryURL + outputFileName
-            // delete invalid downloaded files
-            let attributes = try? FileManager.default.attributesOfItem(atPath: outputFile.path)
-            if let fileSize = attributes?[FileAttributeKey.size] as? UInt64, fileSize <= 0 {
-                try? FileManager.default.removeItem(atPath: directoryURL.path)
-            }
-            try! FileManager.default.createDirectory(atPath: directoryURL.path, withIntermediateDirectories: true, attributes: nil)
+    func beforeBuild() throws {
+        if FileManager.default.fileExists(atPath: directoryURL.path) {
+            return 
+        }
 
-            if !FileManager.default.fileExists(atPath: outputFile.path) {
-                try! Utility.launch(path: "wget", arguments: ["-O", outputFileName, library.url], currentDirectoryURL: directoryURL)
-                try! Utility.launch(path: "/usr/bin/unzip", arguments: ["-o",outputFileName], currentDirectoryURL: directoryURL)
-            }
-        } else if !FileManager.default.fileExists(atPath: directoryURL.path) {
-            // pull code from git
-            try! Utility.launch(path: "/usr/bin/git", arguments: ["-c", "advice.detachedHead=false", "clone", "--depth", "1", "--branch", library.version, library.url, directoryURL.path])
+        // pull code from git
+        try! Utility.launch(path: "/usr/bin/git", arguments: ["-c", "advice.detachedHead=false", "clone", "--depth", "1", "--branch", library.version, library.url, directoryURL.path])
 
-            // apply patch
-            let patch = URL.currentDirectory + "../Sources/BuildScripts/patch/\(library.rawValue)"
-            if FileManager.default.fileExists(atPath: patch.path) {
-                _ = try? Utility.launch(path: "/usr/bin/git", arguments: ["checkout", "."], currentDirectoryURL: directoryURL)
-                let fileNames = try! FileManager.default.contentsOfDirectory(atPath: patch.path).sorted()
-                for fileName in fileNames {
-                    try! Utility.launch(path: "/usr/bin/git", arguments: ["apply", "\((patch + fileName).path)"], currentDirectoryURL: directoryURL)
-                }
+        // apply patch
+        let patch = URL.currentDirectory + "../Sources/BuildScripts/patch/\(library.rawValue)"
+        if FileManager.default.fileExists(atPath: patch.path) {
+            _ = try? Utility.launch(path: "/usr/bin/git", arguments: ["checkout", "."], currentDirectoryURL: directoryURL)
+            let fileNames = try! FileManager.default.contentsOfDirectory(atPath: patch.path).sorted()
+            for fileName in fileNames {
+                try! Utility.launch(path: "/usr/bin/git", arguments: ["apply", "\((patch + fileName).path)"], currentDirectoryURL: directoryURL)
             }
         }
     }
 
     func buildALL() throws {
+        try beforeBuild()
         try? FileManager.default.removeItem(at: URL.currentDirectory + library.rawValue)
         try? FileManager.default.removeItem(at: directoryURL.appendingPathExtension("log"))
         for platform in BaseBuild.platforms {
@@ -146,6 +138,10 @@ class BaseBuild {
         }
         try createXCFramework()
         try packageRelease()
+        try afterBuild()
+    }
+
+    func afterBuild() throws {
         try generatePackageManagerFile()
     }
 
@@ -310,8 +306,7 @@ class BaseBuild {
 
     func createXCFramework() throws {
         // clean all old xcframework
-        let xcframeworkReleasePath = URL.currentDirectory + ["xcframework"]
-        try? Utility.removeFiles(extensions: [".xcframework"], currentDirectoryURL: xcframeworkReleasePath)
+        try? Utility.removeFiles(extensions: [".xcframework"], currentDirectoryURL: self.xcframeworkDirectoryURL)
 
         var frameworks: [String] = []
         let libNames = try self.frameworks()
@@ -357,7 +352,7 @@ class BaseBuild {
             arguments.append(frameworkPath)
         }
         arguments.append("-output")
-        let XCFrameworkFile = URL.currentDirectory + ["xcframework", name + ".xcframework"]
+        let XCFrameworkFile = self.xcframeworkDirectoryURL + [name + ".xcframework"]
         arguments.append(XCFrameworkFile.path)
         if FileManager.default.fileExists(atPath: XCFrameworkFile.path) {
             try? FileManager.default.removeItem(at: XCFrameworkFile)
@@ -583,7 +578,6 @@ class BaseBuild {
                 frameworks.append(libName)
             }
         }
-        let xcframeworkReleasePath = URL.currentDirectory + ["xcframework"]
         for framework in frameworks {
             // clean old files
             try Utility.launch(path: "/bin/rm", arguments: ["-rf", "\(framework)*.xcframework.zip"], currentDirectoryURL: releaseDirPath)
@@ -592,18 +586,18 @@ class BaseBuild {
             let XCFrameworkFile =  framework + ".xcframework"
             let zipFile = releaseDirPath + [framework + ".xcframework.zip"]
             let checksumFile = releaseDirPath + [framework + ".xcframework.checksum.txt"]
-            try Utility.launch(path: "/usr/bin/zip", arguments: ["-qr", zipFile.path, XCFrameworkFile], currentDirectoryURL: xcframeworkReleasePath)
+            try Utility.launch(path: "/usr/bin/zip", arguments: ["-qr", zipFile.path, XCFrameworkFile], currentDirectoryURL: self.xcframeworkDirectoryURL)
             Utility.shell("swift package compute-checksum \(zipFile.path) > \(checksumFile.path)")
 
             if BaseBuild.options.enableSplitPlatform {
                 for group in BaseBuild.splitPlatformGroups.keys {
                     let XCFrameworkName =  "\(framework)-\(group)"
                     let XCFrameworkFile =  XCFrameworkName + ".xcframework"
-                    let XCFrameworkPath = xcframeworkReleasePath + ["\(framework)-\(group).xcframework"]
+                    let XCFrameworkPath = self.xcframeworkDirectoryURL + ["\(framework)-\(group).xcframework"]
                     if FileManager.default.fileExists(atPath: XCFrameworkPath.path) {
                         let zipFile = releaseDirPath + [XCFrameworkName + ".xcframework.zip"]
                         let checksumFile = releaseDirPath + [XCFrameworkName + ".xcframework.checksum.txt"]
-                        try Utility.launch(path: "/usr/bin/zip", arguments: ["-qr", zipFile.path, XCFrameworkFile], currentDirectoryURL: xcframeworkReleasePath)
+                        try Utility.launch(path: "/usr/bin/zip", arguments: ["-qr", zipFile.path, XCFrameworkFile], currentDirectoryURL: self.xcframeworkDirectoryURL)
                         Utility.shell("swift package compute-checksum \(zipFile.path) > \(checksumFile.path)")
                     }
                 }
@@ -718,7 +712,25 @@ class BaseBuild {
 
 class ZipBaseBuild : BaseBuild {
 
+    override func beforeBuild() throws {
+        // unzip builded static library
+        let outputFileName = "\(library.rawValue).zip"
+        let outputFile = directoryURL + outputFileName
+        // delete invalid downloaded files
+        let attributes = try? FileManager.default.attributesOfItem(atPath: outputFile.path)
+        if let fileSize = attributes?[FileAttributeKey.size] as? UInt64, fileSize <= 0 {
+            try? FileManager.default.removeItem(atPath: directoryURL.path)
+        }
+        try! FileManager.default.createDirectory(atPath: directoryURL.path, withIntermediateDirectories: true, attributes: nil)
+
+        if !FileManager.default.fileExists(atPath: outputFile.path) {
+            try! Utility.launch(path: "wget", arguments: ["-O", outputFileName, library.url], currentDirectoryURL: directoryURL)
+            try! Utility.launch(path: "/usr/bin/unzip", arguments: ["-o",outputFileName], currentDirectoryURL: directoryURL)
+        }
+    }
+
     override func buildALL() throws {
+        try beforeBuild()
         try? FileManager.default.removeItem(at: URL.currentDirectory + library.rawValue)
         try? FileManager.default.removeItem(at: directoryURL.appendingPathExtension("log"))
         try? FileManager.default.createDirectory(atPath: (URL.currentDirectory + library.rawValue).path, withIntermediateDirectories: true, attributes: nil)
@@ -753,7 +765,11 @@ class ZipBaseBuild : BaseBuild {
             }
         }
 
-        try generatePackageManagerFile()
+        try afterBuild()
+    }
+
+    override func afterBuild() throws {
+        try super.afterBuild()
     }
 }
 
@@ -1139,18 +1155,11 @@ enum Utility {
             if let logURL = logURL {
                 // print log when run in GitHub Action
                 if ProcessInfo.processInfo.environment.keys.contains("GITHUB_ACTION") {
+                    print("############# \(logURL) CONTENT BEGIN #############")
                     if let content = String(data: try Data(contentsOf: logURL), encoding: .utf8) {
                         print(content)
                     }
-                    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-                    let configLog = URL(string: "/Users/runner/work/MPVKit/MPVKit/dist/FFmpeg/xros/scratch/arm64/ffbuild/config.log")!
-                    if FileManager.default.fileExists(atPath: configLog.path) {
-                        print("###################")
-                        if let content = try? String(contentsOfFile: configLog.path, encoding: .utf8) {
-                            print(content)
-                            print("###################")
-                        }
-                    }
+                    print("#############  \(logURL) CONTENT END #############")
                 }
                 print("please view log file for detail: \(logURL)\n")
             }

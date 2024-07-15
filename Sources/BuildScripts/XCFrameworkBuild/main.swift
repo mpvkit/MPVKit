@@ -4,37 +4,35 @@ do {
     let options = try ArgumentOptions.parse(CommandLine.arguments)
     try Build.performCommand(options)
 
-    // SSL
+    // // SSL
     // try BuildOpenSSL().buildALL()
-    try BuildGmp().buildALL()
-    try BuildNettle().buildALL()
-    try BuildGnutls().buildALL()
+    // try BuildGmp().buildALL()
+    // try BuildNettle().buildALL()
+    // try BuildGnutls().buildALL()
 
-    // libass
-    try BuildUnibreak().buildALL()
-    try BuildFreetype().buildALL()
-    try BuildFribidi().buildALL()
-    try BuildHarfbuzz().buildALL()
-    try BuildASS().buildALL()
+    // // libass
+    // try BuildUnibreak().buildALL()
+    // try BuildFreetype().buildALL()
+    // try BuildFribidi().buildALL()
+    // try BuildHarfbuzz().buildALL()
+    // try BuildASS().buildALL()
 
-    // libsmbclient
-    if options.enableGPL {
-        try BuildSmbclient().buildALL()
-    }
+    // // libsmbclient
+    // try BuildSmbclient().buildALL()
     
-    // ffmpeg
-    try BuildDovi().buildALL()
-    try BuildVulkan().buildALL()
-    try BuildShaderc().buildALL()
-    try BuildLittleCms().buildALL()
-    try BuildPlacebo().buildALL()
-    try BuildDav1d().buildALL()
-    try BuildFFMPEG().buildALL()
+    // // ffmpeg
+    // try BuildDovi().buildALL()
+    // try BuildVulkan().buildALL()
+    // try BuildShaderc().buildALL()
+    // try BuildLittleCms().buildALL()
+    // try BuildPlacebo().buildALL()
+    // try BuildDav1d().buildALL()
+    // try BuildFFMPEG().buildALL()
 
     // mpv
     try BuildUchardet().buildALL()
-    try BuildBluray().buildALL()
     try BuildLuaJIT().buildALL()
+    try BuildBluray().buildALL()
     try BuildMPV().buildALL()
 } catch {
     print(error.localizedDescription)
@@ -83,7 +81,7 @@ enum Library: String, CaseIterable {
         case .libshaderc:  // compiling GLSL (OpenGL Shading Language) shaders into SPIR-V (Standard Portable Intermediate Representation - Vulkan) code
             return "2024.1.0"
         case .libuchardet:
-            return "v0.0.8"
+            return "0.0.8"
         case .libbluray:
             return "1.3.4"
         case .libluajit:
@@ -130,7 +128,7 @@ enum Library: String, CaseIterable {
         case .libshaderc:
             return "https://github.com/mpvkit/libshaderc-build/releases/download/\(self.version)/libshaderc-all.zip"
         case .libuchardet:
-            return "https://gitlab.freedesktop.org/uchardet/uchardet"
+            return "https://github.com/mpvkit/libuchardet-build/releases/download/\(self.version)/libuchardet-all.zip"
         case .libbluray:
             return "https://code.videolan.org/videolan/libbluray.git"
         case .libluajit:
@@ -324,8 +322,8 @@ enum Library: String, CaseIterable {
             return  [
                 .target(
                     name: "Libuchardet",
-                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libuchardet.xcframework.zip",
-                    checksum: ""
+                    url: "https://github.com/mpvkit/libuchardet-build/releases/download/\(self.version)/Libuchardet.xcframework.zip",
+                    checksum: "https://github.com/mpvkit/libuchardet-build/releases/download/\(self.version)/Libuchardet.xcframework.checksum.txt"
                 ),
             ]
         case .libbluray:
@@ -348,32 +346,69 @@ enum Library: String, CaseIterable {
     }
 }
 
-private class BuildUchardet: BaseBuild {
+private class BuildUchardet: ZipBaseBuild {
     init() {
         super.init(library: .libuchardet)
     }
 }
 
 
-
+// depend openssl, ffmpeg, freetype
 private class BuildBluray: BaseBuild {
     init() {
         super.init(library: .libbluray)
-
-        Utility.shell("git submodule update --init --recursive", currentDirectoryURL: directoryURL)
     }
 
-    override func build(platform: PlatformType, arch: ArchType) throws {
-        // 依赖 DiskArbitration 框架，只能 macos 下使用，不然提示缺少 DiskArbitration/DADisk.h
-        if platform != .macos && platform != .maccatalyst {
-            return
+    override func beforeBuild() throws {
+        if FileManager.default.fileExists(atPath: directoryURL.path) {
+            return 
         }
-        try super.build(platform: platform, arch: arch)
+
+        // pull code from git
+        let noPatchURL = directoryURL + "nopatch"
+        try! Utility.launch(path: "/usr/bin/git", arguments: ["-c", "advice.detachedHead=false", "clone", "--recursive", "--depth", "1", "--branch", library.version, library.url, noPatchURL.path])
+
+        let patchURL = directoryURL + "patch"
+        try! Utility.launch(path: "/usr/bin/git", arguments: ["-c", "advice.detachedHead=false", "clone", "--recursive", "--depth", "1", "--branch", library.version, library.url, patchURL.path])
+        // apply patch
+        let patch = URL.currentDirectory + "../Sources/BuildScripts/patch/\(library.rawValue)"
+        if FileManager.default.fileExists(atPath: patch.path) {
+            _ = try? Utility.launch(path: "/usr/bin/git", arguments: ["checkout", "."], currentDirectoryURL: patchURL)
+            let fileNames = try! FileManager.default.contentsOfDirectory(atPath: patch.path).sorted()
+            for fileName in fileNames {
+                try! Utility.launch(path: "/usr/bin/git", arguments: ["apply", "\((patch + fileName).path)"], currentDirectoryURL: patchURL)
+            }
+        }
+    }
+
+    override func configure(buildURL: URL, environ: [String: String], platform: PlatformType, arch: ArchType) throws {
+        // 只能 macos 支持 DiskArbitration 框架，其他平台使用 patch 版本去掉 DiskArbitration 依赖
+        var workURL = directoryURL + "nopatch"
+        if platform != .macos && platform != .maccatalyst {
+            workURL = directoryURL + "patch"
+        }
+
+        let configure = workURL + "configure"
+        if !FileManager.default.fileExists(atPath: configure.path) {
+            var bootstrap = workURL + "bootstrap"
+            if !FileManager.default.fileExists(atPath: bootstrap.path) {
+                bootstrap = workURL + ".bootstrap"
+            }
+            if FileManager.default.fileExists(atPath: bootstrap.path) {
+                try Utility.launch(executableURL: bootstrap, arguments: [], currentDirectoryURL: workURL, environment: environ)
+            }
+        }
+        var arguments = [
+            "--prefix=\(thinDir(platform: platform, arch: arch).path)",
+        ]
+        arguments.append(contentsOf: self.arguments(platform: platform, arch: arch))
+        try Utility.launch(executableURL: configure, arguments: arguments, currentDirectoryURL: buildURL, environment: environ)
     }
 
     override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
         [
-            "--without-external-libudfread",
+            "--enable-udf",  // for read iso file
+
             "--disable-doxygen-doc",
             "--disable-doxygen-dot",
             "--disable-doxygen-html",
@@ -381,6 +416,7 @@ private class BuildBluray: BaseBuild {
             "--disable-doxygen-pdf",
             "--disable-examples",
             "--disable-bdjava-jar",
+            "--without-fontconfig",
             "--with-pic",
             "--enable-static",
             "--disable-shared",
@@ -390,6 +426,7 @@ private class BuildBluray: BaseBuild {
         ]
     }
 }
+
 
 private class BuildLuaJIT: ZipBaseBuild {
     init() {
@@ -485,6 +522,10 @@ private class BuildMPV: BaseBuild {
 private class BuildFFMPEG: BaseBuild {
     init() {
         super.init(library: .FFmpeg)
+    }
+
+    override func beforeBuild() throws {
+        try super.beforeBuild()
 
         if Utility.shell("which nasm") == nil {
             Utility.shell("brew install nasm")
@@ -492,7 +533,7 @@ private class BuildFFMPEG: BaseBuild {
         if Utility.shell("which sdl2-config") == nil {
             Utility.shell("brew install sdl2")
         }
-        
+
         let lldbFile = URL.currentDirectory + "LLDBInitFile"
         try? FileManager.default.removeItem(at: lldbFile)
         FileManager.default.createFile(atPath: lldbFile.path, contents: nil, attributes: nil)
@@ -858,6 +899,14 @@ private class BuildSmbclient: ZipBaseBuild {
     init() {
         super.init(library: .libsmbclient)
     }
+
+    override func buildALL() throws {
+        if !BaseBuild.options.enableGPL {
+            return
+        }
+
+        try super.buildALL()
+    }
 }
 
 private class BuildDav1d: ZipBaseBuild {
@@ -900,6 +949,8 @@ private class BuildVulkan: ZipBaseBuild {
     }
 
     override func buildALL() throws {
+        try super.beforeBuild()
+
         try? FileManager.default.removeItem(at: URL.currentDirectory + library.rawValue)
         try? FileManager.default.removeItem(at: directoryURL.appendingPathExtension("log"))
         try? FileManager.default.createDirectory(atPath: (URL.currentDirectory + library.rawValue).path, withIntermediateDirectories: true, attributes: nil)
@@ -930,6 +981,6 @@ private class BuildVulkan: ZipBaseBuild {
             }
         }
 
-        try generatePackageManagerFile()
+        try super.afterBuild()
     }
 }

@@ -33,20 +33,20 @@ jobs:
     - name: Build GPL version
       run: |
          make build enable-gpl version=${{ github.event.inputs.version }}
-         mv ./dist ./gpl
-         cd ./gpl/release
+         cd ./dist/release
+
+         # remove libbluray, same as LGPL version
+         rm -rf libbluray*.zip Libbluray*.zip Libbluray*.txt
+         rename 's/-all\.zip/-GPL-all\.zip/' *-all.zip
          rename 's/\.xcframework\.zip/-GPL\.xcframework\.zip/' *.xcframework.zip
          rename 's/\.xcframework\.checksum\.txt/-GPL\.xcframework\.checksum\.txt/' *.xcframework.checksum.txt
 
     - name: Print
-      run: ls -al ./gpl/release/
+      run: ls -al ./dist/release/
     
-
     - name: Build LGPL version
       run: |
         make build version=${{ github.event.inputs.version }}
-        cp ./gpl/release/*.xcframework.zip ./dist/release/
-        cp ./gpl/release/*.xcframework.checksum.txt ./dist/release/
 
     - name: Print
       run: ls -al ./dist/release/

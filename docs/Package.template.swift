@@ -19,24 +19,24 @@ let package = Package(
         .target(
             name: "_MPVKit",
             dependencies: [
-                "Libmpv", "_FFmpegKit", "Libuchardet",
-                .target(name: "Libbluray", condition: .when(platforms: [.macOS, .macCatalyst])),
+                "Libmpv", "_FFmpegKit", "Libuchardet", "Libbluray",
                 .target(name: "Libluajit", condition: .when(platforms: [.macOS])),
             ],
+            path: "Sources/_MPVKit",
             linkerSettings: [
                 .linkedFramework("AVFoundation"),
                 .linkedFramework("CoreAudio"),
-            ],
-            path: "Sources/_MPVKit"
+            ]
         ),
         .target(
             name: "_FFmpegKit",
             dependencies: [
                 "Libavcodec", "Libavfilter", "Libavformat", "Libavutil", "Libswresample", "Libswscale",
-                "Libass", "Libfreetype", "Libfribidi", "Libharfbuzz",
+                "Libssl", "Libcrypto", "Libass", "Libfreetype", "Libfribidi", "Libharfbuzz",
                 "MoltenVK", "Libshaderc_combined", "lcms2", "Libplacebo", "Libdovi", "Libunibreak",
                 "gmp", "nettle", "hogweed", "gnutls", "Libdav1d"
             ],
+            path: "Sources/_FFmpegKit",
             linkerSettings: [
                 .linkedFramework("AudioToolbox"),
                 .linkedFramework("CoreVideo"),
@@ -51,30 +51,29 @@ let package = Package(
                 .linkedLibrary("xml2"),
                 .linkedLibrary("z"),
                 .linkedLibrary("c++"),
-            ],
-            path: "Sources/_FFmpegKit"
+            ]
         ),
         .target(
             name: "_MPVKit-GPL",
             dependencies: [
-                "Libmpv-GPL", "_FFmpegKit-GPL", "Libuchardet",
-                .target(name: "Libbluray", condition: .when(platforms: [.macOS, .macCatalyst])),
+                "Libmpv-GPL", "_FFmpegKit-GPL", "Libuchardet", "Libbluray",
                 .target(name: "Libluajit", condition: .when(platforms: [.macOS])),
             ],
+            path: "Sources/_MPVKit-GPL",
             linkerSettings: [
                 .linkedFramework("AVFoundation"),
                 .linkedFramework("CoreAudio"),
-            ],
-            path: "Sources/_MPVKit-GPL"
+            ]
         ),
         .target(
             name: "_FFmpegKit-GPL",
             dependencies: [
                 "Libavcodec-GPL", "Libavfilter-GPL", "Libavformat-GPL", "Libavutil-GPL", "Libswresample-GPL", "Libswscale-GPL",
-                "Libass", "Libfreetype", "Libfribidi", "Libharfbuzz",
+                "Libssl", "Libcrypto", "Libass", "Libfreetype", "Libfribidi", "Libharfbuzz",
                 "MoltenVK", "Libshaderc_combined", "lcms2", "Libplacebo", "Libdovi", "Libunibreak",
                 "Libsmbclient", "gmp", "nettle", "hogweed", "gnutls", "Libdav1d"
             ],
+            path: "Sources/_FFmpegKit-GPL",
             linkerSettings: [
                 .linkedFramework("AudioToolbox"),
                 .linkedFramework("CoreVideo"),
@@ -89,8 +88,7 @@ let package = Package(
                 .linkedLibrary("xml2"),
                 .linkedLibrary("z"),
                 .linkedLibrary("c++"),
-            ],
-            path: "Sources/_FFmpegKit-GPL"
+            ]
         ),
 
         .binaryTarget(
