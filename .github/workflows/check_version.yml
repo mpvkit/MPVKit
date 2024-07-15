@@ -9,6 +9,7 @@ jobs:
   build:
     permissions:
       contents: write
+      pull-requests: write
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -16,37 +17,27 @@ jobs:
       - name: Checkout ffmpeg
         uses: actions/checkout@v4
         with:
-          repository: "mpv-player/mpv"
+          repository: "FFmpeg/FFmpeg"
           path: 'ffmpeg'
           fetch-depth: 0
-          fetch-tags: true
 
       - name: Checkout mpv
         uses: actions/checkout@v4
         with:
-          repository: "FFmpeg/FFmpeg"
+          repository: "mpv-player/mpv"
           path: 'mpv'
           fetch-depth: 0
-          fetch-tags: true
-
-      - name: check
-        run: cd ./ffmpeg && echo $(git tag)
-
-      - name: check
-        run: cd ./mpv && echo $(git tag)
 
       - name: Get latest verion
         id: version
         run: |
           cd ./ffmpeg
-          git tag
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "ffmpeg latest tag: $latest_tag"
           echo "::set-output name=ffmpeg::$latest_tag"
           cd ..
 
           cd ./mpv
-          git tag
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "mpv latest tag: $latest_tag"
           echo "::set-output name=mpv::$latest_tag"
