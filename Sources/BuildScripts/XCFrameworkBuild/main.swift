@@ -371,7 +371,11 @@ private class BuildMPV: BaseBuild {
     }
 
     override func flagsDependencelibrarys() -> [Library] {
-        [.gmp, .libsmbclient]
+        if BaseBuild.options.enableGPL {
+            return [.gmp, .libsmbclient]
+        } else {
+            return [.gmp]
+        }
     }
 
 
@@ -458,16 +462,22 @@ private class BuildFFMPEG: BaseBuild {
     }
 
     override func flagsDependencelibrarys() -> [Library] {
-        [.gmp, .nettle, .gnutls, .libsmbclient]
+        if BaseBuild.options.enableGPL {
+            return [.gmp, .nettle, .gnutls, .libsmbclient]
+        } else {
+            return [.gmp, .nettle, .gnutls]
+        }
     }
 
     override func cFlags(platform: PlatformType, arch: ArchType) -> [String] {
         var cFlags = super.cFlags(platform: platform, arch: arch)
 
         // append special libsmbclient include path
-        let path = thinDir(library: .libsmbclient, platform: platform, arch: arch)
-        if FileManager.default.fileExists(atPath: path.path) {
-            cFlags.append("-I\(path.path)/include/samba-4.0")
+        if BaseBuild.options.enableGPL {
+            let path = thinDir(library: .libsmbclient, platform: platform, arch: arch)
+            if FileManager.default.fileExists(atPath: path.path) {
+                cFlags.append("-I\(path.path)/include/samba-4.0")
+            }
         }
 
         return cFlags
@@ -484,9 +494,11 @@ private class BuildFFMPEG: BaseBuild {
         if FileManager.default.fileExists(atPath: path.path) {
             ldFlags.append(contentsOf: ["-framework", "Security", "-framework", "CoreFoundation"])
         }
-        path = thinDir(library: .libsmbclient, platform: platform, arch: arch)
-        if FileManager.default.fileExists(atPath: path.path) {
-            ldFlags.append(contentsOf: ["-lresolv", "-lpthread", "-lz", "-liconv"])
+        if BaseBuild.options.enableGPL {
+            path = thinDir(library: .libsmbclient, platform: platform, arch: arch)
+            if FileManager.default.fileExists(atPath: path.path) {
+                ldFlags.append(contentsOf: ["-lresolv", "-lpthread", "-lz", "-liconv"])
+            }
         }
         return ldFlags
     }
@@ -897,13 +909,6 @@ private class BuildSmbclient: ZipBaseBuild {
         super.init(library: .libsmbclient)
     }
 
-    override func buildALL() throws {
-        if !BaseBuild.options.enableGPL {
-            return
-        }
-
-        try super.buildALL()
-    }
 }
 
 private class BuildDav1d: ZipBaseBuild {
