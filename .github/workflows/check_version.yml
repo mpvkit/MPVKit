@@ -32,7 +32,7 @@ jobs:
         id: version
         run: |
           cd ./ffmpeg
-          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1 release/7.0`)
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "ffmpeg latest tag: $latest_tag"
           echo "FFMPEG_LATEST_VERSION=$latest_tag" >> $GITHUB_ENV
           cd ..
@@ -52,19 +52,36 @@ jobs:
           fail-on-error: false
           script: |
             import re
+
+            def parse_version(ver):
+              if '-' in ver or ver == '':
+                return 0
+              return int(re.sub(r'[^0-9]+', r'', ver))
+
+            
             file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
             with open(file_path, 'r', encoding='utf-8') as file:
               content = file.read()
-            content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"$MPV_LATEST_VERSION"', content, count=1)
-            content = re.sub(r'(case .FFmpeg[^"]+?)"(.+?)"', r'\1"$FFMPEG_LATEST_VERSION"', content, count=1)
+            mpvOldVersion = re.search(r'(case .libmpv[^"]+?)"(.+?)"', content).group(2)
+            print(mpvOldVersion)
+            mpvNewVersion = '${{ env.MPV_LATEST_VERSION }}'
+            ffmpegOldVersion = re.search(r'(case .FFmpeg[^"]+?)"(.+?)"', content).group(2)
+            print(ffmpegOldVersion)
+            ffmpegNewVersion = '${{ env.FFMPEG_LATEST_VERSION }}'
+            if parse_version(mpvNewVersion) > parse_version(mpvOldVersion):
+              content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"${{ env.MPV_LATEST_VERSION }}"', content, count=1)
+            if parse_version(ffmpegNewVersion) > parse_version(ffmpegOldVersion):
+              content = re.sub(r'(case .FFmpeg[^"]+?)"(.+?)"', r'\1"${{ env.FFMPEG_LATEST_VERSION }}"', content, count=1)
             with open(file_path, 'w', encoding='utf-8') as file:
               file.write(content)
 
             file_path = './README.md'
             with open(file_path, 'r', encoding='utf-8') as file:
               content = file.read()
-            content = re.sub(r'mpv-.*-blue', r'mpv-$MPV_LATEST_VERSION-blue', content, count=1)
-            content = re.sub(r'ffmpeg-.*-blue', r'ffmpeg-$FFMPEG_LATEST_VERSION-blue', content, count=1)
+            if parse_version(mpvNewVersion) > parse_version(mpvOldVersion):
+              content = re.sub(r'mpv-.*-blue', r'mpv-${{ env.MPV_LATEST_VERSION }}-blue', content, count=1)
+            if parse_version(ffmpegNewVersion) > parse_version(ffmpegOldVersion):
+              content = re.sub(r'ffmpeg-.*-blue', r'ffmpeg-${{ env.FFMPEG_LATEST_VERSION }}-blue', content, count=1)
             with open(file_path, 'w', encoding='utf-8') as file:
               file.write(content)
 
