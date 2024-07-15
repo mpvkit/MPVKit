@@ -4,30 +4,30 @@ do {
     let options = try ArgumentOptions.parse(CommandLine.arguments)
     try Build.performCommand(options)
 
-    // // SSL
-    // try BuildOpenSSL().buildALL()
-    // try BuildGmp().buildALL()
-    // try BuildNettle().buildALL()
-    // try BuildGnutls().buildALL()
+    // SSL
+    try BuildOpenSSL().buildALL()
+    try BuildGmp().buildALL()
+    try BuildNettle().buildALL()
+    try BuildGnutls().buildALL()
 
-    // // libass
-    // try BuildUnibreak().buildALL()
-    // try BuildFreetype().buildALL()
-    // try BuildFribidi().buildALL()
-    // try BuildHarfbuzz().buildALL()
-    // try BuildASS().buildALL()
+    // libass
+    try BuildUnibreak().buildALL()
+    try BuildFreetype().buildALL()
+    try BuildFribidi().buildALL()
+    try BuildHarfbuzz().buildALL()
+    try BuildASS().buildALL()
 
-    // // libsmbclient
-    // try BuildSmbclient().buildALL()
+    // libsmbclient
+    try BuildSmbclient().buildALL()
     
-    // // ffmpeg
-    // try BuildDovi().buildALL()
-    // try BuildVulkan().buildALL()
-    // try BuildShaderc().buildALL()
-    // try BuildLittleCms().buildALL()
-    // try BuildPlacebo().buildALL()
-    // try BuildDav1d().buildALL()
-    // try BuildFFMPEG().buildALL()
+    // ffmpeg
+    try BuildDovi().buildALL()
+    try BuildVulkan().buildALL()
+    try BuildShaderc().buildALL()
+    try BuildLittleCms().buildALL()
+    try BuildPlacebo().buildALL()
+    try BuildDav1d().buildALL()
+    try BuildFFMPEG().buildALL()
 
     // mpv
     try BuildUchardet().buildALL()
