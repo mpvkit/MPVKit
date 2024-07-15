@@ -13,28 +13,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/checkout@v4
+      - name: Checkout ffmpeg
+        uses: actions/checkout@v4
         with:
           repository: "mpv-player/mpv"
           path: 'ffmpeg'
           fetch-tags: true
 
-      - uses: actions/checkout@v4
+      - name: Checkout mpv
+        uses: actions/checkout@v4
         with:
           repository: "FFmpeg/FFmpeg"
           path: 'mpv'
           fetch-tags: true
 
+      - name: check
+        run: cd ./ffmpeg && git tag
+
+      - name: check
+        run: cd ./mpv && git tag
+
       - name: Get latest verion
         id: version
         run: |
           cd ./ffmpeg
+          git tag
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "ffmpeg latest tag: $latest_tag"
           echo "::set-output name=ffmpeg::$latest_tag"
           cd ..
 
           cd ./mpv
+          git tag
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "mpv latest tag: $latest_tag"
           echo "::set-output name=mpv::$latest_tag"
