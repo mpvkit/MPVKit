@@ -1,0 +1,63 @@
+name: Check mpv and ffmpeg new version
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 * *'
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@
+        with:
+          repository: "mpv-player/mpv"
+          path: 'ffmpeg'
+          fetch-tags: true
+
+      - uses: actions/checkout@v4
+        with:
+          repository: "FFmpeg/FFmpeg"
+          path: 'mpv'
+          fetch-tags: true
+
+      - name: Get latest verion
+        id: version
+        run: |
+          cd ./ffmpeg
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "ffmpeg latest tag: $latest_tag"
+          echo "::set-output name=ffmpeg::$latest_tag"
+          cd ..
+
+          cd ./mpv
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "mpv latest tag: $latest_tag"
+          echo "::set-output name=mpv::$latest_tag"
+          cd ..
+
+          rm -rf ./ffmpeg
+          rm -rf ./mpv
+
+
+      - name: update to new version
+        run: |
+          sed -i '' '/case .libmpv:/,/case/s/\(return "\)[^"]*\("\)/\1${{ steps.version.outputs.mpv }}\2/' ./Sources/BuildScripts/XCFrameworkBuild/main.swift
+          sed -i '' '/case .FFmpeg:/,/case/s/\(return "\)[^"]*\("\)/\1${{ steps.version.outputs.ffmpeg }}\2/' ./Sources/BuildScripts/XCFrameworkBuild/main.swift
+          sed -i '' 's/mpv-.*-blue/mpv-${{ steps.version.outputs.mpv }}-blue/' ./README.md
+          sed -i '' 's/ffmpeg-.*-blue/ffmpeg-${{ steps.version.outputs.ffmpeg }}-blue/' ./README.md
+
+      - name: Uncommitted change
+        run: date +%s > ./report.txt
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: |
+            ./Sources/BuildScripts/XCFrameworkBuild/main.swift
+            ./README.md
+            ./report.txt
