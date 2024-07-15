@@ -58,7 +58,8 @@ jobs:
                 return 0
               return int(re.sub(r'[^0-9]+', r'', ver))
 
-            
+            commitMessage = ''
+
             file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
             with open(file_path, 'r', encoding='utf-8') as file:
               content = file.read()
@@ -70,10 +71,13 @@ jobs:
             ffmpegNewVersion = '${{ env.FFMPEG_LATEST_VERSION }}'
             if parse_version(mpvNewVersion) > parse_version(mpvOldVersion):
               content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"${{ env.MPV_LATEST_VERSION }}"', content, count=1)
+              commitMessage += "mpv bump version to ${{ env.MPV_LATEST_VERSION }}\n"
             if parse_version(ffmpegNewVersion) > parse_version(ffmpegOldVersion):
               content = re.sub(r'(case .FFmpeg[^"]+?)"(.+?)"', r'\1"${{ env.FFMPEG_LATEST_VERSION }}"', content, count=1)
+              commitMessage += "mpv bump version to ${{ env.MPV_LATEST_VERSION }}\n"
             with open(file_path, 'w', encoding='utf-8') as file:
               file.write(content)
+            
 
             file_path = './README.md'
             with open(file_path, 'r', encoding='utf-8') as file:
@@ -85,6 +89,8 @@ jobs:
             with open(file_path, 'w', encoding='utf-8') as file:
               file.write(content)
 
+            set_env('COMMIT_MESSAGE', commitMessage)
+
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
@@ -92,3 +98,7 @@ jobs:
           add-paths: |
             ./Sources/BuildScripts/XCFrameworkBuild/main.swift
             ./README.md
+          title: "mpv ${{ env.MPV_LATEST_VERSION }} && FFmpeg ${{ env.FFMPEG_LATEST_VERSION }}"
+          body: "${{ env.COMMIT_MESSAGE }}"
+          commit-message: "${{ env.COMMIT_MESSAGE }}"
+          
