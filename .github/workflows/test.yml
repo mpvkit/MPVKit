@@ -1,0 +1,40 @@
+name: Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: genereate release note
+        uses: jannekem/run-python-script-action@v1
+        with:
+          script: |
+            releaseNote = f'''
+            * mpv version: v333
+            * ffmpeg version: v6767
+            '''
+            set_env('RELEASE_NOTE', releaseNote)
+
+
+      - name: Install dependencies
+        run: |
+          echo 'ddddd' > aaaa.txt
+
+          
+      - name: Upload binary to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: test
+          tag_name: test
+          files: |
+            ./aaaa.txt
+          body: ${{ env.RELEASE_NOTE }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          
