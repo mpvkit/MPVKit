@@ -16,6 +16,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: genereate release note
+        uses: jannekem/run-python-script-action@v1
+        with:
+          script: |
+            import re
+
+            file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
+            with open(file_path, 'r', encoding='utf-8') as file:
+              content = file.read()
+            mpvVersion = re.search(r'(case .libmpv[^"]+?)"(.+?)"', content).group(2)
+            ffmpegVersion = re.search(r'(case .FFmpeg[^"]+?)"(.+?)"', content).group(2)
+            libplaceboVersion = re.search(r'(case .libplacebo[^"]+?)"(.+?)"', content).group(2)
+            vulkanVersion = re.search(r'(case .vulkan[^"]+?)"(.+?)"', content).group(2)
+            releaseNote = f'mpv version: {mpvVersion}\n' +
+                          f'ffmpeg version: {ffmpegVersion}\n' +
+                          f'placebo version: {libplaceboVersion}\n' +
+                          f'MoltenVK version: {vulkanVersion}'
+            set_env('RELEASE_NOTE', releaseNote)
+
+
       - name: Install dependencies
         run: |
           brew install autoconf
@@ -118,5 +138,7 @@ jobs:
             ./dist/release/*.txt
             ./dist/release/*.zip
           prerelease: ${{ contains(github.event.inputs.version, 'alpha') || contains(github.event.inputs.version, 'beta') }}
+          body: "${{ env.RELEASE_NOTE }}"
           generate_release_notes: true
           fail_on_unmatched_files: true
+          

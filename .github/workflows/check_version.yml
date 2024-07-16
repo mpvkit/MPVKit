@@ -49,7 +49,6 @@ jobs:
       - name: update to new version
         uses: jannekem/run-python-script-action@v1
         with:
-          fail-on-error: false
           script: |
             import re
 
@@ -100,5 +99,5 @@ jobs:
             ./README.md
           title: "mpv ${{ env.MPV_LATEST_VERSION }} && FFmpeg ${{ env.FFMPEG_LATEST_VERSION }}"
           body: "${{ env.COMMIT_MESSAGE }}"
-          commit-message: "${{ env.COMMIT_MESSAGE }}"
+          commit-message: "chore: ${{ env.COMMIT_MESSAGE }}"
           
