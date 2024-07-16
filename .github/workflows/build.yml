@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release'
-        required: true
-        default: '0.38.0'
+        description: 'Release tag name (default use mpv version)'
+        default: ''
 
 jobs:
   build:
