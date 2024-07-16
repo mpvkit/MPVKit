@@ -70,7 +70,7 @@ jobs:
 
       - name: Build GPL version
         run: |
-          make build enable-gpl version=${{ github.event.inputs.version }}
+          make build enable-gpl version=${{ env.RELEASE_VERSION }}
 
           cd ./dist/release
           rename 's/-all\.zip/-GPL-all\.zip/' *-all.zip
@@ -93,7 +93,7 @@ jobs:
       
       - name: Build LGPL version
         run: |
-          make build version=${{ github.event.inputs.version }}
+          make build version=${{ env.RELEASE_VERSION }}
       
       
       - name: Update Package.swift
@@ -102,37 +102,37 @@ jobs:
           cp -f ./dist/release/Package.swift ./Package.swift
 
 
-          LibmpvGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libmpv-GPL.xcframework.zip"
+          LibmpvGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ env.RELEASE_VERSION }}/Libmpv-GPL.xcframework.zip"
           LibmpvGPL_checksum=$(cat ./dist/release/Libmpv-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libmpv-GPL_url)#${LibmpvGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libmpv-GPL_checksum)#${LibmpvGPL_checksum}#g" ./Package.swift
 
-          LibavcodecGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libavcodec-GPL.xcframework.zip"
+          LibavcodecGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ env.RELEASE_VERSION }}/Libavcodec-GPL.xcframework.zip"
           LibavcodecGPL_checksum=$(cat ./dist/release/Libavcodec-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libavcodec-GPL_url)#${LibavcodecGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libavcodec-GPL_checksum)#${LibavcodecGPL_checksum}#g" ./Package.swift
 
-          LibavformatGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libavformat-GPL.xcframework.zip"
+          LibavformatGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ env.RELEASE_VERSION }}/Libavformat-GPL.xcframework.zip"
           LibavformatGPL_checksum=$(cat ./dist/release/Libavformat-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libavformat-GPL_url)#${LibavformatGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libavformat-GPL_checksum)#${LibavformatGPL_checksum}#g" ./Package.swift
 
-          LibavfilterGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libavfilter-GPL.xcframework.zip"
+          LibavfilterGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ env.RELEASE_VERSION }}/Libavfilter-GPL.xcframework.zip"
           LibavfilterGPL_checksum=$(cat ./dist/release/Libavfilter-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libavfilter-GPL_url)#${LibavfilterGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libavfilter-GPL_checksum)#${LibavfilterGPL_checksum}#g" ./Package.swift
 
-          LibavutilGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libavutil-GPL.xcframework.zip"
+          LibavutilGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ env.RELEASE_VERSION }}/Libavutil-GPL.xcframework.zip"
           LibavutilGPL_checksum=$(cat ./dist/release/Libavutil-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libavutil-GPL_url)#${LibavutilGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libavutil-GPL_checksum)#${LibavutilGPL_checksum}#g" ./Package.swift
 
-          LibswresampleGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libswresample-GPL.xcframework.zip"
+          LibswresampleGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ env.RELEASE_VERSION }}/Libswresample-GPL.xcframework.zip"
           LibswresampleGPL_checksum=$(cat ./dist/release/Libswresample-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libswresample-GPL_url)#${LibswresampleGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libswresample-GPL_checksum)#${LibswresampleGPL_checksum}#g" ./Package.swift
 
-          LibswscaleGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ github.event.inputs.version }}/Libswscale-GPL.xcframework.zip"
+          LibswscaleGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ env.RELEASE_VERSION }}/Libswscale-GPL.xcframework.zip"
           LibswscaleGPL_checksum=$(cat ./dist/release/Libswscale-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libswscale-GPL_url)#${LibswscaleGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libswscale-GPL_checksum)#${LibswscaleGPL_checksum}#g" ./Package.swift
@@ -144,7 +144,7 @@ jobs:
           default_author: github_actions
           add: |
             - Package.swift
-          message: "chore: bump version to ${{ github.event.inputs.version }}"
+          message: "chore: bump version to ${{ env.RELEASE_VERSION }}"
           push: "origin HEAD:${{ github.ref_name }}"
           
       - name: Upload binary to GitHub Release
