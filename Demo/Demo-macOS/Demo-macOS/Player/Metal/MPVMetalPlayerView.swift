@@ -34,11 +34,31 @@ struct MPVMetalPlayerView: NSViewControllerRepresentable {
     public final class Coordinator: MPVPlayerDelegate, ObservableObject {
         weak var player: MPVMetalViewController?
         
+        @Published var pause : Bool = false {
+            didSet {
+                if pause {
+                    self.player?.pause()
+                } else {
+                    self.player?.play()
+                }
+            }
+        }
+        
+        @Published var hdrEnabled : Bool = false {
+            didSet {
+                self.player?.hdrEnabled = hdrEnabled
+            }
+        }
+        
+        @Published var hdrAvailable : Bool = false
+        @Published var edrRange : String = "1.0"
+        
         var playUrl : URL?
         var onPropertyChange: ((MPVMetalViewController, String, Any?) -> Void)?
         
         func play(_ url: URL) {
             player?.loadFile(url)
+            self.pause = false
         }
         
         func propertyChange(mpv: OpaquePointer, propertyName: String, data: Any?) {

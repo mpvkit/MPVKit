@@ -9,6 +9,7 @@ final class MPVMetalViewController: NSViewController {
     var metalLayer = MetalLayer()
     var mpv: OpaquePointer!
     var delegate: MPVPlayerDelegate?
+    var edrRange: CGFloat?
     lazy var queue = DispatchQueue(label: "mpv", qos: .userInitiated)
     
     var playUrl: URL?
@@ -21,14 +22,12 @@ final class MPVMetalViewController: NSViewController {
     var hdrEnabled = false {
         didSet {
             // FIXME: target-colorspace-hint does not support being changed at runtime.
-            // this option should be set as early as possible otherwise can cause issues
+            // this option should be set when mpv init otherwise can cause player slow and hangs.
             // not recommended to use this way.
             if hdrEnabled {
                 checkError(mpv_set_option_string(mpv, "target-colorspace-hint", "yes"))
-//                checkError(mpv_set_option_string(mpv, "target-peak", "203"))
             } else {
                 checkError(mpv_set_option_string(mpv, "target-colorspace-hint", "no"))
-//                checkError(mpv_set_option_string(mpv, "target-peak", "auto"))
             }
         }
     }
@@ -40,33 +39,6 @@ final class MPVMetalViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        NotificationCenter.default.addObserver(
-            forName: NSApplication.didChangeScreenParametersNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] value in
-            print("@@[didChangeScreenParametersNotification] \(String(describing: value))")
-            guard let self = self else { return }
-            
-            for screen in NSScreen.screens {
-                var maxPot: CGFloat = -1.0
-                var maxRef: CGFloat = -1.0
-                var maxRange: CGFloat = -1.0
-                
-                print("-----------------------------------------------------------------------------")
-                if #available(macOS 10.15, *) {
-                    maxPot = screen.maximumPotentialExtendedDynamicRangeColorComponentValue
-                    maxRef = screen.maximumReferenceExtendedDynamicRangeColorComponentValue
-                }
-                maxRange = screen.maximumExtendedDynamicRangeColorComponentValue
-                
-                print("maximumPotentialExtendedDynamicRangeColorComponentValue: \(maxPot)")
-                print("maximumReferenceExtendedDynamicRangeColorComponentValue: \(maxRef)")
-                print("maximumExtendedDynamicRangeColorComponentValue: \(maxRange)")
-                print("-----------------------------------------------------------------------------")
-            }
-        }
         
         metalLayer.frame = view.frame
         metalLayer.contentsScale = NSScreen.main!.backingScaleFactor
@@ -80,6 +52,23 @@ final class MPVMetalViewController: NSViewController {
         if let url = playUrl {
             loadFile(url)
         }
+        
+        // observer EDR range value change
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] value in
+            guard let self = self else { return }
+            
+            if let screen = NSScreen.screens.first {
+                let maxRange = screen.maximumExtendedDynamicRangeColorComponentValue
+                DispatchQueue.main.async {
+                    self.delegate?.propertyChange(mpv: self.mpv, propertyName: "edr", data: maxRange)
+                }
+            }
+        }
+        
     }
     
     override func viewDidLayout() {
@@ -94,7 +83,7 @@ final class MPVMetalViewController: NSViewController {
         }
     }
     
-    func setupMpv() {
+    func setupMpv(hdrPass : Bool = false) {
         mpv = mpv_create()
         if mpv == nil {
             print("failed creating context\n")
@@ -118,7 +107,10 @@ final class MPVMetalViewController: NSViewController {
         //checkError(mpv_set_option_string(mpv, "gpu-context", "moltenvk"))
         checkError(mpv_set_option_string(mpv, "hwdec", "videotoolbox"))
         checkError(mpv_set_option_string(mpv, "ytdl", "no"))
-        checkError(mpv_set_option_string(mpv, "target-colorspace-hint", "yes")) // HDR passthrough
+        if hdrPass {
+            // FIXME: target-colorspace-hint does not support being changed at runtime.
+            checkError(mpv_set_option_string(mpv, "target-colorspace-hint", "yes")) // HDR passthrough
+        }
 //        checkError(mpv_set_option_string(mpv, "tone-mapping-visualize", "yes"))  // only for debugging purposes
 //        checkError(mpv_set_option_string(mpv, "profile", "fast"))   // can fix frame drop in poor device when play 4k
 
@@ -135,12 +127,18 @@ final class MPVMetalViewController: NSViewController {
     
     
     func loadFile(
-        _ url: URL
+        _ url: URL,
+        time: Double? = nil
     ) {
         var args = [url.absoluteString]
         var options = [String]()
         
         args.append("replace")
+        args.append("-1")
+        
+        if let time, time > 0 {
+            options.append("start=\(Int(time))")
+        }
         
         if !options.isEmpty {
             args.append(options.joined(separator: ","))
@@ -232,13 +230,7 @@ final class MPVMetalViewController: NSViewController {
                         case MPVProperty.videoParamsSigPeak:
                             if let sigPeak = UnsafePointer<Double>(OpaquePointer(property.data))?.pointee {
                                 DispatchQueue.main.async {
-                                    // FIXME: HDR toggle here may cause app issue
-//                                    if self.hdrAvailable {
-//                                        self.hdrEnabled = true
-//                                    } else {
-//                                        self.hdrEnabled = false
-//                                    }
-//                                    self.delegate?.propertyChange(mpv: mpv, propertyName: propertyName, data: sigPeak)
+                                    self.delegate?.propertyChange(mpv: mpv, propertyName: propertyName, data: sigPeak)
                                 }
                             }
                         default: break

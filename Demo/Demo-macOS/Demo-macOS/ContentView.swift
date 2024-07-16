@@ -2,8 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var coordinator = MPVMetalPlayerView.Coordinator()
-    @State var pause = false
-    @State var hdrEnabled = false
+    @State var hdrAvailable = false
     @State var tonemappingVisualizeEnabled = false
     @State var showControlOverlay = false
     
@@ -14,8 +13,11 @@ struct ContentView: View {
                 .onPropertyChange{ player, propertyName, propertyData in
                     switch propertyName {
                     case MPVProperty.videoParamsSigPeak:
-                        hdrEnabled = player.hdrEnabled
-                        pause = false
+                        coordinator.hdrAvailable = player.hdrAvailable
+                    case "edr":
+                        if let edrRange = propertyData as? CGFloat {
+                            coordinator.edrRange = String(format: "%.1f", edrRange)
+                        }
                     default: break
                     }
                 }
@@ -24,14 +26,9 @@ struct ContentView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 12) {
                     Button {
-                        pause.toggle()
-                        if pause {
-                            coordinator.player?.pause()
-                        } else {
-                            coordinator.player?.play()
-                        }
+                        coordinator.pause.toggle()
                     } label: {
-                        Text(pause ? "play" : "pause").frame(maxWidth: .infinity)
+                        Text(coordinator.pause ? "play" : "pause").frame(maxWidth: .infinity)
                     }
                     Divider()
                     Button {
@@ -64,7 +61,14 @@ struct ContentView: View {
                     HStack() {
                         Text("HDR")
                         Spacer()
-                        Text(hdrEnabled ? "ON" : "OFF")
+                        Toggle("", isOn: $coordinator.hdrEnabled)
+                            .disabled(!coordinator.hdrAvailable)
+                            .toggleStyle(.switch)
+                    }
+                    HStack() {
+                        Text("EDR")
+                        Spacer()
+                        Text(coordinator.edrRange)
                     }
                     Spacer()
                 }

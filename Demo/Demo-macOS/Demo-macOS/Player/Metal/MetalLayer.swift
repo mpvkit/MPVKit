@@ -16,37 +16,6 @@ class MetalLayer: CAMetalLayer {
         }
     }
     
-    override var pixelFormat: MTLPixelFormat {
-        get {
-            return super.pixelFormat
-        }
-        set {
-            print("[CAMetalLayer] pixelFormat: \(String(describing: newValue))")
-            super.pixelFormat = newValue
-        }
-    }
-    
-    override var colorspace: CGColorSpace? {
-        get {
-            return super.colorspace
-        }
-        set {
-            print("[CAMetalLayer] colorspace: \(String(describing: newValue))")
-            super.colorspace = newValue
-        }
-    }
-    
-    override var edrMetadata: CAEDRMetadata? {
-        get {
-            return super.edrMetadata
-        }
-        set {
-            print("[CAMetalLayer] edrMetadata: \(String(describing: newValue))")
-//            super.edrMetadata = .hdr10(minLuminance: 0.5, maxLuminance: 500, opticalOutputScale: 100)
-            super.edrMetadata = newValue
-        }
-    }
-    
     // Hack for fix [target-colorspace-hint] option:
     // Update wantsExtendedDynamicRangeContent need run in main thread to activate screen EDR mode, other thread can't activate
     override var wantsExtendedDynamicRangeContent: Bool  {
@@ -54,7 +23,6 @@ class MetalLayer: CAMetalLayer {
             return super.wantsExtendedDynamicRangeContent
         }
         set {
-            print("[CAMetalLayer] wantsExtendedDynamicRangeContent: \(String(describing: newValue))")
             if Thread.isMainThread {
                 super.wantsExtendedDynamicRangeContent = newValue
             } else {
