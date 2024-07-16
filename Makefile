@@ -20,6 +20,8 @@ gpl:
 	swift run --build-path ./.build --package-path Sources/BuildScripts build enable-gpl $(filter-out $@,$(MAKECMDGOALS)) $(MAKEFLAGS)
 
 clean:
-	@rm -rf ./.build
+	@find . -name '.build' -type d -exec rm -rf {} +
+	@find . -name '.swiftpm' -type d -exec rm -rf {} +
 	@rm -rf ./dist
 	@rm -rf ./*.log
+	@swift package reset

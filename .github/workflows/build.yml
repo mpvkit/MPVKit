@@ -30,10 +30,10 @@ jobs:
             libplaceboVersion = re.search(r'(case .libplacebo[^"]+?)"(.+?)"', content).group(2)
             vulkanVersion = re.search(r'(case .vulkan[^"]+?)"(.+?)"', content).group(2)
             releaseNote = f'''
-            mpv version: {mpvVersion}
-            ffmpeg version: {ffmpegVersion}
-            placebo version: {libplaceboVersion}
-            MoltenVK version: {vulkanVersion}
+            * mpv version: {mpvVersion}
+            * ffmpeg version: {ffmpegVersion}
+            * placebo version: v{libplaceboVersion}
+            * MoltenVK version: v{vulkanVersion}
             '''
             set_env('RELEASE_NOTE', releaseNote)
 
@@ -140,7 +140,7 @@ jobs:
             ./dist/release/*.txt
             ./dist/release/*.zip
           prerelease: ${{ contains(github.event.inputs.version, 'alpha') || contains(github.event.inputs.version, 'beta') }}
-          body: "${{ env.RELEASE_NOTE }}"
+          body: ${{ env.RELEASE_NOTE }}
           generate_release_notes: true
           fail_on_unmatched_files: true
           

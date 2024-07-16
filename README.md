@@ -40,6 +40,8 @@ make build
 make build platform=ios,macos
 # or build GPL version
 make build enable-gpl
+# or clean all build temp files and cache
+make clean
 # or see help
 make help
 ```

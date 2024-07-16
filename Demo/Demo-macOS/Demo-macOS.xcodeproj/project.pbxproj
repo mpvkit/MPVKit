@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F416CD9A2C4585D0008EB99A /* MPVKit-GPL in Frameworks */ = {isa = PBXBuildFile; productRef = F416CD992C4585D0008EB99A /* MPVKit-GPL */; };
+		F416CD9C2C45863C008EB99A /* MPVKit in Resources */ = {isa = PBXBuildFile; fileRef = F416CD9B2C45863C008EB99A /* MPVKit */; };
 		F43769882A80A39200E35E7E /* Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43769872A80A39200E35E7E /* Demo_macOSApp.swift */; };
 		F437698A2A80A39200E35E7E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43769892A80A39200E35E7E /* ContentView.swift */; };
 		F437698C2A80A39300E35E7E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F437698B2A80A39300E35E7E /* Assets.xcassets */; };
@@ -17,13 +19,13 @@
 		F48028892BEB7395002396AA /* MPVProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48028882BEB7394002396AA /* MPVProperty.swift */; };
 		F480288B2BEB73C3002396AA /* MPVPlayerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F480288A2BEB73C3002396AA /* MPVPlayerDelegate.swift */; };
 		F48584F62BE8CA4C004A8744 /* MetalLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48584F52BE8CA4C004A8744 /* MetalLayer.swift */; };
-		F4B91DA32C45529900DE563F /* MPVKit-GPL in Frameworks */ = {isa = PBXBuildFile; productRef = F4B91DA22C45529900DE563F /* MPVKit-GPL */; };
 		F4EB5D062B61541C00486E3F /* MPVMetalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D052B61541C00486E3F /* MPVMetalViewController.swift */; };
 		F4EB5D082B61543700486E3F /* MPVMetalPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D072B61543700486E3F /* MPVMetalPlayerView.swift */; };
 		F4FC2C702A84C2AA00795829 /* MPVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FC2C6F2A84C2AA00795829 /* MPVViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F416CD9B2C45863C008EB99A /* MPVKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MPVKit; path = ../..; sourceTree = "<group>"; };
 		F43769842A80A39200E35E7E /* Demo-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Demo-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F43769872A80A39200E35E7E /* Demo_macOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Demo_macOSApp.swift; sourceTree = "<group>"; };
 		F43769892A80A39200E35E7E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -52,7 +54,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F43769B52A80E00800E35E7E /* CoreAudio.framework in Frameworks */,
-				F4B91DA32C45529900DE563F /* MPVKit-GPL in Frameworks */,
+				F416CD9A2C4585D0008EB99A /* MPVKit-GPL in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +64,7 @@
 		F437697B2A80A39200E35E7E = {
 			isa = PBXGroup;
 			children = (
+				F416CD9B2C45863C008EB99A /* MPVKit */,
 				F43769862A80A39200E35E7E /* Demo-macOS */,
 				F43769852A80A39200E35E7E /* Products */,
 				F43769AB2A80DF7300E35E7E /* Frameworks */,
@@ -158,7 +161,7 @@
 			);
 			name = "Demo-macOS";
 			packageProductDependencies = (
-				F4B91DA22C45529900DE563F /* MPVKit-GPL */,
+				F416CD992C4585D0008EB99A /* MPVKit-GPL */,
 			);
 			productName = "Demo-macOS";
 			productReference = F43769842A80A39200E35E7E /* Demo-macOS.app */;
@@ -189,7 +192,7 @@
 			);
 			mainGroup = F437697B2A80A39200E35E7E;
 			packageReferences = (
-				F4B91DA12C45529900DE563F /* XCRemoteSwiftPackageReference "MPVKit" */,
+				F416CD982C4585D0008EB99A /* XCRemoteSwiftPackageReference "MPVKit" */,
 			);
 			productRefGroup = F43769852A80A39200E35E7E /* Products */;
 			projectDirPath = "";
@@ -205,6 +208,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F416CD9C2C45863C008EB99A /* MPVKit in Resources */,
 				F437698F2A80A39300E35E7E /* Preview Assets.xcassets in Resources */,
 				F437698C2A80A39300E35E7E /* Assets.xcassets in Resources */,
 			);
@@ -422,7 +426,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		F4B91DA12C45529900DE563F /* XCRemoteSwiftPackageReference "MPVKit" */ = {
+		F416CD982C4585D0008EB99A /* XCRemoteSwiftPackageReference "MPVKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mpvkit/MPVKit.git";
 			requirement = {
@@ -433,9 +437,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F4B91DA22C45529900DE563F /* MPVKit-GPL */ = {
+		F416CD992C4585D0008EB99A /* MPVKit-GPL */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F4B91DA12C45529900DE563F /* XCRemoteSwiftPackageReference "MPVKit" */;
+			package = F416CD982C4585D0008EB99A /* XCRemoteSwiftPackageReference "MPVKit" */;
 			productName = "MPVKit-GPL";
 		};
 /* End XCSwiftPackageProductDependency section */

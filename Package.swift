@@ -8,10 +8,12 @@ let package = Package(
     products: [
         .library(
             name: "MPVKit",
+            type: .static,
             targets: ["_MPVKit"]
         ),
         .library(
             name: "MPVKit-GPL",
+            type: .static,
             targets: ["_MPVKit-GPL"]
         ),
     ],
@@ -19,7 +21,7 @@ let package = Package(
         .target(
             name: "_MPVKit",
             dependencies: [
-                "Libmpv", "_FFmpegKit", "Libuchardet", "Libbluray",
+                "Libmpv", "_FFmpeg", "Libuchardet", "Libbluray",
                 .target(name: "Libluajit", condition: .when(platforms: [.macOS])),
             ],
             path: "Sources/_MPVKit",
@@ -29,14 +31,14 @@ let package = Package(
             ]
         ),
         .target(
-            name: "_FFmpegKit",
+            name: "_FFmpeg",
             dependencies: [
                 "Libavcodec", "Libavfilter", "Libavformat", "Libavutil", "Libswresample", "Libswscale",
                 "Libssl", "Libcrypto", "Libass", "Libfreetype", "Libfribidi", "Libharfbuzz",
                 "MoltenVK", "Libshaderc_combined", "lcms2", "Libplacebo", "Libdovi", "Libunibreak",
                 "gmp", "nettle", "hogweed", "gnutls", "Libdav1d"
             ],
-            path: "Sources/_FFmpegKit",
+            path: "Sources/_FFmpeg",
             linkerSettings: [
                 .linkedFramework("AudioToolbox"),
                 .linkedFramework("CoreVideo"),
@@ -56,7 +58,7 @@ let package = Package(
         .target(
             name: "_MPVKit-GPL",
             dependencies: [
-                "Libmpv-GPL", "_FFmpegKit-GPL", "Libuchardet", "Libbluray",
+                "Libmpv-GPL", "_FFmpeg-GPL", "Libuchardet", "Libbluray",
                 .target(name: "Libluajit", condition: .when(platforms: [.macOS])),
             ],
             path: "Sources/_MPVKit-GPL",
@@ -66,14 +68,14 @@ let package = Package(
             ]
         ),
         .target(
-            name: "_FFmpegKit-GPL",
+            name: "_FFmpeg-GPL",
             dependencies: [
                 "Libavcodec-GPL", "Libavfilter-GPL", "Libavformat-GPL", "Libavutil-GPL", "Libswresample-GPL", "Libswscale-GPL",
                 "Libssl", "Libcrypto", "Libass", "Libfreetype", "Libfribidi", "Libharfbuzz",
                 "MoltenVK", "Libshaderc_combined", "lcms2", "Libplacebo", "Libdovi", "Libunibreak",
                 "Libsmbclient", "gmp", "nettle", "hogweed", "gnutls", "Libdav1d"
             ],
-            path: "Sources/_FFmpegKit-GPL",
+            path: "Sources/_FFmpeg-GPL",
             linkerSettings: [
                 .linkedFramework("AudioToolbox"),
                 .linkedFramework("CoreVideo"),

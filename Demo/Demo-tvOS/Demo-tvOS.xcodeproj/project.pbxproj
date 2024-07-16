@@ -10,6 +10,7 @@
 		F451FBA22C456B5E009B8851 /* MPVKit-GPL in Frameworks */ = {isa = PBXBuildFile; productRef = F451FBA12C456B5E009B8851 /* MPVKit-GPL */; };
 		F4850CAA2BEE59C900ABB79A /* MPVProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4850CA82BEE59C900ABB79A /* MPVProperty.swift */; };
 		F4850CAB2BEE59C900ABB79A /* MPVPlayerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4850CA92BEE59C900ABB79A /* MPVPlayerDelegate.swift */; };
+		F4A6123F2C45F2A100434C46 /* MPVKit in Resources */ = {isa = PBXBuildFile; fileRef = F4A6123E2C45F2A100434C46 /* MPVKit */; };
 		F4D8D7962BD7553E00246C75 /* MPVMetalPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D8D7952BD7553E00246C75 /* MPVMetalPlayerView.swift */; };
 		F4D8D7982BD7559700246C75 /* MetalLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D8D7972BD7559700246C75 /* MetalLayer.swift */; };
 		F4EB5D162B61E45000486E3F /* Demo_tvOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D152B61E45000486E3F /* Demo_tvOSApp.swift */; };
@@ -25,6 +26,7 @@
 /* Begin PBXFileReference section */
 		F4850CA82BEE59C900ABB79A /* MPVProperty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVProperty.swift; sourceTree = "<group>"; };
 		F4850CA92BEE59C900ABB79A /* MPVPlayerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVPlayerDelegate.swift; sourceTree = "<group>"; };
+		F4A6123E2C45F2A100434C46 /* MPVKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MPVKit; path = ../..; sourceTree = "<group>"; };
 		F4D8D7952BD7553E00246C75 /* MPVMetalPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVMetalPlayerView.swift; sourceTree = "<group>"; };
 		F4D8D7972BD7559700246C75 /* MetalLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalLayer.swift; sourceTree = "<group>"; };
 		F4EB5D122B61E45000486E3F /* Demo-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Demo-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -73,6 +75,7 @@
 		F4EB5D092B61E45000486E3F = {
 			isa = PBXGroup;
 			children = (
+				F4A6123E2C45F2A100434C46 /* MPVKit */,
 				F4EB5D142B61E45000486E3F /* Demo-tvOS */,
 				F4EB5D132B61E45000486E3F /* Products */,
 			);
@@ -148,7 +151,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					F4EB5D112B61E45000486E3F = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -181,6 +184,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4A6123F2C45F2A100434C46 /* MPVKit in Resources */,
 				F4EB5D1D2B61E45200486E3F /* Preview Assets.xcassets in Resources */,
 				F4EB5D1A2B61E45200486E3F /* Assets.xcassets in Resources */,
 			);
@@ -245,6 +249,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -305,6 +310,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -331,7 +337,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo-tvOS/Preview Content\"";
-				DEVELOPMENT_TEAM = 733599CLJU;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -357,7 +363,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo-tvOS/Preview Content\"";
-				DEVELOPMENT_TEAM = 733599CLJU;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
