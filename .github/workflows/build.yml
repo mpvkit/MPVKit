@@ -46,7 +46,7 @@ jobs:
             set_env('MPV_VERSION', mpvVersion)
             set_env('RELEASE_VERSION', releaseVersion)
 
-            with open('./RELEASE_NOTE.txt', 'w', encoding='utf-8') as file:
+            with open('/tmp/RELEASE_NOTE.txt', 'w', encoding='utf-8') as file:
               file.write(f'''
               * mpv version: {mpvVersion}
               * ffmpeg version: {ffmpegVersion}
@@ -157,7 +157,7 @@ jobs:
             ./dist/release/*.txt
             ./dist/release/*.zip
           prerelease: ${{ contains(github.event.inputs.version, 'alpha') || contains(github.event.inputs.version, 'beta') }}
-          body_path: ./RELEASE_NOTE.txt
+          body_path: /tmp/RELEASE_NOTE.txt
           generate_release_notes: true
           fail_on_unmatched_files: true
           

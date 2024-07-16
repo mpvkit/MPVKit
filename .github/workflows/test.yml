@@ -15,8 +15,9 @@ jobs:
         uses: jannekem/run-python-script-action@v1
         with:
           script: |
-            with open('./RELEASE_NOTE.txt', 'w', encoding='utf-8') as file:
+            with open('/tmp/RELEASE_NOTE.txt', 'w', encoding='utf-8') as file:
               file.write(f'''
+              ## good
               * mpv version: ddd
               * ffmpeg version: v444.
               * placebo version: 444
@@ -35,7 +36,7 @@ jobs:
           tag_name: test
           files: |
             ./aaaa.txt
-          body_path: ./RELEASE_NOTE.txt
+          body_path: /tmp/RELEASE_NOTE.txt
           generate_release_notes: true
           fail_on_unmatched_files: true
           
