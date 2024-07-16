@@ -16,26 +16,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: genereate release note
+      - name: Check version to release
         uses: jannekem/run-python-script-action@v1
         with:
           script: |
             import re
 
+            def normalize_version(version_string):
+              version_string = re.sub(r'[^.0-9]+|-.+', '', version_string)
+              parts = re.split(r'\.', version_string)
+              major = int(parts[0])
+              minor = int(parts[1]) if len(parts) > 1 else 0
+              patch = int(parts[2]) if len(parts) > 2 else 0
+              return f"{major}.{minor}.{patch}"
+
             file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
             with open(file_path, 'r', encoding='utf-8') as file:
               content = file.read()
+
             mpvVersion = re.search(r'(case .libmpv[^"]+?)"(.+?)"', content).group(2)
             ffmpegVersion = re.search(r'(case .FFmpeg[^"]+?)"(.+?)"', content).group(2)
             libplaceboVersion = re.search(r'(case .libplacebo[^"]+?)"(.+?)"', content).group(2)
             vulkanVersion = re.search(r'(case .vulkan[^"]+?)"(.+?)"', content).group(2)
-            releaseNote = f'''
-            * mpv version: {mpvVersion}
-            * ffmpeg version: {ffmpegVersion}
-            * placebo version: v{libplaceboVersion}
-            * MoltenVK version: v{vulkanVersion}
-            '''
-            set_env('RELEASE_NOTE', releaseNote)
+
+            print(f'mpv version: {mpvVersion}')
+            print(f'ffmpeg version: {ffmpegVersion}')
+            releaseVersion = normalize_version('${{ github.event.inputs.version }}' or mpvVersion)
+            print(f'release version: {releaseVersion}')
+            set_env('MPV_VERSION', mpvVersion)
+            set_env('RELEASE_VERSION', releaseVersion)
+
+            with open('./RELEASE_NOTE.txt', 'w', encoding='utf-8') as file:
+              file.write(f'''
+              * mpv version: {mpvVersion}
+              * ffmpeg version: {ffmpegVersion}
+              * placebo version: v{libplaceboVersion}
+              * MoltenVK version: v{vulkanVersion}
+              ''')
 
 
       - name: Install dependencies
@@ -134,13 +151,13 @@ jobs:
       - name: Upload binary to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ github.event.inputs.version }}
-          tag_name: ${{ github.event.inputs.version }}
+          name: ${{ env.MPV_VERSION }}
+          tag_name: ${{ env.RELEASE_VERSION }}
           files: |
             ./dist/release/*.txt
             ./dist/release/*.zip
           prerelease: ${{ contains(github.event.inputs.version, 'alpha') || contains(github.event.inputs.version, 'beta') }}
-          body: ${{ env.RELEASE_NOTE }}
+          body_path: ./RELEASE_NOTE.txt
           generate_release_notes: true
           fail_on_unmatched_files: true
           

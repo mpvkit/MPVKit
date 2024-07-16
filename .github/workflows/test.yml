@@ -15,8 +15,12 @@ jobs:
         uses: jannekem/run-python-script-action@v1
         with:
           script: |
-            releaseNote = "* mpv version: v333%0A* ffmpeg version: v6767%0A"
-            set_env('RELEASE_NOTE', releaseNote)
+            with open('./RELEASE_NOTE.txt', 'w', encoding='utf-8') as file:
+              file.write(f'''
+              * mpv version: ddd
+              * ffmpeg version: v444.
+              * placebo version: 444
+              ''')
 
 
       - name: Install dependencies
@@ -31,7 +35,7 @@ jobs:
           tag_name: test
           files: |
             ./aaaa.txt
-          body: ${{ env.RELEASE_NOTE }}
+          body_path: ./RELEASE_NOTE.txt
           generate_release_notes: true
           fail_on_unmatched_files: true
           
