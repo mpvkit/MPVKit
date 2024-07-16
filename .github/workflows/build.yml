@@ -40,7 +40,7 @@ jobs:
 
             print(f'mpv version: {mpvVersion}')
             print(f'ffmpeg version: {ffmpegVersion}')
-            releaseVersion = normalize_version('${{ github.event.inputs.version }}' or mpvVersion)
+            releaseVersion = '${{ github.event.inputs.version }}' or normalize_version(mpvVersion)
             print(f'release version: {releaseVersion}')
             set_env('MPV_VERSION', mpvVersion)
             set_env('RELEASE_VERSION', releaseVersion)
