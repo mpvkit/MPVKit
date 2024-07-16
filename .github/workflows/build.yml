@@ -29,10 +29,12 @@ jobs:
             ffmpegVersion = re.search(r'(case .FFmpeg[^"]+?)"(.+?)"', content).group(2)
             libplaceboVersion = re.search(r'(case .libplacebo[^"]+?)"(.+?)"', content).group(2)
             vulkanVersion = re.search(r'(case .vulkan[^"]+?)"(.+?)"', content).group(2)
-            releaseNote = f'mpv version: {mpvVersion}\n' +
-                          f'ffmpeg version: {ffmpegVersion}\n' +
-                          f'placebo version: {libplaceboVersion}\n' +
-                          f'MoltenVK version: {vulkanVersion}'
+            releaseNote = f'''
+            mpv version: {mpvVersion}
+            ffmpeg version: {ffmpegVersion}
+            placebo version: {libplaceboVersion}
+            MoltenVK version: {vulkanVersion}
+            '''
             set_env('RELEASE_NOTE', releaseNote)
 
 
