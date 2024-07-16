@@ -15,10 +15,7 @@ jobs:
         uses: jannekem/run-python-script-action@v1
         with:
           script: |
-            releaseNote = f'''
-            * mpv version: v333
-            * ffmpeg version: v6767
-            '''
+            releaseNote = "* mpv version: v333\n* ffmpeg version: v6767\n"
             set_env('RELEASE_NOTE', releaseNote)
 
 
