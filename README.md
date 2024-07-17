@@ -1,7 +1,7 @@
 # MPVKit
 
 [![mpv](https://img.shields.io/badge/mpv-v0.38.0-blue.svg)](https://github.com/mpv-player/mpv)
-[![ffmpeg](https://img.shields.io/badge/ffmpeg-n7.0-blue.svg)](https://github.com/FFmpeg/FFmpeg)
+[![ffmpeg](https://img.shields.io/badge/ffmpeg-n7.0.1-blue.svg)](https://github.com/FFmpeg/FFmpeg)
 [![license](https://img.shields.io/github/license/mpvkit/MPVKit)](https://github.com/mpvkit/MPVKit/main/LICENSE)
 
 > MPVKit is only suitable for learning `libmpv` and will not be maintained too frequently.
@@ -54,6 +54,20 @@ make help
 ```
 
 > Use <kbd>Shift</kbd>+<kbd>i</kbd> to show stats overlay
+
+## Related Projects
+
+* [moltenvk-build](https://github.com/mpvkit/moltenvk-build)
+* [libplacebo-build](https://github.com/mpvkit/libplacebo-build)
+* [libdovi-build](https://github.com/mpvkit/libdovi-build)
+* [libshaderc-build](https://github.com/mpvkit/libshaderc-build)
+* [libbluray-build](https://github.com/mpvkit/libbluray-build)
+* [libluajit-build](https://github.com/mpvkit/libluajit-build)
+* [libass-build](https://github.com/mpvkit/libass-build)
+* [libsmbclient-build](https://github.com/mpvkit/libsmbclient-build)
+* [gnutls-build](https://github.com/mpvkit/gnutls-build)
+* [openssl-build](https://github.com/mpvkit/openssl-build)
+
 
 ## License
 Because MPVKit compiles FFmpeg and mpv with the GPL license enabled. So MPVKit follow the GPL license.
