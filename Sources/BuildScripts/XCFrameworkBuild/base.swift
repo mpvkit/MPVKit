@@ -1166,7 +1166,8 @@ enum Utility {
                                 let errPath = "\(firstMatch[1].value ?? "")"
                                 if !errPath.isEmpty {
                                     print("############# \(errPath) CONTENT BEGIN #############")
-                                    Utility.shell("cat \(errPath)")
+                                    let content = Utility.shell("cat \(errPath)", isOutput: true)
+                                    print(content ?? "")
                                     print("#############  \(errPath) CONTENT END #############")
                                 }
                             }
