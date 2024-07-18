@@ -384,7 +384,7 @@ private class BuildMPV: BaseBuild {
         var ldFlags = super.ldFlags(platform: platform, arch: arch)
 
         if BaseBuild.options.enableGPL {
-            path = thinDir(library: .libsmbclient, platform: platform, arch: arch)
+            let path = thinDir(library: .libsmbclient, platform: platform, arch: arch)
             if FileManager.default.fileExists(atPath: path.path) {
                 ldFlags.append(contentsOf: ["-lresolv", "-lpthread", "-lz", "-liconv"])
             }
