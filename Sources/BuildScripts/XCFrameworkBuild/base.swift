@@ -1156,11 +1156,23 @@ enum Utility {
             if let logURL = logURL {
                 // print log when run in GitHub Action
                 if ProcessInfo.processInfo.environment.keys.contains("GITHUB_ACTION") {
-                    print("############# \(logURL) CONTENT BEGIN #############")
                     if let content = String(data: try Data(contentsOf: logURL), encoding: .utf8) {
+                        print("############# \(logURL) CONTENT BEGIN #############")
                         print(content)
+                        print("#############  \(logURL) CONTENT END #############")
+                        if #available(macOS 13.0, *) {
+                            let regErrLogPath = try Regex("A full log can be found at\\s+?(/.*\\.txt)")
+                            if let firstMatch = content.firstMatch(of: regErrLogPath) {
+                                if let errURL = URL(string: "\(firstMatch[1].value ?? "")"), 
+                                    let content = String(data: try Data(contentsOf: errURL), encoding: .utf8) {
+                                    print("############# \(logURL) CONTENT BEGIN #############")
+                                    print(content)
+                                    print("#############  \(logURL) CONTENT END #############")
+                                }
+                            }
+                        }
                     }
-                    print("#############  \(logURL) CONTENT END #############")
+                    
                 }
                 print("please view log file for detail: \(logURL)\n")
             }
