@@ -366,6 +366,31 @@ private class BuildMPV: BaseBuild {
         }
     }
 
+    override func cFlags(platform: PlatformType, arch: ArchType) -> [String] {
+        var cFlags = super.cFlags(platform: platform, arch: arch)
+
+        // append special libsmbclient include path
+        if BaseBuild.options.enableGPL {
+            let path = thinDir(library: .libsmbclient, platform: platform, arch: arch)
+            if FileManager.default.fileExists(atPath: path.path) {
+                cFlags.append("-I\(path.path)/include/samba-4.0")
+            }
+        }
+
+        return cFlags
+    }
+
+    override func ldFlags(platform: PlatformType, arch: ArchType) -> [String] {
+        var ldFlags = super.ldFlags(platform: platform, arch: arch)
+
+        if BaseBuild.options.enableGPL {
+            path = thinDir(library: .libsmbclient, platform: platform, arch: arch)
+            if FileManager.default.fileExists(atPath: path.path) {
+                ldFlags.append(contentsOf: ["-lresolv", "-lpthread", "-lz", "-liconv"])
+            }
+        }
+        return ldFlags
+    }
 
     override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
         var array = [
