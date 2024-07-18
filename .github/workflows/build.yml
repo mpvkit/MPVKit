@@ -59,7 +59,7 @@ jobs:
           brew install autoconf
           brew install automake
           brew install libtool
-          brew install meson
+          python -m pip install meson==1.4.2
           brew install ninja
           brew install rename
 
