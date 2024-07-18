@@ -1163,10 +1163,10 @@ enum Utility {
                         if #available(macOS 13.0, *) {
                             let regErrLogPath = try Regex("A full log can be found at\\s+?(/.*\\.txt)")
                             if let firstMatch = content.firstMatch(of: regErrLogPath) {
-                                if let errPath = firstMatch[1].value as? String {
-                                    print("############# \(logURL) CONTENT BEGIN #############")
+                                if let errPath = "\(firstMatch[1].value ?? "")", !errPath.isEmpty {
+                                    print("############# \(errPath) CONTENT BEGIN #############")
                                     Utility.shell("cat \(errPath)")
-                                    print("#############  \(logURL) CONTENT END #############")
+                                    print("#############  \(errPath) CONTENT END #############")
                                 }
                             }
                         }
