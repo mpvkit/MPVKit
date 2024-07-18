@@ -61,6 +61,7 @@ jobs:
           brew install libtool
           brew install ninja
           brew install rename
+          meson --version
 
       - name: Setup Xcode to support visionOS
         run: |
