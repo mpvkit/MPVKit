@@ -158,16 +158,16 @@ class BaseBuild {
         try? FileManager.default.createDirectory(at: buildURL, withIntermediateDirectories: true, attributes: nil)
         let environ = environment(platform: platform, arch: arch)
         if FileManager.default.fileExists(atPath: (directoryURL + "meson.build").path) {
-            if Utility.shell("which meson", environment: environ) == nil {
-                Utility.shell("brew install meson", environment: environ)
+            if Utility.shell("which meson") == nil {
+                Utility.shell("brew install meson")
             }
-            if Utility.shell("which ninja", environment: environ) == nil {
-                Utility.shell("brew install ninja", environment: environ)
+            if Utility.shell("which ninja") == nil {
+                Utility.shell("brew install ninja")
             }
             
 
             let crossFile = createMesonCrossFile(platform: platform, arch: arch)
-            let meson = Utility.shell("which meson", isOutput: true, environment: environ)!
+            let meson = Utility.shell("which meson", isOutput: true)!
             try Utility.launch(path: meson, arguments: ["setup", buildURL.path, "--cross-file=\(crossFile.path)"] + arguments(platform: platform, arch: arch), currentDirectoryURL: directoryURL, environment: environ)
             try Utility.launch(path: meson, arguments: ["compile", "--clean"], currentDirectoryURL: buildURL, environment: environ)
             try Utility.launch(path: meson, arguments: ["compile", "--verbose"], currentDirectoryURL: buildURL, environment: environ)
@@ -1077,6 +1077,11 @@ enum Utility {
         }
         if !environment.keys.contains("PATH") {
             environment["PATH"] = BaseBuild.defaultPath
+
+            // meson need to use pip version on GITHUB ACTION, use brew version will build failed
+            if ProcessInfo.processInfo.environment.keys.contains("GITHUB_ACTION") {
+                environment["PATH"] = "/Library/Frameworks/Python.framework/Versions/Current/bin:" + environment["PATH"]!
+            }
         }
         task.environment = environment
 

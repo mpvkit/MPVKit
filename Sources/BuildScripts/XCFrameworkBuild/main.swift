@@ -352,12 +352,6 @@ private class BuildMPV: BaseBuild {
         super.init(library: .libmpv)
     }
 
-    override func environment(platform: PlatformType, arch: ArchType) -> [String: String] {
-        var env = super.environment(platform: platform, arch: arch)
-        env["PATH"] = "/Library/Frameworks/Python.framework/Versions/Current/bin:" + (env["PATH"] ?? "") // GIT ACTION python path
-        return env
-    }
-
     override func flagsDependencelibrarys() -> [Library] {
         if BaseBuild.options.enableGPL {
             return [.gmp, .libsmbclient]

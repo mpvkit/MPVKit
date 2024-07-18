@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release tag name (default use mpv version)'
+        description: 'Release tag name (default mpv version)'
         default: ''
 
 jobs:
@@ -70,7 +70,7 @@ jobs:
 
       - name: Build GPL version
         run: |
-          make build enable-gpl version=${{ env.RELEASE_VERSION }} platform=xros
+          make build enable-gpl version=${{ env.RELEASE_VERSION }}
 
           cd ./dist/release
           rename 's/-all\.zip/-GPL-all\.zip/' *-all.zip
