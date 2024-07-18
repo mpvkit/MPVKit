@@ -70,8 +70,7 @@ jobs:
 
       - name: Build GPL version
         run: |
-          make build version=${{ env.RELEASE_VERSION }} platform=tvos
-          exit(1)
+          make build enable-gpl version=${{ env.RELEASE_VERSION }}
 
           cd ./dist/release
           rename 's/-all\.zip/-GPL-all\.zip/' *-all.zip
