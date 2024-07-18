@@ -70,7 +70,7 @@ jobs:
 
       - name: Build GPL version
         run: |
-          make build enable-gpl version=${{ env.RELEASE_VERSION }}
+          make build enable-gpl version=${{ env.RELEASE_VERSION }} platform=xros
 
           cd ./dist/release
           rename 's/-all\.zip/-GPL-all\.zip/' *-all.zip
