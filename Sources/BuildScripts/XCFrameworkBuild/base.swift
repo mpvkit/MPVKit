@@ -158,16 +158,16 @@ class BaseBuild {
         try? FileManager.default.createDirectory(at: buildURL, withIntermediateDirectories: true, attributes: nil)
         let environ = environment(platform: platform, arch: arch)
         if FileManager.default.fileExists(atPath: (directoryURL + "meson.build").path) {
-            if Utility.shell("which meson") == nil {
-                Utility.shell("brew install meson")
+            if Utility.shell("which meson", environ: environ) == nil {
+                Utility.shell("brew install meson", environ: environ)
             }
-            if Utility.shell("which ninja") == nil {
-                Utility.shell("brew install ninja")
+            if Utility.shell("which ninja", environ: environ) == nil {
+                Utility.shell("brew install ninja", environ: environ)
             }
             
 
             let crossFile = createMesonCrossFile(platform: platform, arch: arch)
-            let meson = Utility.shell("which meson", isOutput: true)!
+            let meson = Utility.shell("which meson", isOutput: true, environ: environ)!
             try Utility.launch(path: meson, arguments: ["setup", buildURL.path, "--cross-file=\(crossFile.path)"] + arguments(platform: platform, arch: arch), currentDirectoryURL: directoryURL, environment: environ)
             try Utility.launch(path: meson, arguments: ["compile", "--clean"], currentDirectoryURL: buildURL, environment: environ)
             try Utility.launch(path: meson, arguments: ["compile", "--verbose"], currentDirectoryURL: buildURL, environment: environ)
