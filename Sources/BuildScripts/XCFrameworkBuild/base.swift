@@ -1013,13 +1013,6 @@ enum ArchType: String, CaseIterable {
         return false
     }
 
-    var hostArchitecture: String {
-        #if arch(arm64)
-        return "arm64"
-        #else
-        return "x86_64"
-        #endif
-    }
 
     var cpuFamily: String {
         switch self {
@@ -1037,6 +1030,14 @@ enum ArchType: String, CaseIterable {
         case .x86_64:
             return "x86_64"
         }
+    }
+
+    static var hostArch : ArchType {
+        #if arch(arm64)
+        return .arm64
+        #else
+        return .x86_64
+        #endif
     }
 }
 

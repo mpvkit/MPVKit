@@ -350,7 +350,11 @@ enum Library: String, CaseIterable {
 private class BuildMPV: BaseBuild {
     init() {
         super.init(library: .libmpv)
- 
+    }
+
+    override func beforeBuild() throws {
+        try super.beforeBuild()
+
         let path = directoryURL + "meson.build"
         if let data = FileManager.default.contents(atPath: path.path), var str = String(data: data, encoding: .utf8) {
             str = str.replacingOccurrences(of: "# ffmpeg", with: """
