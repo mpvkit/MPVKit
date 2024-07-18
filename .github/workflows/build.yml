@@ -59,9 +59,9 @@ jobs:
           brew install autoconf
           brew install automake
           brew install libtool
+          brew install meson
           brew install ninja
           brew install rename
-          meson --version
 
       - name: Setup Xcode to support visionOS
         run: |
@@ -70,7 +70,8 @@ jobs:
 
       - name: Build GPL version
         run: |
-          make build enable-gpl version=${{ env.RELEASE_VERSION }} platform=xros
+          make build enable-gpl version=${{ env.RELEASE_VERSION }} platform=tvos
+          exit(1)
 
           cd ./dist/release
           rename 's/-all\.zip/-GPL-all\.zip/' *-all.zip
