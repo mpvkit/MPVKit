@@ -59,7 +59,6 @@ jobs:
           brew install autoconf
           brew install automake
           brew install libtool
-          brew install meson
           brew install ninja
           brew install rename
 
@@ -70,7 +69,7 @@ jobs:
 
       - name: Build GPL version
         run: |
-          make build enable-gpl version=${{ env.RELEASE_VERSION }} platform=tvos,xros
+          make build enable-gpl version=${{ env.RELEASE_VERSION }} platform=xros
 
           cd ./dist/release
           rename 's/-all\.zip/-GPL-all\.zip/' *-all.zip
