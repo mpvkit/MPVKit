@@ -67,7 +67,7 @@ enum Library: String, CaseIterable {
         case .libharfbuzz:
             return "0.17.3"
         case .libsmbclient:
-            return "4.15.13"
+            return "4.15.13-alpha"
         case .libdav1d:    // AV1 decoding
             return "1.4.3"
         case .lcms2:
@@ -350,28 +350,6 @@ enum Library: String, CaseIterable {
 private class BuildMPV: BaseBuild {
     init() {
         super.init(library: .libmpv)
-    }
-
-    override func beforeBuild() throws {
-        try super.beforeBuild()
-
-        let path = directoryURL + "meson.build"
-        if let data = FileManager.default.contents(atPath: path.path), var str = String(data: data, encoding: .utf8) {
-            str = str.replacingOccurrences(of: "# ffmpeg", with: """
-            add_languages('objc')
-            #ffmpeg
-            """)
-            str = str.replacingOccurrences(of: """
-            subprocess_source = files('osdep/subprocess-posix.c')
-            """, with: """
-            if host_machine.subsystem() == 'tvos' or host_machine.subsystem() == 'tvos-simulator'
-                subprocess_source = files('osdep/subprocess-dummy.c')
-            else
-                subprocess_source =files('osdep/subprocess-posix.c')
-            endif
-            """)
-            try! str.write(toFile: path.path, atomically: true, encoding: .utf8)
-        }
     }
 
     override func flagsDependencelibrarys() -> [Library] {
@@ -815,8 +793,6 @@ private class BuildBluray: BaseBuild {
 
     override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
         [
-            "--enable-udf",  // for read iso file
-
             "--disable-doxygen-doc",
             "--disable-doxygen-dot",
             "--disable-doxygen-html",

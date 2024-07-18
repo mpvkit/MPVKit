@@ -65,12 +65,12 @@ jobs:
 
       - name: Setup Xcode to support visionOS
         run: |
-          sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
           xcodebuild -showsdks
 
       - name: Build GPL version
         run: |
-          make build enable-gpl version=${{ env.RELEASE_VERSION }} platform=xros
+          make build enable-gpl version=${{ env.RELEASE_VERSION }} platform=tvos,xros
 
           cd ./dist/release
           rename 's/-all\.zip/-GPL-all\.zip/' *-all.zip
