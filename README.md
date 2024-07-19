@@ -67,6 +67,11 @@ make help
 * [gnutls-build](https://github.com/mpvkit/gnutls-build)
 * [openssl-build](https://github.com/mpvkit/openssl-build)
 
+## Donation
+
+If you appreciate my current work, you can buy me a cup of coffee ☕️.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C0C410P7UN)
 
 ## License
 Because MPVKit compiles FFmpeg and mpv with the GPL license enabled. So MPVKit follow the GPL license.
