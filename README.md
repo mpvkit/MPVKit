@@ -61,7 +61,6 @@ make help
 * [libplacebo-build](https://github.com/mpvkit/libplacebo-build)
 * [libdovi-build](https://github.com/mpvkit/libdovi-build)
 * [libshaderc-build](https://github.com/mpvkit/libshaderc-build)
-* [libbluray-build](https://github.com/mpvkit/libbluray-build)
 * [libluajit-build](https://github.com/mpvkit/libluajit-build)
 * [libass-build](https://github.com/mpvkit/libass-build)
 * [libsmbclient-build](https://github.com/mpvkit/libsmbclient-build)
