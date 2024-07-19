@@ -67,7 +67,7 @@ enum Library: String, CaseIterable {
         case .libharfbuzz:
             return "0.17.3"
         case .libsmbclient:
-            return "4.15.13-alpha"
+            return "4.15.13"
         case .libdav1d:    // AV1 decoding
             return "1.4.3"
         case .lcms2:
