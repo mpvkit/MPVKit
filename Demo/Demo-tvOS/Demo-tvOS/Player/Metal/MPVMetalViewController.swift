@@ -8,7 +8,7 @@ import Libmpv
 final class MPVMetalViewController: UIViewController {
     var metalLayer = MetalLayer()
     var mpv: OpaquePointer!
-    var delegate: MPVPlayerDelegate?
+    var playDelegate: MPVPlayerDelegate?
     lazy var queue = DispatchQueue(label: "mpv", qos: .userInitiated)
     
     var playUrl: URL?
@@ -25,10 +25,8 @@ final class MPVMetalViewController: UIViewController {
             // not recommended to use this way.
             if hdrEnabled {
                 checkError(mpv_set_option_string(mpv, "target-colorspace-hint", "yes"))
-//                checkError(mpv_set_option_string(mpv, "target-peak", "203"))
             } else {
                 checkError(mpv_set_option_string(mpv, "target-colorspace-hint", "no"))
-//                checkError(mpv_set_option_string(mpv, "target-peak", "auto"))
             }
         }
     }
@@ -37,9 +35,12 @@ final class MPVMetalViewController: UIViewController {
         super.viewDidLoad()
         
         metalLayer.frame = view.frame
+        print(view.bounds)
+        print(view.frame)
         metalLayer.contentsScale = UIScreen.main.nativeScale
         metalLayer.framebufferOnly = true
         metalLayer.backgroundColor = UIColor.black.cgColor
+        
         view.layer.addSublayer(metalLayer)
         
         setupMpv()
@@ -50,7 +51,9 @@ final class MPVMetalViewController: UIViewController {
     }
     
     override func viewDidLayoutSubviews() {
-        metalLayer.frame = self.view.frame
+        super.viewDidLayoutSubviews()
+        
+        metalLayer.frame = view.frame
     }
     
     func setupMpv() {
@@ -76,6 +79,8 @@ final class MPVMetalViewController: UIViewController {
         checkError(mpv_set_option_string(mpv, "gpu-api", "vulkan"))
         //checkError(mpv_set_option_string(mpv, "gpu-context", "moltenvk"))
         checkError(mpv_set_option_string(mpv, "hwdec", "videotoolbox"))
+        checkError(mpv_set_option_string(mpv, "video-rotate", "no"))
+        
         checkError(mpv_set_option_string(mpv, "ytdl", "no"))
 //        checkError(mpv_set_option_string(mpv, "target-colorspace-hint", "yes")) // HDR passthrough
 //        checkError(mpv_set_option_string(mpv, "tone-mapping-visualize", "yes"))  // only for debugging purposes
@@ -85,7 +90,7 @@ final class MPVMetalViewController: UIViewController {
         checkError(mpv_initialize(mpv))
         
         mpv_observe_property(mpv, 0, MPVProperty.videoParamsSigPeak, MPV_FORMAT_DOUBLE)
-        mpv_observe_property(mpv, 0, MPVProperty.videoParamsColormatrix, MPV_FORMAT_STRING)
+        mpv_observe_property(mpv, 0, MPVProperty.pausedForCache, MPV_FORMAT_FLAG)
         mpv_set_wakeup_callback(self.mpv, { (ctx) in
             let client = unsafeBitCast(ctx, to: MPVMetalViewController.self)
             client.readEvents()
@@ -186,7 +191,9 @@ final class MPVMetalViewController: UIViewController {
     }
     
     func readEvents() {
-        queue.async { [self] in
+        queue.async { [weak self] in
+            guard let self else { return }
+            
             while self.mpv != nil {
                 let event = mpv_wait_event(self.mpv, 0)
                 if event?.pointee.event_id == MPV_EVENT_NONE {
@@ -199,17 +206,10 @@ final class MPVMetalViewController: UIViewController {
                     if let property = UnsafePointer<mpv_event_property>(dataOpaquePtr)?.pointee {
                         let propertyName = String(cString: property.name)
                         switch propertyName {
-                        case MPVProperty.videoParamsSigPeak:
-                            if let sigPeak = UnsafePointer<Double>(OpaquePointer(property.data))?.pointee {
-                                DispatchQueue.main.async {
-                                    // FIXME: HDR toggle here may cause app issue
-                                    if self.hdrAvailable {
-                                        self.hdrEnabled = true
-                                    } else {
-                                        self.hdrEnabled = false
-                                    }
-                                    self.delegate?.propertyChange(mpv: mpv, propertyName: propertyName, data: sigPeak)
-                                }
+                        case MPVProperty.pausedForCache:
+                            let buffering = UnsafePointer<Bool>(OpaquePointer(property.data))?.pointee ?? true
+                            DispatchQueue.main.async {
+                                self.playDelegate?.propertyChange(mpv: self.mpv, propertyName: propertyName, data: buffering)
                             }
                         default: break
                         }

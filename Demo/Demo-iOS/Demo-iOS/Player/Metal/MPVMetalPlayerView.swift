@@ -6,7 +6,7 @@ struct MPVMetalPlayerView: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> some UIViewController {
         let mpv =  MPVMetalViewController()
-        mpv.delegate = coordinator
+        mpv.playDelegate = coordinator
         mpv.playUrl = coordinator.playUrl
         
         context.coordinator.player = mpv

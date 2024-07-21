@@ -20,7 +20,6 @@
 		F4EB5D292B61E48A00486E3F /* MPVMetalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D242B61E48A00486E3F /* MPVMetalViewController.swift */; };
 		F4EB5D2A2B61E48A00486E3F /* MPVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D252B61E48A00486E3F /* MPVViewController.swift */; };
 		F4EB5D2C2B61E48A00486E3F /* MPVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D272B61E48A00486E3F /* MPVPlayerView.swift */; };
-		F4EB5D2D2B61E48A00486E3F /* MPVOGLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EB5D282B61E48A00486E3F /* MPVOGLView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,7 +36,6 @@
 		F4EB5D242B61E48A00486E3F /* MPVMetalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVMetalViewController.swift; sourceTree = "<group>"; };
 		F4EB5D252B61E48A00486E3F /* MPVViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVViewController.swift; sourceTree = "<group>"; };
 		F4EB5D272B61E48A00486E3F /* MPVPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVPlayerView.swift; sourceTree = "<group>"; };
-		F4EB5D282B61E48A00486E3F /* MPVOGLView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVOGLView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,7 +53,6 @@
 		F4BA11AB2BCCFD9C00B472DE /* OpenGL */ = {
 			isa = PBXGroup;
 			children = (
-				F4EB5D282B61E48A00486E3F /* MPVOGLView.swift */,
 				F4EB5D272B61E48A00486E3F /* MPVPlayerView.swift */,
 				F4EB5D252B61E48A00486E3F /* MPVViewController.swift */,
 			);
@@ -204,7 +201,6 @@
 				F4EB5D182B61E45000486E3F /* ContentView.swift in Sources */,
 				F4850CAA2BEE59C900ABB79A /* MPVProperty.swift in Sources */,
 				F4EB5D162B61E45000486E3F /* Demo_tvOSApp.swift in Sources */,
-				F4EB5D2D2B61E48A00486E3F /* MPVOGLView.swift in Sources */,
 				F4EB5D2C2B61E48A00486E3F /* MPVPlayerView.swift in Sources */,
 				F4850CAB2BEE59C900ABB79A /* MPVPlayerDelegate.swift in Sources */,
 			);

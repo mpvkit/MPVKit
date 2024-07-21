@@ -2,21 +2,17 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var coordinator = MPVMetalPlayerView.Coordinator()
-    @State var pause = false
-    @State var hdrEnabled = false
-    @State var tonemappingVisualizeEnabled = false
-    @State var showControlOverlay = false
+    @State var loading = false
     
     
     var body: some View {
         VStack {
             MPVMetalPlayerView(coordinator: coordinator)
-                .play(URL(string: "https://github.com/cxfksword/video-test/raw/master/resources/HDR10_ToneMapping_Test_240_1000_nits.mp4")!)
+                .play(URL(string: "https://github.com/mpvkit/video-test/raw/master/resources/HDR10_ToneMapping_Test_240_1000_nits.mp4")!)
                 .onPropertyChange{ player, propertyName, propertyData in
                     switch propertyName {
-                    case MPVProperty.videoParamsSigPeak:
-                        hdrEnabled = player.hdrEnabled
-                        pause = false
+                    case MPVProperty.pausedForCache:
+                        loading = propertyData as! Bool
                     default: break
                     }
                 }
@@ -32,29 +28,44 @@ struct ContentView: View {
                             Text("h264").frame(width: 130, height: 100)
                         }
                         Button {
-                            coordinator.play(URL(string: "https://github.com/cxfksword/video-test/raw/master/resources/h265.mp4")!)
+                            coordinator.play(URL(string: "https://github.com/mpvkit/video-test/raw/master/resources/h265.mp4")!)
                         } label: {
                             Text("h265").frame(width: 130, height: 100)
                         }
                         Button {
-                            coordinator.play(URL(string: "https://github.com/cxfksword/video-test/raw/master/resources/hdr.mkv")!)
-                        } label: {
-                            Text("HDR").frame(width: 130, height: 100)
-                        }
-                        Button {
-                            coordinator.play(URL(string: "https://github.com/cxfksword/video-test/raw/master/resources/pgs_subtitle.mkv")!)
+                            coordinator.play(URL(string: "https://github.com/mpvkit/video-test/raw/master/resources/pgs_subtitle.mkv")!)
                         } label: {
                             Text("subtitle").frame(width: 130, height: 100)
                         }
                         Button {
-                            coordinator.play(URL(string: "https://github.com/cxfksword/video-test/raw/master/resources/rmvb.rm")!)
+                            coordinator.play(URL(string: "https://github.com/mpvkit/video-test/raw/master/resources/hdr.mkv")!)
                         } label: {
-                            Text("rmvb").frame(width: 130, height: 100)
+                            Text("HDR").frame(width: 130, height: 100)
+                        }
+                        Button {
+                            coordinator.play(URL(string: "https://github.com/mpvkit/video-test/raw/master/resources/DolbyVision_P5.mp4")!)
+                        } label: {
+                            Text("DV_P5").frame(width: 130, height: 100)
+                        }
+                        Button {
+                            coordinator.play(URL(string: "https://github.com/mpvkit/video-test/raw/master/resources/DolbyVision_P8.mp4")!)
+                        } label: {
+                            Text("DV_P8").frame(width: 130, height: 100)
                         }
                     }
                 }
             }
         }
+        .overlay(overlayView)
         .preferredColorScheme(.dark)
+    }
+    
+    @ViewBuilder
+    private var overlayView: some View {
+        if loading {
+            ProgressView()
+        } else {
+            EmptyView()
+        }
     }
 }

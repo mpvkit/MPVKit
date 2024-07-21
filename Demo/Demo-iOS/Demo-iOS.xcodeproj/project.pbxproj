@@ -11,7 +11,6 @@
 		F4850CA42BEE188300ABB79A /* MPVPlayerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4850CA22BEE188300ABB79A /* MPVPlayerDelegate.swift */; };
 		F4850CA52BEE188300ABB79A /* MPVProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4850CA32BEE188300ABB79A /* MPVProperty.swift */; };
 		F4850CA72BEE190100ABB79A /* MetalLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4850CA62BEE190100ABB79A /* MetalLayer.swift */; };
-		F49050C52B43B07300683EA6 /* MPVOGLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49050C42B43B07300683EA6 /* MPVOGLView.swift */; };
 		F49796712B42A42B009FEB5B /* MPVMetalPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49796702B42A42B009FEB5B /* MPVMetalPlayerView.swift */; };
 		F4A1F01B2A84EFE2004E91B7 /* Demo_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1F01A2A84EFE2004E91B7 /* Demo_iOSApp.swift */; };
 		F4A1F01D2A84EFE2004E91B7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1F01C2A84EFE2004E91B7 /* ContentView.swift */; };
@@ -30,7 +29,6 @@
 		F4850CA22BEE188300ABB79A /* MPVPlayerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVPlayerDelegate.swift; sourceTree = "<group>"; };
 		F4850CA32BEE188300ABB79A /* MPVProperty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVProperty.swift; sourceTree = "<group>"; };
 		F4850CA62BEE190100ABB79A /* MetalLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalLayer.swift; sourceTree = "<group>"; };
-		F49050C42B43B07300683EA6 /* MPVOGLView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVOGLView.swift; sourceTree = "<group>"; };
 		F49796702B42A42B009FEB5B /* MPVMetalPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPVMetalPlayerView.swift; sourceTree = "<group>"; };
 		F4A1F0172A84EFE2004E91B7 /* Demo-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Demo-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4A1F01A2A84EFE2004E91B7 /* Demo_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Demo_iOSApp.swift; sourceTree = "<group>"; };
@@ -121,7 +119,6 @@
 		F4BA11AF2BCCFF1000B472DE /* OpenGL */ = {
 			isa = PBXGroup;
 			children = (
-				F49050C42B43B07300683EA6 /* MPVOGLView.swift */,
 				F4A1F02A2A84F022004E91B7 /* MPVPlayerView.swift */,
 				F4A1F0292A84F022004E91B7 /* MPVViewController.swift */,
 			);
@@ -223,7 +220,6 @@
 				F4A1F02B2A84F022004E91B7 /* MPVViewController.swift in Sources */,
 				F4850CA52BEE188300ABB79A /* MPVProperty.swift in Sources */,
 				F4850CA42BEE188300ABB79A /* MPVPlayerDelegate.swift in Sources */,
-				F49050C52B43B07300683EA6 /* MPVOGLView.swift in Sources */,
 				F49796712B42A42B009FEB5B /* MPVMetalPlayerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

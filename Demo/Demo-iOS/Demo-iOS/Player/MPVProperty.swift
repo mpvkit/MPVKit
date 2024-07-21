@@ -9,4 +9,6 @@ struct MPVProperty {
     static let videoParamsSceneMaxR = "video-params/scene-max-r"
     static let videoParamsSceneMaxG = "video-params/scene-max-g"
     static let videoParamsSceneMaxB = "video-params/scene-max-b"
+    static let pause = "pause"
+    static let pausedForCache = "paused-for-cache"
 }

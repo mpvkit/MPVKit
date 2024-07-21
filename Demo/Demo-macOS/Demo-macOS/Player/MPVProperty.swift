@@ -12,4 +12,6 @@ struct MPVProperty {
     static let duration = "duration"
     static let timePos = "time-pos"
     static let path = "path"
+    static let pause = "pause"
+    static let pausedForCache = "paused-for-cache"
 }

@@ -2,12 +2,12 @@ import Foundation
 import SwiftUI
 
 struct MPVPlayerView: UIViewControllerRepresentable {
-    let playUrl : URL?
-    let coordinator = Coordinator()
+    @ObservedObject var coordinator: Coordinator
     
     func makeUIViewController(context: Context) -> some UIViewController {
         let mpv =  MPVViewController()
-        mpv.playUrl = playUrl
+        mpv.playDelegate = coordinator
+        mpv.playUrl = coordinator.playUrl
         
         context.coordinator.player = mpv
         return mpv
@@ -20,11 +20,31 @@ struct MPVPlayerView: UIViewControllerRepresentable {
         coordinator
     }
     
-    public final class Coordinator: ObservableObject {
+    func play(_ url: URL) -> Self {
+        coordinator.playUrl = url
+        return self
+    }
+    
+    func onPropertyChange(_ handler: @escaping (MPVViewController, String, Any?) -> Void) -> Self {
+        coordinator.onPropertyChange = handler
+        return self
+    }
+    
+    @MainActor
+    public final class Coordinator: MPVPlayerDelegate, ObservableObject {
         weak var player: MPVViewController?
         
+        var playUrl : URL?
+        var onPropertyChange: ((MPVViewController, String, Any?) -> Void)?
+        
         func play(_ url: URL) {
-            player?.play(url)
+            player?.loadFile(url)
+        }
+        
+        func propertyChange(mpv: OpaquePointer, propertyName: String, data: Any?) {
+            guard let player else { return }
+            
+            self.onPropertyChange?(player, propertyName, data)
         }
     }
 }

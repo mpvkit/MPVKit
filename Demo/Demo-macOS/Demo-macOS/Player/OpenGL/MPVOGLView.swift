@@ -6,6 +6,7 @@ import Libmpv
 final class MPVOGLView: NSOpenGLView {
     var mpv: OpaquePointer!
     var mpvGL: OpaquePointer!
+    var playDelegate: MPVPlayerDelegate?
     var queue = DispatchQueue(label: "mpv", qos: .userInteractive)
     private var defaultFBO: GLint = -1
     
@@ -87,6 +88,7 @@ final class MPVOGLView: NSOpenGLView {
         
         }
         
+        mpv_observe_property(mpv, 0, MPVProperty.pausedForCache, MPV_FORMAT_FLAG)
         mpv_set_wakeup_callback(self.mpv, mpvWakeUp, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
     }
     
@@ -104,6 +106,27 @@ final class MPVOGLView: NSOpenGLView {
         }
         
         command("loadfile", args: args)
+    }
+    
+    func getDouble(_ name: String) -> Double {
+        guard mpv != nil else { return 0.0 }
+        var data = Double()
+        mpv_get_property(mpv, name, MPV_FORMAT_DOUBLE, &data)
+        return data
+    }
+    
+    func getString(_ name: String) -> String? {
+        guard mpv != nil else { return nil }
+        let cstr = mpv_get_property_string(mpv, name)
+        let str: String? = cstr == nil ? nil : String(cString: cstr!)
+        mpv_free(cstr)
+        return str
+    }
+    
+    func setFlag(_ name: String, _ flag: Bool) {
+        guard mpv != nil else { return }
+        var data: Int = flag ? 1 : 0
+        mpv_set_property(mpv, name, MPV_FORMAT_FLAG, &data)
     }
     
     func command(
@@ -152,6 +175,25 @@ final class MPVOGLView: NSOpenGLView {
                     break
                 }
                 switch event!.pointee.event_id {
+                case MPV_EVENT_PROPERTY_CHANGE:
+                    let dataOpaquePtr = OpaquePointer(event!.pointee.data)
+                    if let property = UnsafePointer<mpv_event_property>(dataOpaquePtr)?.pointee {
+                        let propertyName = String(cString: property.name)
+                        switch propertyName {
+                        case MPVProperty.videoParamsSigPeak:
+                            if let sigPeak = UnsafePointer<Double>(OpaquePointer(property.data))?.pointee {
+                                DispatchQueue.main.async {
+                                    self.playDelegate?.propertyChange(mpv: self.mpv, propertyName: propertyName, data: sigPeak)
+                                }
+                            }
+                        case MPVProperty.pausedForCache:
+                            let buffering = UnsafePointer<Bool>(OpaquePointer(property.data))?.pointee ?? true
+                            DispatchQueue.main.async {
+                                self.playDelegate?.propertyChange(mpv: self.mpv, propertyName: propertyName, data: buffering)
+                            }
+                        default: break
+                        }
+                    }
                 case MPV_EVENT_SHUTDOWN:
                     mpv_render_context_free(mpvGL);
                     mpv_terminate_destroy(mpv);
