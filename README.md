@@ -6,7 +6,7 @@
 
 > MPVKit is only suitable for learning `libmpv` and will not be maintained too frequently.
 
-`MPVKit` is a collection of tools to use `mpv` in `iOS`, `macOS`, `tvOS`, `visionOS` applications.
+`MPVKit` is a collection of tools to use `mpv` in `iOS`, `macOS`, `tvOS` applications.
 
 It includes scripts to build `mpv` native libraries.
 
