@@ -73,11 +73,12 @@ class ArgumentOptions {
                             options.platforms += [PlatformType.ios, PlatformType.isimulator]
                         case "tvos":
                             options.platforms += [PlatformType.tvos, PlatformType.tvsimulator]
+                        case "xros":
+                            options.platforms += [PlatformType.xros, PlatformType.xrsimulator]
                         default:
-                            if let other = PlatformType(rawValue: platformStr), !options.platforms.contains(other) {
+                            guard let other = PlatformType(rawValue: platformStr) else { throw NSError(domain: "unknown platform: \(val)", code: 1) } 
+                            if !options.platforms.contains(other) {
                                 options.platforms += [other]
-                            } else {
-                                throw NSError(domain: "unknown platform: \(val)", code: 1)
                             }
                         }
                     }
