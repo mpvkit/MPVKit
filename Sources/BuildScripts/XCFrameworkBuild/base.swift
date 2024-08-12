@@ -435,7 +435,7 @@ class BaseBuild {
     }
 
     private func createPlist(path: String, name: String, minVersion: String, platform: String) {
-        let identifier = "com.kintan.ksplayer." + name
+        let identifier = "com.mpvkit." + normalizeBundleIdentifier(name)
         let content = """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -471,6 +471,11 @@ class BaseBuild {
         </plist>
         """
         FileManager.default.createFile(atPath: path, contents: content.data(using: .utf8), attributes: nil)
+    }
+
+    // CFBundleIdentifier must contain only alphanumerics, dots, hyphens 
+    private func normalizeBundleIdentifier(_ identifier: String) -> String {
+        return identifier.replacingOccurrences(of: "_", with: "")
     }
 
 
