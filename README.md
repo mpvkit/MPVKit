@@ -77,4 +77,4 @@ If you appreciate my current work, you can buy me a cup of coffee ☕️.
 
 `MPVKit` source alone is licensed under the LGPL v3.0.
 
-`MPVKit` bundles (`frameworks`, `xcframeworks`), which include both `libmpv` and `FFmpeg` libraries, are also licensed under the LGPL v3.0. However, if the source code is built using the optional `enable-gpl` flag or prebuilt binaries with ``-GPL` postfix are used, then `MPVKit` bundles become subject to the GPL v3.0.
+`MPVKit` bundles (`frameworks`, `xcframeworks`), which include both `libmpv` and `FFmpeg` libraries, are also licensed under the LGPL v3.0. However, if the source code is built using the optional `enable-gpl` flag or prebuilt binaries with `-GPL` postfix are used, then `MPVKit` bundles become subject to the GPL v3.0.
