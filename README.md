@@ -36,13 +36,13 @@ https://github.com/mpvkit/MPVKit.git
 
 ```bash
 make build
-# or specified platforms (ios,macos,tvos,tvsimulator,isimulator,maccatalyst,xros,xrsimulator)
+# specified platforms (ios,macos,tvos,tvsimulator,isimulator,maccatalyst,xros,xrsimulator)
 make build platform=ios,macos
-# or build GPL version
+# build GPL version
 make build enable-gpl
-# or clean all build temp files and cache
+# clean all build temp files and cache
 make clean
-# or see help
+# see help
 make help
 ```
 
@@ -74,4 +74,7 @@ If you appreciate my current work, you can buy me a cup of coffee ☕️.
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C0C410P7UN)
 
 ## License
-Because MPVKit compiles FFmpeg and mpv with the GPL license enabled. So MPVKit follow the GPL license.
+
+`MPVKit` source alone is licensed under the LGPL v3.0.
+
+`MPVKit` bundles (`frameworks`, `xcframeworks`), which include both `libmpv` and `FFmpeg` libraries, are also licensed under the LGPL v3.0. However, if the source code is built using the optional `enable-gpl` flag or prebuilt binaries with ``-GPL` postfix are used, then `MPVKit` bundles become subject to the GPL v3.0.
