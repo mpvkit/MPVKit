@@ -32,7 +32,7 @@ jobs:
         id: version
         run: |
           cd ./ffmpeg
-          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          latest_tag=$(git tag | grep n | grep -v "-" | sort -r | head -n 1)
           echo "ffmpeg latest tag: $latest_tag"
           echo "FFMPEG_LATEST_VERSION=$latest_tag" >> $GITHUB_ENV
           cd ..
@@ -57,23 +57,24 @@ jobs:
                 return 0
               return int(re.sub(r'[^0-9]+', r'', ver))
 
-            commitMessage = ''
-
             file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
             with open(file_path, 'r', encoding='utf-8') as file:
               content = file.read()
+
             mpvOldVersion = re.search(r'(case .libmpv[^"]+?)"(.+?)"', content).group(2)
             print("mpv old version:", mpvOldVersion)
             mpvNewVersion = '${{ env.MPV_LATEST_VERSION }}'
+            if parse_version(mpvNewVersion) > parse_version(mpvOldVersion):
+              content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"${{ env.MPV_LATEST_VERSION }}"', content, count=1)
+              set_env('FOUND_NEW_MPV_VERSION', '1')
+
             ffmpegOldVersion = re.search(r'(case .FFmpeg[^"]+?)"(.+?)"', content).group(2)
             print("ffmpeg old version:", ffmpegOldVersion)
             ffmpegNewVersion = '${{ env.FFMPEG_LATEST_VERSION }}'
-            if parse_version(mpvNewVersion) > parse_version(mpvOldVersion):
-              content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"${{ env.MPV_LATEST_VERSION }}"', content, count=1)
-              commitMessage += "mpv bump version to ${{ env.MPV_LATEST_VERSION }}\n"
             if parse_version(ffmpegNewVersion) > parse_version(ffmpegOldVersion):
               content = re.sub(r'(case .FFmpeg[^"]+?)"(.+?)"', r'\1"${{ env.FFMPEG_LATEST_VERSION }}"', content, count=1)
-              commitMessage += "mpv bump version to ${{ env.MPV_LATEST_VERSION }}\n"
+              set_env('FOUND_NEW_FFMPEG_VERSION', '1')
+
             with open(file_path, 'w', encoding='utf-8') as file:
               file.write(content)
             
@@ -88,16 +89,37 @@ jobs:
             with open(file_path, 'w', encoding='utf-8') as file:
               file.write(content)
 
-            set_env('COMMIT_MESSAGE', commitMessage)
-
 
       - name: Create Pull Request
+        if: env.FOUND_NEW_MPV_VERSION && !env.FOUND_NEW_FFMPEG_VERSION
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: |
+            ./Sources/BuildScripts/XCFrameworkBuild/main.swift
+            ./README.md
+          title: "mpv bump version to ${{ env.MPV_LATEST_VERSION }}"
+          body: "https://github.com/mpv-player/mpv/releases/tag/${{ env.MPV_LATEST_VERSION }}\n"
+          commit-message: "chore: mpv bump version to ${{ env.MPV_LATEST_VERSION }}"
+
+      - name: Create Pull Request
+        if: env.FOUND_NEW_FFMPEG_VERSION && !env.FOUND_NEW_MPV_VERSION
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: |
+            ./Sources/BuildScripts/XCFrameworkBuild/main.swift
+            ./README.md
+          title: "FFmpeg bump version to ${{ env.FFMPEG_LATEST_VERSION }}"
+          body: "https://github.com/FFmpeg/FFmpeg/blob/${{ env.FFMPEG_LATEST_VERSION }}/Changelog\n"
+          commit-message: "chore: FFmpeg bump version to ${{ env.FFMPEG_LATEST_VERSION }}"
+
+      - name: Create Pull Request
+        if: env.FOUND_NEW_FFMPEG_VERSION && env.FOUND_NEW_MPV_VERSION
         uses: peter-evans/create-pull-request@v6
         with:
           add-paths: |
             ./Sources/BuildScripts/XCFrameworkBuild/main.swift
             ./README.md
           title: "mpv ${{ env.MPV_LATEST_VERSION }} && FFmpeg ${{ env.FFMPEG_LATEST_VERSION }}"
-          body: "${{ env.COMMIT_MESSAGE }}"
-          commit-message: "chore: ${{ env.COMMIT_MESSAGE }}"
+          body: "https://github.com/mpv-player/mpv/releases/tag/${{ env.MPV_LATEST_VERSION }}\nhttps://github.com/FFmpeg/FFmpeg/blob/${{ env.FFMPEG_LATEST_VERSION }}/Changelog\n"
+          commit-message: "chore: mpv ${{ env.MPV_LATEST_VERSION }} && FFmpeg ${{ env.FFMPEG_LATEST_VERSION }}"
           

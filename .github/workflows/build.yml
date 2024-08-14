@@ -47,8 +47,8 @@ jobs:
 
             with open('/tmp/RELEASE_NOTE.txt', 'w', encoding='utf-8') as file:
               file.write(f'''
-              * mpv version: {mpvVersion}
-              * ffmpeg version: {ffmpegVersion}
+              * mpv version: {mpvVersion} ([changelog](https://github.com/mpv-player/mpv/releases/tag/{mpvVersion}))
+              * ffmpeg version: {ffmpegVersion} ([changelog](https://github.com/FFmpeg/FFmpeg/blob/{ffmpegVersion}/Changelog))
               * placebo version: v{libplaceboVersion}
               * MoltenVK version: v{vulkanVersion}
               ''')
