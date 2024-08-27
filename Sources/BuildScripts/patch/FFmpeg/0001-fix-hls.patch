@@ -23,7 +23,7 @@ index 62473a15dd..1bacc52f4b 100644
 -                    if (ts_diff >= 0 && (pls->seek_flags  & AVSEEK_FLAG_ANY ||
 -                                        pls->pkt->flags & AV_PKT_FLAG_KEY)) {
 +                    if ((ts_diff >= 0 && (pls->seek_flags & AVSEEK_FLAG_ANY)) ||
-+                        (!(pls->seek_flags & AVSEEK_FLAG_ANY) && (pls->pkt.flags & AV_PKT_FLAG_KEY)))  {
++                        (!(pls->seek_flags & AVSEEK_FLAG_ANY) && (pls->pkt->flags & AV_PKT_FLAG_KEY)))  {
                          pls->seek_timestamp = AV_NOPTS_VALUE;
                          break;
                      }
