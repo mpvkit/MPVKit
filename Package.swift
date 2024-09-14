@@ -188,8 +188,8 @@ let package = Package(
 
         .binaryTarget(
             name: "Libass",
-            url: "https://github.com/mpvkit/libass-build/releases/download/0.17.3/Libass.xcframework.zip",
-            checksum: "af24cd1429069153f0ca5c650e0b374c27ae38283aca47cbbbc9edb3165b182e"
+            url: "https://github.com/mpvkit/libass-build/releases/download/0.17.3-fallback/Libass.xcframework.zip",
+            checksum: "2a69d3ef5edd7d01cad3bdab0274103a66413eca69c525e834b27775f1db3c0b"
         ),
 
         .binaryTarget(
