@@ -98,33 +98,27 @@ let package = Package(
         ),
         .binaryTarget(
             name: "Libavcodec-GPL",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libavcodec-GPL.xcframework.zip",
-            checksum: "47b13ebf692898ef7d67a205e787576271029be24de7fc6bc650edc8ffcc742e"
+            path: "Sources/Libavcodec.xcframework"
         ),
         .binaryTarget(
             name: "Libavformat-GPL",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libavformat-GPL.xcframework.zip",
-            checksum: "3d33a56ce51e845ca3e55ce597d18efd3cc7fdf93830bf2c634cc56664083268"
+            path: "Sources/Libavformat.xcframework"
         ),
         .binaryTarget(
             name: "Libavfilter-GPL",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libavfilter-GPL.xcframework.zip",
-            checksum: "81acde32a7eda12c575bb2a02005fca83feb7f2a6bc34a9e71f5fd8209b11519"
+            path: "Sources/Libavfilter.xcframework"
         ),
         .binaryTarget(
             name: "Libavutil-GPL",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libavutil-GPL.xcframework.zip",
-            checksum: "c55e67f2ae9906c6e1c96ae86ccc9d31bf33d3896cd2be1852d53a43379e4049"
+            path: "Sources/Libavutil.xcframework"
         ),
         .binaryTarget(
             name: "Libswresample-GPL",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libswresample-GPL.xcframework.zip",
-            checksum: "8ebca51d22cf87ad7c08ee69757a7c3a6b887932e9b089510069a4f7e61cb5fb"
+            path: "Sources/Libswresample.xcframework"
         ),
         .binaryTarget(
             name: "Libswscale-GPL",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libswscale-GPL.xcframework.zip",
-            checksum: "16018897a536ba763456e10a836d3744cb765e7d8d68af41c37f4f30278f8531"
+            path: "Sources/Libswscale.xcframework"
         ),
         //AUTO_GENERATE_TARGETS_BEGIN//
 
@@ -188,8 +182,7 @@ let package = Package(
 
         .binaryTarget(
             name: "Libass",
-            url: "https://github.com/mpvkit/libass-build/releases/download/0.17.3/Libass.xcframework.zip",
-            checksum: "af24cd1429069153f0ca5c650e0b374c27ae38283aca47cbbbc9edb3165b182e"
+            path: "Sources/Libass.xcframework"
         ),
 
         .binaryTarget(
@@ -236,33 +229,27 @@ let package = Package(
 
         .binaryTarget(
             name: "Libavcodec",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libavcodec.xcframework.zip",
-            checksum: "cee5ee3c60c23a4955449c879ebe9e8d14222eb7eee44237001941de04f9ddd4"
+            path: "Sources/Libavcodec.xcframework"
         ),
         .binaryTarget(
             name: "Libavformat",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libavformat.xcframework.zip",
-            checksum: "dd55e8eab39dc7ad4471529f5fd4aeae9e5d56b1a32cfd16c99db9f07462b821"
+            path: "Sources/Libavformat.xcframework"
         ),
         .binaryTarget(
             name: "Libavfilter",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libavfilter.xcframework.zip",
-            checksum: "56dbac984f871d82d0c324b2db107d84698332046953182f8971fa221e213c6e"
+            path: "Sources/Libavfilter.xcframework"
         ),
         .binaryTarget(
             name: "Libavutil",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libavutil.xcframework.zip",
-            checksum: "6cd3c8c28441554d29af323c993e6d0fc3f22519d53fd3cc21532092173eda0a"
+            path: "Sources/Libavutil.xcframework"
         ),
         .binaryTarget(
             name: "Libswresample",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libswresample.xcframework.zip",
-            checksum: "ebd6efa0cedf840ff66d5943bb0fb4f2700e97429909d1ecf4967a75a324a47b"
+            path: "Sources/Libswresample.xcframework"
         ),
         .binaryTarget(
             name: "Libswscale",
-            url: "https://github.com/mpvkit/MPVKit/releases/download/0.38.0-fix/Libswscale.xcframework.zip",
-            checksum: "ea3d1ce5784b659015ce8c8f02a363bfd55bf0093dfa17a86cf9e5ca0038b1df"
+            path: "Sources/Libswscale.xcframework"
         ),
 
         .binaryTarget(
