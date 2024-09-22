@@ -123,6 +123,9 @@ class BaseBuild {
             _ = try? Utility.launch(path: "/usr/bin/git", arguments: ["checkout", "."], currentDirectoryURL: directoryURL)
             let fileNames = try! FileManager.default.contentsOfDirectory(atPath: patch.path).sorted()
             for fileName in fileNames {
+                if !fileName.hasSuffix(".patch") {
+                    continue
+                }
                 try! Utility.launch(path: "/usr/bin/git", arguments: ["apply", "\((patch + fileName).path)"], currentDirectoryURL: directoryURL)
             }
         }
@@ -475,7 +478,7 @@ class BaseBuild {
 
     // CFBundleIdentifier must contain only alphanumerics, dots, hyphens 
     private func normalizeBundleIdentifier(_ identifier: String) -> String {
-        return identifier.replacingOccurrences(of: "_", with: "")
+        return identifier.replacingOccurrences(of: "_", with: "-")
     }
 
 
