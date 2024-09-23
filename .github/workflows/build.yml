@@ -112,6 +112,11 @@ jobs:
           sed -i '' "s#\\\(Libavcodec-GPL_url)#${LibavcodecGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libavcodec-GPL_checksum)#${LibavcodecGPL_checksum}#g" ./Package.swift
 
+          LibavdeviceGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ env.RELEASE_VERSION }}/Libavdevice-GPL.xcframework.zip"
+          LibavdeviceGPL_checksum=$(cat ./dist/release/Libavdevice-GPL.xcframework.checksum.txt)
+          sed -i '' "s#\\\(Libavdevice-GPL_url)#${LibavdeviceGPL_url}#g" ./Package.swift
+          sed -i '' "s#\\\(Libavdevice-GPL_checksum)#${LibavdeviceGPL_checksum}#g" ./Package.swift
+
           LibavformatGPL_url="https://github.com/mpvkit/MPVKit/releases/download/${{ env.RELEASE_VERSION }}/Libavformat-GPL.xcframework.zip"
           LibavformatGPL_checksum=$(cat ./dist/release/Libavformat-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libavformat-GPL_url)#${LibavformatGPL_url}#g" ./Package.swift

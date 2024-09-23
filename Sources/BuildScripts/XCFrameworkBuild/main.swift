@@ -155,6 +155,11 @@ enum Library: String, CaseIterable {
                     checksum: ""
                 ),
                 .target(
+                    name: "Libavdevice",
+                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavdevice.xcframework.zip",
+                    checksum: ""
+                ),
+                .target(
                     name: "Libavformat",
                     url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavformat.xcframework.zip",
                     checksum: ""
@@ -579,11 +584,7 @@ private class BuildFFMPEG: BaseBuild {
             arguments.append("--enable-filter=color")
             arguments.append("--enable-filter=lut")
             arguments.append("--enable-filter=testsrc")
-            arguments.append("--disable-avdevice")
-            //            arguments.append("--enable-avdevice")
-            //            arguments.append("--enable-indev=lavfi")
         } else {
-            arguments.append("--disable-avdevice")
             arguments.append("--disable-programs")
         }
         //        if platform == .isimulator || platform == .tvsimulator {
