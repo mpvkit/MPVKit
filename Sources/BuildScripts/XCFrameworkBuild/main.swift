@@ -21,6 +21,7 @@ do {
     try BuildSmbclient().buildALL()
     
     // ffmpeg
+    try BuildUavs3d().buildALL()
     try BuildDovi().buildALL()
     try BuildVulkan().buildALL()
     try BuildShaderc().buildALL()
@@ -41,11 +42,11 @@ do {
 
 
 enum Library: String, CaseIterable {
-    case libmpv, FFmpeg, libshaderc, vulkan, lcms2, libdovi, openssl, libunibreak, libfreetype, libfribidi, libharfbuzz, libass, libsmbclient, libplacebo, libdav1d, gmp, nettle, gnutls, libuchardet, libbluray, libluajit
+    case libmpv, FFmpeg, libshaderc, vulkan, lcms2, libdovi, openssl, libunibreak, libfreetype, libfribidi, libharfbuzz, libass, libsmbclient, libplacebo, libdav1d, gmp, nettle, gnutls, libuchardet, libbluray, libluajit, libuavs3d
     var version: String {
         switch self {
         case .libmpv:
-            return "v0.38.0"
+            return "v0.39.0"
         case .FFmpeg:
             return "n7.0.2"
         case .openssl:
@@ -77,15 +78,17 @@ enum Library: String, CaseIterable {
         case .libdovi:
             return "3.3.0"
         case .vulkan:
-            return "1.2.9"
+            return "1.2.9-fix"
         case .libshaderc:  // compiling GLSL (OpenGL Shading Language) shaders into SPIR-V (Standard Portable Intermediate Representation - Vulkan) code
-            return "2024.1.0-fix"
+            return "2024.2.0"
         case .libuchardet:
             return "0.0.8"
         case .libbluray:
             return "1.3.4"
         case .libluajit:
             return "2.1.0"
+        case .libuavs3d:
+            return "1.2.1"
         }
     }
 
@@ -133,6 +136,8 @@ enum Library: String, CaseIterable {
             return "https://code.videolan.org/videolan/libbluray.git"
         case .libluajit:
             return "https://github.com/mpvkit/libluajit-build/releases/download/\(self.version)/libluajit-all.zip"
+        case .libuavs3d:
+            return "https://github.com/mpvkit/libuavs3d-build/releases/download/\(self.version)/libuavs3d-all.zip"
         }
     }
 
@@ -152,6 +157,11 @@ enum Library: String, CaseIterable {
                 .target(
                     name: "Libavcodec",
                     url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavcodec.xcframework.zip",
+                    checksum: ""
+                ),
+                .target(
+                    name: "Libavdevice",
+                    url: "https://github.com/mpvkit/MPVKit/releases/download/\(BaseBuild.options.releaseVersion)/Libavdevice.xcframework.zip",
                     checksum: ""
                 ),
                 .target(
@@ -340,6 +350,14 @@ enum Library: String, CaseIterable {
                     name: "Libluajit",
                     url: "https://github.com/mpvkit/libluajit-build/releases/download/\(self.version)/Libluajit.xcframework.zip",
                     checksum: "https://github.com/mpvkit/libluajit-build/releases/download/\(self.version)/Libluajit.xcframework.checksum.txt"
+                ),
+            ]
+        case .libuavs3d:
+            return  [
+                .target(
+                    name: "Libuavs3d",
+                    url: "https://github.com/mpvkit/libuavs3d-build/releases/download/\(self.version)/Libuavs3d.xcframework.zip",
+                    checksum: "https://github.com/mpvkit/libuavs3d-build/releases/download/\(self.version)/Libuavs3d.xcframework.checksum.txt"
                 ),
             ]
         }
@@ -579,17 +597,13 @@ private class BuildFFMPEG: BaseBuild {
             arguments.append("--enable-filter=color")
             arguments.append("--enable-filter=lut")
             arguments.append("--enable-filter=testsrc")
-            arguments.append("--disable-avdevice")
-            //            arguments.append("--enable-avdevice")
-            //            arguments.append("--enable-indev=lavfi")
         } else {
-            arguments.append("--disable-avdevice")
             arguments.append("--disable-programs")
         }
         //        if platform == .isimulator || platform == .tvsimulator {
         //            arguments.append("--assert-level=1")
         //        }
-        var dependencyLibrary = [Library.gmp, .gnutls, .libfreetype, .libharfbuzz, .libfribidi, .libass, .vulkan, .libshaderc, .lcms2, .libplacebo, .libdav1d]
+        var dependencyLibrary = [Library.gmp, .gnutls, .libfreetype, .libharfbuzz, .libfribidi, .libass, .vulkan, .libshaderc, .lcms2, .libplacebo, .libdav1d, .libuavs3d]
         if BaseBuild.options.enableGPL {
             dependencyLibrary += [.libsmbclient]
         }
@@ -599,7 +613,7 @@ private class BuildFFMPEG: BaseBuild {
                 arguments.append("--enable-\(library.rawValue)")
                 if library == .libsmbclient {
                     arguments.append("--enable-protocol=\(library.rawValue)")
-                } else if library == .libdav1d {
+                } else if library == .libdav1d || library == .libuavs3d {
                     arguments.append("--enable-decoder=\(library.rawValue)")
                 } else if library == .libass {
                     arguments.append("--enable-filter=ass")
@@ -912,6 +926,12 @@ private class BuildDav1d: ZipBaseBuild {
 private class BuildLittleCms: ZipBaseBuild {
     init() {
         super.init(library: .lcms2)
+    }
+}
+
+private class BuildUavs3d: ZipBaseBuild {
+    init() throws {
+        super.init(library: .libuavs3d)
     }
 }
 
