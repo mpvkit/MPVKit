@@ -191,7 +191,9 @@ jobs:
         with:
           add-paths: |
             ./Sources/BuildScripts/XCFrameworkBuild/main.swift
-          title: "bump version to ${{ env.LATEST_VERSION }}"
+          branch: "create-pull-request/${{ matrix.library.name }}"
+          delete-branch: true
+          title: "${{ matrix.library.name }} bump version to ${{ env.LATEST_VERSION }}"
           body: "https://github.com/${{ matrix.library.repository }}/releases/tag/${{ env.LATEST_VERSION }}\n"
-          commit-message: "chore: bump version to ${{ env.LATEST_VERSION }}"
+          commit-message: "chore: ${{ matrix.library.name }} bump version to ${{ env.LATEST_VERSION }}"
           
