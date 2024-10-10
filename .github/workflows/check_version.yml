@@ -123,7 +123,7 @@ jobs:
           body: "https://github.com/mpv-player/mpv/releases/tag/${{ env.MPV_LATEST_VERSION }}\nhttps://github.com/FFmpeg/FFmpeg/blob/${{ env.FFMPEG_LATEST_VERSION }}/Changelog\n"
           commit-message: "chore: mpv ${{ env.MPV_LATEST_VERSION }} && FFmpeg ${{ env.FFMPEG_LATEST_VERSION }}"
 
-check-deps:
+checkdeps:
     permissions:
       contents: write
       pull-requests: write
