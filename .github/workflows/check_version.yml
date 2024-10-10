@@ -6,7 +6,7 @@ on:
     - cron: '0 0 * * 1'
 
 jobs:
-  build:
+  check:
     permissions:
       contents: write
       pull-requests: write
@@ -122,4 +122,76 @@ jobs:
           title: "mpv ${{ env.MPV_LATEST_VERSION }} && FFmpeg ${{ env.FFMPEG_LATEST_VERSION }}"
           body: "https://github.com/mpv-player/mpv/releases/tag/${{ env.MPV_LATEST_VERSION }}\nhttps://github.com/FFmpeg/FFmpeg/blob/${{ env.FFMPEG_LATEST_VERSION }}/Changelog\n"
           commit-message: "chore: mpv ${{ env.MPV_LATEST_VERSION }} && FFmpeg ${{ env.FFMPEG_LATEST_VERSION }}"
+
+check-deps:
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      matrix:
+        library:
+          - name: libass
+            repository: "mpvkit/libass-build"
+          - name: vulkan
+            repository: "mpvkit/moltenvk-build"
+          - name: libplacebo
+            repository: "mpvkit/libplacebo-build"
+          - name: libshaderc
+            repository: "mpvkit/libshaderc-build"
+          - name: libdovi
+            repository: "mpvkit/libdovi-build"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.library.repository }}
+          path: 'latest_code'
+          fetch-depth: 0
+
+      - name: Get latest verion
+        id: version
+        run: |
+          cd ./latest_code
+          latest_tag=$(git tag --sort=-v:refname | grep -v "-" | head -n 1)
+          echo "latest tag: $latest_tag"
+          echo "LATEST_VERSION=$latest_tag" >> $GITHUB_ENV
+          rm -rf ../latest_code
+
+      - name: update to new version
+        uses: jannekem/run-python-script-action@v1
+        with:
+          script: |
+            import re
+
+            def parse_version(ver):
+              if '-' in ver or ver == '':
+                return 0
+              return int(re.sub(r'[^0-9]+', r'', ver))
+
+            file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
+            with open(file_path, 'r', encoding='utf-8') as file:
+              content = file.read()
+            oldVersion = re.search(r'(case .${{ matrix.library.name }}[^"]+?)"(.+?)"', content).group(2)
+            print("old version:", oldVersion)
+            newVersion = '${{ env.LATEST_VERSION }}'
+            print("new version:", newVersion)
+            if parse_version(newVersion) > parse_version(oldVersion):
+              content = re.sub(r'(case .${{ matrix.library.name }}[^"]+?)"(.+?)"', r'\1"${{ env.LATEST_VERSION }}"', content, count=1)
+              set_env('FOUND_NEW_VERSION', '1')
+              with open(file_path, 'w', encoding='utf-8') as file:
+                file.write(content)
+
+
+      - name: Create Pull Request
+        if: env.FOUND_NEW_VERSION
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: |
+            ./Sources/BuildScripts/XCFrameworkBuild/main.swift
+          title: "bump version to ${{ env.LATEST_VERSION }}"
+          body: "https://github.com/${{ matrix.library.repository }}/releases/tag/${{ env.LATEST_VERSION }}\n"
+          commit-message: "chore: bump version to ${{ env.LATEST_VERSION }}"
           
