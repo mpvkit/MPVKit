@@ -18,10 +18,7 @@
 		F4A1F0222A84EFE3004E91B7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4A1F0212A84EFE3004E91B7 /* Preview Assets.xcassets */; };
 		F4A1F02B2A84F022004E91B7 /* MPVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1F0292A84F022004E91B7 /* MPVViewController.swift */; };
 		F4A1F02C2A84F022004E91B7 /* MPVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1F02A2A84F022004E91B7 /* MPVPlayerView.swift */; };
-		F4A1F0332A84F2CE004E91B7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4A1F0322A84F2CE004E91B7 /* AVFoundation.framework */; };
-		F4A1F0352A84F2D4004E91B7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4A1F0342A84F2D4004E91B7 /* CoreAudio.framework */; };
-		F4A612412C45F4F300434C46 /* MPVKit in Resources */ = {isa = PBXBuildFile; fileRef = F4A612402C45F4F300434C46 /* MPVKit */; };
-		F4B91DA02C45528700DE563F /* MPVKit-GPL in Frameworks */ = {isa = PBXBuildFile; productRef = F4B91D9F2C45528700DE563F /* MPVKit-GPL */; };
+		F4D8669C2CBCAF20009CC9F8 /* MPVKit-GPL in Frameworks */ = {isa = PBXBuildFile; productRef = F4D8669B2CBCAF20009CC9F8 /* MPVKit-GPL */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +37,7 @@
 		F4A1F0302A84F226004E91B7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F4A1F0322A84F2CE004E91B7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		F4A1F0342A84F2D4004E91B7 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
-		F4A612402C45F4F300434C46 /* MPVKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MPVKit; path = ../..; sourceTree = "<group>"; };
+		F4D8669A2CBCAEC7009CC9F8 /* MPVKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MPVKit; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,9 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4B91DA02C45528700DE563F /* MPVKit-GPL in Frameworks */,
-				F4A1F0352A84F2D4004E91B7 /* CoreAudio.framework in Frameworks */,
-				F4A1F0332A84F2CE004E91B7 /* AVFoundation.framework in Frameworks */,
+				F4D8669C2CBCAF20009CC9F8 /* MPVKit-GPL in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,7 +55,6 @@
 		F4A1F00E2A84EFE2004E91B7 = {
 			isa = PBXGroup;
 			children = (
-				F4A612402C45F4F300434C46 /* MPVKit */,
 				F4A1F0192A84EFE2004E91B7 /* Demo-iOS */,
 				F4A1F0182A84EFE2004E91B7 /* Products */,
 				F4A1F0312A84F2CD004E91B7 /* Frameworks */,
@@ -110,6 +104,7 @@
 		F4A1F0312A84F2CD004E91B7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F4D8669A2CBCAEC7009CC9F8 /* MPVKit */,
 				F4A1F0342A84F2D4004E91B7 /* CoreAudio.framework */,
 				F4A1F0322A84F2CE004E91B7 /* AVFoundation.framework */,
 			);
@@ -152,7 +147,7 @@
 			);
 			name = "Demo-iOS";
 			packageProductDependencies = (
-				F4B91D9F2C45528700DE563F /* MPVKit-GPL */,
+				F4D8669B2CBCAF20009CC9F8 /* MPVKit-GPL */,
 			);
 			productName = "Demo-iOS";
 			productReference = F4A1F0172A84EFE2004E91B7 /* Demo-iOS.app */;
@@ -183,7 +178,6 @@
 			);
 			mainGroup = F4A1F00E2A84EFE2004E91B7;
 			packageReferences = (
-				F4B91D9E2C45528700DE563F /* XCRemoteSwiftPackageReference "MPVKit" */,
 			);
 			productRefGroup = F4A1F0182A84EFE2004E91B7 /* Products */;
 			projectDirPath = "";
@@ -199,7 +193,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4A612412C45F4F300434C46 /* MPVKit in Resources */,
 				F4A1F0222A84EFE3004E91B7 /* Preview Assets.xcassets in Resources */,
 				F4A1F01F2A84EFE3004E91B7 /* Assets.xcassets in Resources */,
 			);
@@ -422,21 +415,9 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		F4B91D9E2C45528700DE563F /* XCRemoteSwiftPackageReference "MPVKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mpvkit/MPVKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.38.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		F4B91D9F2C45528700DE563F /* MPVKit-GPL */ = {
+		F4D8669B2CBCAF20009CC9F8 /* MPVKit-GPL */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F4B91D9E2C45528700DE563F /* XCRemoteSwiftPackageReference "MPVKit" */;
 			productName = "MPVKit-GPL";
 		};
 /* End XCSwiftPackageProductDependency section */
