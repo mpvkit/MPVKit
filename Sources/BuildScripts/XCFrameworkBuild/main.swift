@@ -48,7 +48,7 @@ enum Library: String, CaseIterable {
         case .libmpv:
             return "v0.39.0"
         case .FFmpeg:
-            return "n7.0.2"
+            return "n7.1"
         case .openssl:
             return "3.2.0"
         case .gnutls:
