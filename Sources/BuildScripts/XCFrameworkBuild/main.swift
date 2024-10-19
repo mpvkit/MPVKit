@@ -630,9 +630,9 @@ private class BuildFFMPEG: BaseBuild {
 
     override func frameworkExcludeHeaders(_ framework: String) -> [String] {
         if framework == "Libavcodec" {
-            return ["xvmc", "vdpau", "qsv", "dxva2", "d3d11va"]
+            return ["xvmc", "vdpau", "qsv", "dxva2", "d3d11va", "d3d12va"]
         } else if framework == "Libavutil" {
-            return ["hwcontext_vulkan", "hwcontext_vdpau", "hwcontext_vaapi", "hwcontext_qsv", "hwcontext_opencl", "hwcontext_dxva2", "hwcontext_d3d11va", "hwcontext_cuda"]
+            return ["hwcontext_vulkan", "hwcontext_vdpau", "hwcontext_vaapi", "hwcontext_qsv", "hwcontext_opencl", "hwcontext_dxva2", "hwcontext_d3d11va", "hwcontext_d3d12va", "hwcontext_cuda"]
         } else {
             return super.frameworkExcludeHeaders(framework)
         }
@@ -662,7 +662,7 @@ private class BuildFFMPEG: BaseBuild {
         // ,"--disable-rdft"
         // ,"--disable-fft"
         // Hardware accelerators:
-        "--disable-d3d11va", "--disable-dxva2", "--disable-vaapi", "--disable-vdpau",
+        "--disable-d3d11va", "--disable-d3d12va", "--disable-dxva2", "--disable-vaapi", "--disable-vdpau",
         // Individual component options:
         // ,"--disable-everything"
         // ./configure --list-muxers
