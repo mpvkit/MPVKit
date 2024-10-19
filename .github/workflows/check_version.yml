@@ -55,7 +55,12 @@ jobs:
             def parse_version(ver):
               if '-' in ver or ver == '':
                 return 0
-              return int(re.sub(r'[^0-9]+', r'', ver))
+              version_string = re.sub(r'[^.0-9]+', r'', ver)
+              parts = re.split(r'\.', version_string)
+              major = int(parts[0])
+              minor = int(parts[1]) if len(parts) > 1 else 0
+              patch = int(parts[2]) if len(parts) > 2 else 0
+              return int(f"{major}{minor}{patch}")
 
             file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
             with open(file_path, 'r', encoding='utf-8') as file:
@@ -63,6 +68,7 @@ jobs:
 
             mpvOldVersion = re.search(r'(case .libmpv[^"]+?)"(.+?)"', content).group(2)
             print("mpv old version:", mpvOldVersion)
+            set_env('MPV_OLD_VERSION', mpvOldVersion)
             mpvNewVersion = '${{ env.MPV_LATEST_VERSION }}'
             if parse_version(mpvNewVersion) > parse_version(mpvOldVersion):
               content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"${{ env.MPV_LATEST_VERSION }}"', content, count=1)
@@ -70,6 +76,7 @@ jobs:
 
             ffmpegOldVersion = re.search(r'(case .FFmpeg[^"]+?)"(.+?)"', content).group(2)
             print("ffmpeg old version:", ffmpegOldVersion)
+            set_env('FFMPEG_OLD_VERSION', ffmpegOldVersion)
             ffmpegNewVersion = '${{ env.FFMPEG_LATEST_VERSION }}'
             if parse_version(ffmpegNewVersion) > parse_version(ffmpegOldVersion):
               content = re.sub(r'(case .FFmpeg[^"]+?)"(.+?)"', r'\1"${{ env.FFMPEG_LATEST_VERSION }}"', content, count=1)
@@ -98,7 +105,9 @@ jobs:
             ./Sources/BuildScripts/XCFrameworkBuild/main.swift
             ./README.md
           title: "mpv bump version to ${{ env.MPV_LATEST_VERSION }}"
-          body: "https://github.com/mpv-player/mpv/releases/tag/${{ env.MPV_LATEST_VERSION }}\n"
+          body: |
+            https://github.com/mpv-player/mpv/releases/tag/${{ env.MPV_LATEST_VERSION }}
+            https://github.com/mpv-player/mpv/compare/${{ env.MPV_OLD_VERSION }}...${{ env.MPV_LATEST_VERSION }}
           commit-message: "chore: mpv bump version to ${{ env.MPV_LATEST_VERSION }}"
 
       - name: Create Pull Request
@@ -109,7 +118,9 @@ jobs:
             ./Sources/BuildScripts/XCFrameworkBuild/main.swift
             ./README.md
           title: "FFmpeg bump version to ${{ env.FFMPEG_LATEST_VERSION }}"
-          body: "https://github.com/FFmpeg/FFmpeg/blob/${{ env.FFMPEG_LATEST_VERSION }}/Changelog\n"
+          body: |
+            https://github.com/FFmpeg/FFmpeg/blob/${{ env.FFMPEG_LATEST_VERSION }}/Changelog
+            https://github.com/FFmpeg/FFmpeg/compare/${{ env.FFMPEG_OLD_VERSION }}...${{ env.FFMPEG_LATEST_VERSION }}
           commit-message: "chore: FFmpeg bump version to ${{ env.FFMPEG_LATEST_VERSION }}"
 
       - name: Create Pull Request
@@ -120,7 +131,12 @@ jobs:
             ./Sources/BuildScripts/XCFrameworkBuild/main.swift
             ./README.md
           title: "mpv ${{ env.MPV_LATEST_VERSION }} && FFmpeg ${{ env.FFMPEG_LATEST_VERSION }}"
-          body: "https://github.com/mpv-player/mpv/releases/tag/${{ env.MPV_LATEST_VERSION }}\nhttps://github.com/FFmpeg/FFmpeg/blob/${{ env.FFMPEG_LATEST_VERSION }}/Changelog\n"
+          body: |
+            https://github.com/mpv-player/mpv/releases/tag/${{ env.MPV_LATEST_VERSION }}
+            https://github.com/mpv-player/mpv/compare/${{ env.MPV_OLD_VERSION }}...${{ env.MPV_LATEST_VERSION }}
+
+            https://github.com/FFmpeg/FFmpeg/blob/${{ env.FFMPEG_LATEST_VERSION }}/Changelog
+            https://github.com/FFmpeg/FFmpeg/compare/${{ env.FFMPEG_OLD_VERSION }}...${{ env.FFMPEG_LATEST_VERSION }}
           commit-message: "chore: mpv ${{ env.MPV_LATEST_VERSION }} && FFmpeg ${{ env.FFMPEG_LATEST_VERSION }}"
 
   check-deps:
@@ -169,7 +185,12 @@ jobs:
             def parse_version(ver):
               if '-' in ver or ver == '':
                 return 0
-              return int(re.sub(r'[^0-9]+', r'', ver))
+              version_string = re.sub(r'[^.0-9]+', r'', ver)
+              parts = re.split(r'\.', version_string)
+              major = int(parts[0])
+              minor = int(parts[1]) if len(parts) > 1 else 0
+              patch = int(parts[2]) if len(parts) > 2 else 0
+              return int(f"{major}{minor}{patch}")
 
             file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
             with open(file_path, 'r', encoding='utf-8') as file:
@@ -194,6 +215,7 @@ jobs:
           branch: "create-pull-request/${{ matrix.library.name }}"
           delete-branch: true
           title: "${{ matrix.library.name }} bump version to ${{ env.LATEST_VERSION }}"
-          body: "https://github.com/${{ matrix.library.repository }}/releases/tag/${{ env.LATEST_VERSION }}\n"
+          body: |
+            https://github.com/${{ matrix.library.repository }}/releases/tag/${{ env.LATEST_VERSION }}
           commit-message: "chore: ${{ matrix.library.name }} bump version to ${{ env.LATEST_VERSION }}"
           
