@@ -1,0 +1,39 @@
+From 0c14ac8d5f19f22f31ae9505e3db5eb417e8d6e0 Mon Sep 17 00:00:00 2001
+From: llyyr <llyyr.public@gmail.com>
+Date: Sun, 27 Oct 2024 06:52:42 +0530
+Subject: [PATCH 1/2] avformat/hls: always return keyframe if not
+ AVSEEK_FLAG_ANY
+
+Co-Authored-by: vectronic <hello.vectronic@gmail.com>
+---
+ libavformat/hls.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/libavformat/hls.c b/libavformat/hls.c
+index 62473a15ddb5..4d02faa9e49a 100644
+--- a/libavformat/hls.c
++++ b/libavformat/hls.c
+@@ -2350,8 +2350,10 @@ static int hls_read_packet(AVFormatContext *s, AVPacket *pkt)
+                     ts_diff = av_rescale_rnd(pls->pkt->dts, AV_TIME_BASE,
+                                             tb.den, AV_ROUND_DOWN) -
+                             pls->seek_timestamp;
+-                    if (ts_diff >= 0 && (pls->seek_flags  & AVSEEK_FLAG_ANY ||
+-                                        pls->pkt->flags & AV_PKT_FLAG_KEY)) {
++                    /* If AVSEEK_FLAG_ANY, keep reading until ts_diff >= 0,
++                     * otherwise return the first keyframe encountered */
++                    if ((ts_diff >= 0 && (pls->seek_flags & AVSEEK_FLAG_ANY)) ||
++                        (!(pls->seek_flags & AVSEEK_FLAG_ANY) && (pls->pkt->flags & AV_PKT_FLAG_KEY)))  {
+                         pls->seek_timestamp = AV_NOPTS_VALUE;
+                         break;
+                     }
+@@ -2502,7 +2504,7 @@ static int hls_read_seek(AVFormatContext *s, int stream_index,
+         pb->eof_reached = 0;
+         /* Clear any buffered data */
+         pb->buf_end = pb->buf_ptr = pb->buffer;
+-        /* Reset the pos, to let the mpegts demuxer know we've seeked. */
++        /* Reset the pos, to let the mpegts/mov demuxer know we've seeked. */
+         pb->pos = 0;
+         /* Flush the packet queue of the subdemuxer. */
+         ff_read_frame_flush(pls->ctx);
+-- 
+2.47.0
