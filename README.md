@@ -63,6 +63,7 @@ make help
 * [libshaderc-build](https://github.com/mpvkit/libshaderc-build)
 * [libluajit-build](https://github.com/mpvkit/libluajit-build)
 * [libass-build](https://github.com/mpvkit/libass-build)
+* [libbluray-build](https://github.com/mpvkit/libbluray-build)
 * [libsmbclient-build](https://github.com/mpvkit/libsmbclient-build)
 * [gnutls-build](https://github.com/mpvkit/gnutls-build)
 * [openssl-build](https://github.com/mpvkit/openssl-build)
