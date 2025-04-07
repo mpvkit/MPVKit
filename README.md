@@ -1,6 +1,6 @@
 # MPVKit
 
-[![mpv](https://img.shields.io/badge/mpv-v0.39.0-blue.svg)](https://github.com/mpv-player/mpv)
+[![mpv](https://img.shields.io/badge/mpv-v0.40.0-blue.svg)](https://github.com/mpv-player/mpv)
 [![ffmpeg](https://img.shields.io/badge/ffmpeg-n7.1.1-blue.svg)](https://github.com/FFmpeg/FFmpeg)
 [![license](https://img.shields.io/github/license/mpvkit/MPVKit)](https://github.com/mpvkit/MPVKit/main/LICENSE)
 
