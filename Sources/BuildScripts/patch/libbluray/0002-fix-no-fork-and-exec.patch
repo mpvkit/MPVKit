@@ -1,0 +1,47 @@
+diff --git forkSrcPrefix/src/libbluray/bdj/bdj.c forkDstPrefix/src/libbluray/bdj/bdj.c
+index 359bc8f13d40f6a85abadeacd0afd59ce1ed40f3..94f12d0051573faf89c83988f0621dd5587781a9 100644
+--- forkSrcPrefix/src/libbluray/bdj/bdj.c
++++ forkDstPrefix/src/libbluray/bdj/bdj.c
+@@ -44,6 +44,7 @@
+ #include <sys/wait.h>
+ #include <limits.h>
+ #include <unistd.h>
++#include "TargetConditionals.h"
+ #endif
+ 
+ #ifdef _WIN32
+@@ -248,7 +249,7 @@ static char *_java_home_macos()
+     if (result[0])
+         return result;
+ 
+-    pid_t java_home_pid;
++    pid_t java_home_pid = -1;
+     int fd[2], exitcode;
+ 
+     if (pipe(fd)) {
+@@ -256,7 +257,12 @@ static char *_java_home_macos()
+         return NULL;
+     }
+ 
+-    switch (java_home_pid = vfork())
++    #ifdef __APPLE__
++    #if TARGET_OS_OSX
++    java_home_pid = vfork();
++    #endif
++    #endif
++    switch (java_home_pid)
+     {
+         case -1:
+             BD_DEBUG(DBG_BDJ | DBG_CRIT, "vfork failed\n");
+@@ -270,7 +276,11 @@ static char *_java_home_macos()
+             close(fd[1]);
+             close(fd[0]);
+ 
++            #ifdef __APPLE__
++            #if TARGET_OS_OSX
+             execl(MACOS_JAVA_HOME, MACOS_JAVA_HOME);
++            #endif
++            #endif
+ 
+             _exit(-1);
+ 

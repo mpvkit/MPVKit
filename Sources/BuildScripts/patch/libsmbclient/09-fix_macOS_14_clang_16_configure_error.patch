@@ -1,0 +1,37 @@
+From 9c4d6ab703b52483a26ee8f9dd63f684318b2b5e Mon Sep 17 00:00:00 2001
+From: cxfksword <718792+cxfksword@users.noreply.github.com>
+Date: Sat, 13 Jul 2024 18:56:37 +0800
+Subject: [PATCH] fix: macOS 14 clang 16 configure error
+
+---
+ lib/replace/replace.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
+
+diff --git a/lib/replace/replace.c b/lib/replace/replace.c
+index 0652cb4e6d6..3d0a8c96f62 100644
+--- a/lib/replace/replace.c
++++ b/lib/replace/replace.c
+@@ -824,19 +824,7 @@ int rep_strerror_r(int errnum, char *buf, size_t buflen)
+ #undef strerror_r
+ int rep_strerror_r(int errnum, char *buf, size_t buflen)
+ {
+-	char *s = strerror_r(errnum, buf, buflen);
+-	if (s == NULL) {
+-		/* Shouldn't happen, should always get a string */
+-		return EINVAL;
+-	}
+-	if (s != buf) {
+-		strlcpy(buf, s, buflen);
+-		if (strlen(s) > buflen - 1) {
+-			return ERANGE;
+-		}
+-	}
+-	return 0;
+-
++	return strerror_r(errnum, buf, buflen);
+ }
+ #endif
+ 
+-- 
+2.37.5
+

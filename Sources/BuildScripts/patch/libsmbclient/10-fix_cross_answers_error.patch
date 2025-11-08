@@ -1,0 +1,22 @@
+From 18e41a7cf84f68ab7e2b24862254706e23b642cb Mon Sep 17 00:00:00 2001
+From: cxfksword <718792+cxfksword@users.noreply.github.com>
+Date: Thu, 18 Jul 2024 11:42:02 +0800
+Subject: [PATCH] fix: read cross-answers error
+
+---
+ buildtools/wafsamba/samba_cross.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/buildtools/wafsamba/samba_cross.py b/buildtools/wafsamba/samba_cross.py
+index 0868a855a0da..88a940304417 100644
+--- a/buildtools/wafsamba/samba_cross.py
++++ b/buildtools/wafsamba/samba_cross.py
+@@ -134,7 +134,7 @@ def __init__(*k, **kw):
+                 cross_answers_incomplete = True
+                 add_answer(ca_file, msg, ans)
+             (retcode, retstring) = ans
+-            args = ['/bin/sh', '-c', "echo -n '%s'; exit %d" % (retstring, retcode)]
++            args = ['/bin/bash', '-c', "echo -n '%s'; exit %d" % (retstring, retcode)]
+         real_Popen.__init__(*(obj, args), **kw)
+ 
+ 

@@ -1,0 +1,115 @@
+diff --git forkSrcPrefix/libass/ass_coretext.c forkDstPrefix/libass/ass_coretext.c
+index ba40ccab662bcaa79d246df4470b88d3cb833bfa..eabe0c53d494e3082ae84cf04d665fc050655770 100644
+--- forkSrcPrefix/libass/ass_coretext.c
++++ forkDstPrefix/libass/ass_coretext.c
+@@ -58,14 +58,17 @@ static char *cfstr2buf(CFStringRef string)
+     const char *buf_ptr = CFStringGetCStringPtr(string, encoding);
+     if (buf_ptr) {
+         return strdup(buf_ptr);
+-    } else {
+-        size_t len = CFStringGetLength(string);
+-        CFIndex buf_len = CFStringGetMaximumSizeForEncoding(len, encoding);
+-        char *buf = malloc(buf_len);
+-        if (buf)
+-            CFStringGetCString(string, buf, buf_len, encoding);
++    }
++
++    // https://gist.github.com/peter-bloomfield/1b228e2bb654702b1e50ef7524121fb9
++    size_t len = CFStringGetLength(string);
++    CFIndex buf_len = CFStringGetMaximumSizeForEncoding(len, encoding) + 1; // <-- leave room for null terminator
++    char *buf = malloc(buf_len);
++    if (buf && CFStringGetCString(string, buf, buf_len, encoding)) {
+         return buf;
+     }
++
++    return NULL;
+ }
+ 
+ static void destroy_font(void *priv)
+@@ -133,6 +136,17 @@ static char *get_name(CTFontDescriptorRef fontd, CFStringRef attr)
+     return ret;
+ }
+ 
++static char *get_localized_name(CTFontDescriptorRef fontd, CFStringRef attr)
++{
++    char *ret = NULL;
++    CFStringRef name = CTFontDescriptorCopyLocalizedAttribute(fontd, attr, NULL);
++    if (name) {
++        ret = cfstr2buf(name);
++        CFRelease(name);
++    }
++    return ret;
++}
++
+ static bool get_font_info_ct(CTFontDescriptorRef fontd,
+                              char **path_out,
+                              ASS_FontProviderMetaData *info)
+@@ -255,6 +269,54 @@ cleanup:
+     CFRelease(cfname);
+ }
+ 
++static char *find_font_by_localized_name(ASS_Library *lib, const char *family, CFStringRef r)
++{
++    CFDictionaryRef attrs = CFDictionaryCreate(NULL, NULL, NULL, 0, NULL, NULL);
++    CTFontDescriptorRef descriptor = CTFontDescriptorCreateWithAttributes(attrs);
++    CFRelease(attrs);
++    CFArrayRef matches = CTFontDescriptorCreateMatchingFontDescriptors(descriptor, NULL);
++    CFRelease(descriptor);
++    if (!matches)
++        return NULL;
++
++    // ass file font name is part of display name, match first
++    for (int i = 0; i < CFArrayGetCount(matches); i++) {
++        CTFontDescriptorRef fontDescriptor = CFArrayGetValueAtIndex(matches, i);
++        if (!fontDescriptor)
++            continue;
++
++        char *localized_family_name = get_localized_name(fontDescriptor, kCTFontFamilyNameAttribute);
++        if (!localized_family_name) {
++            continue;
++        }
++
++        // check font name prefix match
++        if (strncmp(localized_family_name, family, strlen(family)) != 0) {
++            free(localized_family_name);
++            continue;
++        }
++        free(localized_family_name);
++
++        // check found font can render character
++        CTFontRef fontF = CTFontCreateWithFontDescriptor(fontDescriptor, 0, NULL);
++        CTFontRef fbF = CTFontCreateForString(fontF, r, CFRangeMake(0, 1));
++        CFRelease(fontF);
++        if (fbF) {
++            CFStringRef cffamily = CTFontCopyFamilyName(fbF);
++            CFRelease(fbF);
++            if (cffamily) {
++                char *res_family = cfstr2buf(cffamily);
++                CFRelease(cffamily);
++                CFRelease(matches);
++                return res_family;
++            }
++        }
++    }
++
++    CFRelease(matches);
++    return NULL;
++}
++
+ static char *get_fallback(void *priv, ASS_Library *lib,
+                           const char *family, uint32_t codepoint)
+ {
+@@ -278,6 +340,13 @@ static char *get_fallback(void *priv, ASS_Library *lib,
+         return NULL;
+     }
+ 
++    // find font by localized name first
++    char *match_family = find_font_by_localized_name(lib, family, r);
++    if (match_family) {
++        CFRelease(r);
++        return match_family;
++    }
++
+     CTFontRef fb = CTFontCreateForString(font, r, CFRangeMake(0, 1));
+     CFRelease(font);
+     CFRelease(r);

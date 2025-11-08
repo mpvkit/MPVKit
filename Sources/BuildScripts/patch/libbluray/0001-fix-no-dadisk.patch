@@ -1,0 +1,33 @@
+diff --git forkSrcPrefix/src/file/mount_darwin.c forkDstPrefix/src/file/mount_darwin.c
+index 5b13450e973fca6f44efee5111fa49ac71b65436..4cfdafcb99418efbc1a1c5bbe88c2c0ace7cf8e4 100644
+--- forkSrcPrefix/src/file/mount_darwin.c
++++ forkDstPrefix/src/file/mount_darwin.c
+@@ -30,12 +30,19 @@
+ #define _DARWIN_C_SOURCE
+ #include <sys/stat.h>
+ 
++#ifdef __APPLE__
++#include <TargetConditionals.h>
++#if TARGET_OS_OSX
+ #include <DiskArbitration/DADisk.h>
++#endif
++#endif
+ 
+ static char *bsdname_get_mountpoint(const char *device_path)
+ {
+     char *result = NULL;
+ 
++    #ifdef __APPLE__
++    #if TARGET_OS_OSX
+     DASessionRef session = DASessionCreate(kCFAllocatorDefault);
+     if (session) {
+         DADiskRef disk = DADiskCreateFromBSDName(kCFAllocatorDefault, session, device_path);
+@@ -57,6 +64,8 @@ static char *bsdname_get_mountpoint(const char *device_path)
+         }
+         CFRelease(session);
+     }
++    #endif
++    #endif
+ 
+     return result;
+ }

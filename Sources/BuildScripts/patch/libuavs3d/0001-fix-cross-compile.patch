@@ -1,0 +1,25 @@
+diff --git forkSrcPrefix/CMakeLists.txt forkDstPrefix/CMakeLists.txt
+index 46458c74601f82e9540ad96d922c5d9de2dbe3db..73f2206033c40589aed341b41ff225581acff5ad 100644
+--- forkSrcPrefix/CMakeLists.txt
++++ forkDstPrefix/CMakeLists.txt
+@@ -7,14 +7,14 @@ option(COMPILE_10BIT "Enable 10bit streams decoding support." OFF)
+ set(CMAKE_C_STANDARD 99)
+ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+ 
+-aux_source_directory(./test DIR_SRC_TEST)
++# aux_source_directory(./test DIR_SRC_TEST)
+ 
+ add_subdirectory(./source)
+ 
+-add_executable(uavs3dec ${DIR_SRC_TEST})
++# add_executable(uavs3dec ${DIR_SRC_TEST})
+ 
+-if (NOT MSVC)
+-    target_link_libraries(uavs3dec m)
+-endif()
+-target_link_libraries(uavs3dec uavs3d)
++# if (NOT MSVC)
++#     target_link_libraries(uavs3dec m)
++# endif()
++# target_link_libraries(uavs3dec uavs3d)
+ #target_link_libraries(uavs3dec dl)

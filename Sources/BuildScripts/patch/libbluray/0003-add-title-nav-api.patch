@@ -1,0 +1,89 @@
+diff --git forkSrcPrefix/src/libbluray/bluray.c forkDstPrefix/src/libbluray/bluray.c
+index b3b55f750658444544a59e8827f548a77bd3d5d3..d726a28f61ee951b6bc39d78e011550a8fcf08bd 100644
+--- forkSrcPrefix/src/libbluray/bluray.c
++++ forkDstPrefix/src/libbluray/bluray.c
+@@ -2856,6 +2856,41 @@ static BLURAY_TITLE_INFO *_get_mpls_info(BLURAY *bd, uint32_t title_idx, uint32_
+     return title_info;
+ }
+ 
++BLURAY_TITLE_NAV* bd_get_title_nav(BLURAY *bd, uint32_t title_idx)
++{
++    BLURAY_TITLE_NAV *nav_info;
++
++    bd_mutex_lock(&bd->mutex);
++    if (bd->title_list == NULL) {
++        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "Title list not yet read!\n");
++    } else if (bd->title_list->count <= title_idx) {
++        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "Invalid title index %d!\n", title_idx);
++    } else {
++        nav_info = calloc(1, sizeof(BLURAY_TITLE_NAV));
++        if (!nav_info) {
++            goto error;
++        }
++        nav_info->duration = bd->title_list->title_info[title_idx].duration;
++        nav_info->mpls_id = bd->title_list->title_info[title_idx].mpls_id;
++        memcpy(nav_info->name, bd->title_list->title_info[title_idx].name, 11);
++    }
++    bd_mutex_unlock(&bd->mutex);
++
++    return nav_info;
++
++ error:
++    BD_DEBUG(DBG_CRIT, "Out of memory\n");
++    bd_free_title_nav(nav_info);
++    return NULL;
++}
++
++void bd_free_title_nav(BLURAY_TITLE_NAV *title_nav)
++{
++    if (title_nav) {
++        X_FREE(title_nav);
++    }
++}
++
+ BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx, unsigned angle)
+ {
+     int  mpls_id = -1;
+diff --git forkSrcPrefix/src/libbluray/bluray.h forkDstPrefix/src/libbluray/bluray.h
+index 41cd4f6a876d2522e234e94566ec39359e1787cd..9706d1f9b808008f2e793aebf04a592a82fe4c72 100644
+--- forkSrcPrefix/src/libbluray/bluray.h
++++ forkDstPrefix/src/libbluray/bluray.h
+@@ -303,6 +303,13 @@ typedef struct bd_title_info {
+     uint8_t              mvc_base_view_r_flag;  /**< MVC base view (0 - left, 1 - right) */
+ } BLURAY_TITLE_INFO;
+ 
++/** Playlist navigation information */
++typedef struct bd_title_nav {
++    char            name[11];
++    uint32_t        mpls_id;
++    uint32_t        duration;
++} BLURAY_TITLE_NAV;
++
+ /** Sound effect data */
+ typedef struct bd_sound_effect {
+     uint8_t         num_channels; /**< 1 - mono, 2 - stereo */
+@@ -464,6 +471,24 @@ uint32_t bd_get_titles(BLURAY *bd, uint8_t flags, uint32_t min_title_length);
+  */
+ int bd_get_main_title(BLURAY *bd);
+ 
++/**
++ *
++ *  Get navigation information about a title
++ *
++ * @param bd  BLURAY object
++ * @param title_idx title index number
++ * @return the title navigation, NULL on error
++ */
++BLURAY_TITLE_NAV* bd_get_title_nav(BLURAY *bd, uint32_t title_idx);
++
++/**
++ *
++ *  Free BLURAY_TITLE_NAV object
++ *
++ * @param title_nav  BLURAY_TITLE_NAV object
++ */
++void bd_free_title_nav(BLURAY_TITLE_NAV *title_nav);
++
+ /**
+  *
+  *  Get information about a title

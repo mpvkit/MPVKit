@@ -10,7 +10,7 @@ do {
     try BuildNettle().buildALL()
     try BuildGnutls().buildALL()
 
-    // libass
+    // // libass
     try BuildUnibreak().buildALL()
     try BuildFreetype().buildALL()
     try BuildFribidi().buildALL()
@@ -18,6 +18,7 @@ do {
     try BuildASS().buildALL()
 
     // libsmbclient
+    try BuildReadline().buildALL()
     try BuildSmbclient().buildALL()
 
     // libbluray
@@ -44,7 +45,7 @@ do {
 
 
 enum Library: String, CaseIterable {
-    case libmpv, FFmpeg, libshaderc, vulkan, lcms2, libdovi, openssl, libunibreak, libfreetype, libfribidi, libharfbuzz, libass, libsmbclient, libplacebo, libdav1d, gmp, nettle, gnutls, libuchardet, libbluray, libluajit, libuavs3d
+    case libmpv, FFmpeg, libshaderc, vulkan, lcms2, libdovi, openssl, libunibreak, libfreetype, libfribidi, libharfbuzz, libass, readline, libsmbclient, libplacebo, libdav1d, gmp, nettle, gnutls, libuchardet, libbluray, libluajit, libuavs3d
     var version: String {
         switch self {
         case .libmpv:
@@ -52,45 +53,48 @@ enum Library: String, CaseIterable {
         case .FFmpeg:
             return "n7.1.1"
         case .openssl:
-            return "3.2.0"
+            return "openssl-3.3.2"
         case .gnutls:
-            return "3.8.3"
+            return "3.8.8"
         case .nettle:
-            return "3.8.3"
+            return "nettle_3.10_release_20240616"
         case .gmp:
-            return "3.8.3"
-        case .libass:
-            return "0.17.3"
+            return "v6.2.1"
         case .libunibreak:
-            return "0.17.3"
+            return "libunibreak_6_1"
         case .libfreetype:
-            return "0.17.3"
+            // VER-2-10-1以上版本需要依赖libbrotli库，或指定--with-brotli=no
+            return "VER-2-12-1"
         case .libfribidi:
-            return "0.17.3"
+            return "v1.0.12"
         case .libharfbuzz:
+            return "8.1.1"
+        case .libass:       // depend libunibreak libfreetype libfribidi libharfbuzz
             return "0.17.3"
         case .libsmbclient:
-            return "4.15.13"
+            return "samba-4.15.13"
+        case .readline:
+            return "8.2.0"
         case .libdav1d:    // AV1 decoding
             return "1.4.3"
         case .lcms2:
-            return "7.349.0"
+            return "lcms2.16"
         case .libplacebo:
-            return "7.349.0"
+            return "v7.349.0"
         case .libdovi:
             return "3.3.0"
         case .vulkan:
             return "1.2.9-fix"
         case .libshaderc:  // compiling GLSL (OpenGL Shading Language) shaders into SPIR-V (Standard Portable Intermediate Representation - Vulkan) code
-            return "2024.2.0"
+            return "v2024.3"
         case .libuchardet:
-            return "0.0.8"
+            return "v0.0.8"
         case .libbluray:
             return "1.3.4"
         case .libluajit:
-            return "2.1.0"
+            return "v2.1"
         case .libuavs3d:
-            return "1.2.1"
+            return "1.0"
         }
     }
 
@@ -101,45 +105,47 @@ enum Library: String, CaseIterable {
         case .FFmpeg:
             return "https://github.com/FFmpeg/FFmpeg"
         case .openssl:
-            return "https://github.com/mpvkit/openssl-build/releases/download/\(self.version)/openssl-all.zip"
+            return "https://github.com/openssl/openssl"
         case .gnutls:
-            return "https://github.com/mpvkit/gnutls-build/releases/download/\(self.version)/gnutls-all.zip"
+            return "https://github.com/gnutls/gnutls"
         case .nettle:
-            return "https://github.com/mpvkit/gnutls-build/releases/download/\(self.version)/nettle-all.zip"
+            return "https://git.lysator.liu.se/nettle/nettle"
         case .gmp:
-            return "https://github.com/mpvkit/gnutls-build/releases/download/\(self.version)/gmp-all.zip"
-        case .libass:
-            return "https://github.com/mpvkit/libass-build/releases/download/\(self.version)/libass-all.zip"
+            return "https://github.com/alisw/GMP"
         case .libunibreak:
-            return "https://github.com/mpvkit/libass-build/releases/download/\(self.version)/libunibreak-all.zip"
+            return "https://github.com/adah1972/libunibreak"
         case .libfreetype:
-            return "https://github.com/mpvkit/libass-build/releases/download/\(self.version)/libfreetype-all.zip"
+            return "https://github.com/freetype/freetype"
         case .libfribidi:
-            return "https://github.com/mpvkit/libass-build/releases/download/\(self.version)/libfribidi-all.zip"
+            return "https://github.com/fribidi/fribidi"
         case .libharfbuzz:
-            return "https://github.com/mpvkit/libass-build/releases/download/\(self.version)/libharfbuzz-all.zip"
+            return "https://github.com/harfbuzz/harfbuzz"
+        case .libass:
+            return "https://github.com/libass/libass"
         case .libsmbclient:
-            return "https://github.com/mpvkit/libsmbclient-build/releases/download/\(self.version)/libsmbclient-all.zip"
+            return "https://github.com/samba-team/samba"
+        case .readline:
+            return "https://github.com/mpvkit/readline-build/releases/download/\(self.version)/readline-all.zip"
         case .lcms2:
-            return "https://github.com/mpvkit/libplacebo-build/releases/download/\(self.version)/lcms2-all.zip"
+            return "https://github.com/mm2/Little-CMS"
         case .libplacebo:
-            return "https://github.com/mpvkit/libplacebo-build/releases/download/\(self.version)/libplacebo-all.zip"
+            return "https://github.com/haasn/libplacebo"
         case .libdav1d:
-            return "https://github.com/mpvkit/libdav1d-build/releases/download/\(self.version)/libdav1d-all.zip"
+            return "https://github.com/videolan/dav1d"
         case .libdovi:
             return "https://github.com/mpvkit/libdovi-build/releases/download/\(self.version)/libdovi-all.zip"
         case .vulkan:
             return "https://github.com/mpvkit/moltenvk-build/releases/download/\(self.version)/MoltenVK-all.zip"
         case .libshaderc:
-            return "https://github.com/mpvkit/libshaderc-build/releases/download/\(self.version)/libshaderc-all.zip"
+            return "https://github.com/google/shaderc"
         case .libuchardet:
-            return "https://github.com/mpvkit/libuchardet-build/releases/download/\(self.version)/libuchardet-all.zip"
+            return "https://gitlab.freedesktop.org/uchardet/uchardet"
         case .libbluray:
-            return "https://github.com/mpvkit/libbluray-build/releases/download/\(self.version)/libbluray-all.zip"
+            return "https://code.videolan.org/videolan/libbluray.git"
         case .libluajit:
-            return "https://github.com/mpvkit/libluajit-build/releases/download/\(self.version)/libluajit-all.zip"
+            return "https://github.com/LuaJIT/LuaJIT.git"
         case .libuavs3d:
-            return "https://github.com/mpvkit/libuavs3d-build/releases/download/\(self.version)/libuavs3d-all.zip"
+            return "https://github.com/uavs3/uavs3d"
         }
     }
 
@@ -362,6 +368,8 @@ enum Library: String, CaseIterable {
                     checksum: "https://github.com/mpvkit/libuavs3d-build/releases/download/\(self.version)/Libuavs3d.xcframework.checksum.txt"
                 ),
             ]
+        default:
+            return []
         }
     }
 }
@@ -755,117 +763,632 @@ private class BuildFFMPEG: BaseBuild {
 
 
 
-private class BuildBluray: ZipBaseBuild {
+private class BuildBluray: BaseBuild {
     init() {
         super.init(library: .libbluray)
+
+        // 只能 macos 支持 DiskArbitration 框架，其他平台需要注释去掉 DiskArbitration 依赖
+    }
+
+
+    override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
+        [
+            "--disable-doxygen-doc",
+            "--disable-doxygen-dot",
+            "--disable-doxygen-html",
+            "--disable-doxygen-ps",
+            "--disable-doxygen-pdf",
+            "--disable-examples",
+            "--disable-bdjava-jar",
+            "--without-fontconfig",
+            "--with-pic",
+            "--enable-static",
+            "--disable-shared",
+            "--disable-fast-install",
+            "--disable-dependency-tracking",
+            "--host=\(platform.host(arch: arch))",
+        ]
     }
 }
 
-private class BuildUchardet: ZipBaseBuild {
+
+private class BuildUchardet: BaseBuild {
     init() {
         super.init(library: .libuchardet)
     }
+
+    override func arguments(platform : PlatformType, arch : ArchType) -> [String] {
+        [
+            "-DBUILD_BINARY=0",
+        ]
+    }
 }
 
-private class BuildLuaJIT: ZipBaseBuild {
+
+private class BuildLuaJIT: BaseBuild {
     init() {
         super.init(library: .libluajit)
     }
-}
 
+    var hostArchitecture: String {
+        #if arch(arm64)
+        return "arm64"
+        #else
+        return "x86_64"
+        #endif
+    }
 
-private class BuildPlacebo: ZipBaseBuild {
-    init() {
-        super.init(library: .libplacebo)
+    override func beforeBuild() throws {
+        try super.beforeBuild()
+
+        
+        // remove ABI version, xcframework with ABIVER can't build in swift 5.7.*
+        let makefile = directoryURL + "Makefile"
+        if let data = FileManager.default.contents(atPath: makefile.path), var str = String(data: data, encoding: .utf8) {
+            str = str.replacingOccurrences(of: "-$(ABIVER)", with: "")
+            try! str.write(toFile: makefile.path, atomically: true, encoding: .utf8)
+        }
+        let srcmakefile = directoryURL + "src/Makefile"
+        if let data = FileManager.default.contents(atPath: srcmakefile.path), var str = String(data: data, encoding: .utf8) {
+            str = str.replacingOccurrences(of: "-$(ABIVER)", with: "")
+            try! str.write(toFile: srcmakefile.path, atomically: true, encoding: .utf8)
+        }
+        let pcfile = directoryURL + "etc/luajit.pc"
+        if let data = FileManager.default.contents(atPath: pcfile.path), var str = String(data: data, encoding: .utf8) {
+            str = str.replacingOccurrences(of: "-${abiver}", with: "")
+            try! str.write(toFile: pcfile.path, atomically: true, encoding: .utf8)
+        }
+    }
+
+    override func build(platform: PlatformType, arch: ArchType) throws {
+        // maccatalyst暂时不支持
+        if platform == .maccatalyst {
+            return
+        }
+        let buildURL = scratch(platform: platform, arch: arch)
+        try? FileManager.default.createDirectory(at: buildURL, withIntermediateDirectories: true, attributes: nil)
+        var environ = [String: String]()
+        var arguments = [
+            "PREFIX=\(thinDir(platform: platform, arch: arch).path)"
+        ]
+
+        if platform == .macos {
+            environ["MACOSX_DEPLOYMENT_TARGET"] = "10.15"
+            arguments += [
+                "TARGET_CFLAGS=--target=\(arch.rawValue)-apple-darwin",
+                "TARGET_LDFLAGS=--target=\(arch.rawValue)-apple-darwin",
+                "HOST_CFLAGS=--target=\(hostArchitecture)-apple-darwin",
+                "HOST_LDFLAGS=--target=\(hostArchitecture)-apple-darwin",
+            ]
+        } else {
+            let xcodePath = Utility.shell("xcode-select -p", isOutput: true) ?? "/Applications/Xcode.app/Contents/Developer"
+            environ["TARGET_FLAGS"] = "-arch \(arch.rawValue) -isysroot \(platform.isysroot)"
+            arguments += [
+                "DEFAULT_CC=clang",
+                "CROSS=\(xcodePath)/Toolchains/XcodeDefault.xctoolchain/usr/bin/",
+                "TARGET_SYS=iOS",
+            ]
+        }
+        
+        try Utility.launch(path: "/usr/bin/make", arguments: ["clean"] + arguments, currentDirectoryURL: directoryURL, environment: environ)
+        try Utility.launch(path: "/usr/bin/make", arguments: ["-j8"] + arguments, currentDirectoryURL: directoryURL, environment: environ)
+        try Utility.launch(path: "/usr/bin/make", arguments: ["-j8", "install"] + arguments, currentDirectoryURL:  directoryURL, environment: environ)
+    }
+
+    override func frameworks() throws -> [String] {
+        ["libluajit"]
     }
 }
 
-private class BuildOpenSSL: ZipBaseBuild {
+
+private class BuildPlacebo: BaseBuild {
+    init() {
+        super.init(library: .libplacebo)
+
+    }
+
+    override func beforeBuild() throws {
+        try super.beforeBuild()
+
+        
+        // // switch to master branch, to pull newest code
+        // try! Utility.launch(path: "/usr/bin/git", arguments: ["remote", "set-branches", "--add", "origin", "master"], currentDirectoryURL: directoryURL)
+        // try! Utility.launch(path: "/usr/bin/git", arguments: ["fetch", "origin", "master:master"], currentDirectoryURL: directoryURL)
+        // try! Utility.launch(path: "/usr/bin/git", arguments: ["checkout", "master"], currentDirectoryURL: directoryURL)
+
+        // pull all submodules
+        Utility.shell("git submodule update --init --recursive", currentDirectoryURL: directoryURL)
+    }
+
+
+    override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
+        var args = [
+            "-Dopengl=enabled", 
+            "-Dvulkan=enabled", 
+            "-Dshaderc=enabled",
+            "-Dlcms=enabled", 
+            
+            "-Dxxhash=disabled", 
+            "-Dunwind=disabled", 
+            "-Dglslang=disabled",
+            "-Dd3d11=disabled",
+            "-Ddemos=false",
+            "-Dtests=false",
+        ]
+
+        let path = URL.currentDirectory + [Library.libdovi.rawValue, platform.rawValue, "thin", arch.rawValue]
+        if FileManager.default.fileExists(atPath: path.path) {
+            args += ["-Ddovi=enabled", "-Dlibdovi=enabled"]
+        } else {
+            args += ["-Ddovi=disabled", "-Dlibdovi=disabled"]
+        }
+        return args
+    }
+
+    override func flagsDependencelibrarys() -> [Library] {
+        [.libdovi]
+    }
+}
+
+
+private class BuildOpenSSL: BaseBuild {
     init() {
         super.init(library: .openssl)
     }
-}
 
-private class BuildGmp: ZipBaseBuild {
-    init() {
-        super.init(library: .gmp)
+    override func frameworks() throws -> [String] {
+        ["libssl", "libcrypto"]
+    }
+
+    override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
+        let array = [
+            "--prefix=\(thinDir(platform: platform, arch: arch).path)",
+            "no-async", "no-shared", "no-dso", "no-engine", "no-tests",
+            arch == .x86_64 ? "darwin64-x86_64" : arch == .arm64e ? "iphoneos-cross" : "darwin64-arm64",
+        ]
+        return array
     }
 }
 
-private class BuildNettle: ZipBaseBuild {
+private class BuildGmp: BaseBuild {
+    init() {
+        super.init(library: .gmp)
+        // if Utility.shell("which makeinfo") == nil {
+        //     Utility.shell("brew install texinfo")
+        // }
+    }
+
+    override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
+        [
+            "--disable-maintainer-mode",
+            "--disable-assembly",
+            "--with-pic",
+            "--enable-static",
+            "--disable-shared",
+            "--disable-fast-install",
+            "--host=\(platform.host(arch: arch))",
+            "--prefix=\(thinDir(platform: platform, arch: arch).path)",
+        ]
+    }
+}
+
+private class BuildNettle: BaseBuild {
     init() {
         super.init(library: .nettle)
     }
+
+    override func beforeBuild() throws {
+        if Utility.shell("which autoconf") == nil {
+            Utility.shell("brew install autoconf")
+        }
+
+        try super.beforeBuild()
+    }
+
+    override func flagsDependencelibrarys() -> [Library] {
+        [.gmp]
+    }
+
+    override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
+        [
+            "--disable-assembler",
+            "--disable-openssl",
+            "--disable-gcov",
+            "--disable-documentation",
+            "--enable-pic",
+            "--enable-static",
+            "--disable-shared",
+            "--disable-dependency-tracking",
+            "--host=\(platform.host(arch: arch))",
+            "--prefix=\(thinDir(platform: platform, arch: arch).path)",
+//                arch == .arm64 || arch == .arm64e ? "--enable-arm-neon" : "--enable-x86-aesni",
+        ]
+    }
+
+    override func frameworks() throws -> [String] {
+        [library.rawValue, "hogweed"]
+    }
 }
 
-private class BuildGnutls: ZipBaseBuild {
+private class BuildGnutls: BaseBuild {
     init() {
         super.init(library: .gnutls)
     }
+
+    override func beforeBuild() throws {
+        if Utility.shell("which automake") == nil {
+            Utility.shell("brew install automake")
+        }
+        if Utility.shell("which gtkdocize") == nil {
+            Utility.shell("brew install gtk-doc")
+        }
+        if Utility.shell("which wget") == nil {
+            Utility.shell("brew install wget")
+        }
+        if Utility.shell("brew list bison") == nil {
+            Utility.shell("brew install bison")
+        }
+        if Utility.shell("which glibtoolize") == nil {
+            Utility.shell("brew install libtool")
+        }
+        if Utility.shell("which asn1Parser") == nil {
+            Utility.shell("brew install libtasn1")
+        }
+
+        try super.beforeBuild()
+    }
+
+    override func flagsDependencelibrarys() -> [Library] {
+        [.gmp, .nettle]
+    }
+
+    override func ldFlags(platform: PlatformType, arch: ArchType) -> [String] {
+        var ldFlags = super.ldFlags(platform: platform, arch: arch)
+        ldFlags.append("-lhogweed")
+        return ldFlags
+    }
+
+    override func environment(platform: PlatformType, arch: ArchType) -> [String: String] {
+        var env = super.environment(platform: platform, arch: arch)
+        // 需要bison的版本大于2.4,系统自带的/usr/bin/bison是 2.3
+        env["PATH"] = "/usr/local/opt/bison/bin:/opt/homebrew/opt/bison/bin:" + (env["PATH"] ?? "")
+        return env
+    }
+
+    override func configure(buildURL: URL, environ: [String: String], platform: PlatformType, arch: ArchType) throws {
+        try super.configure(buildURL: buildURL, environ: environ, platform: platform, arch: arch)
+        let path = directoryURL + "lib/accelerated/aarch64/Makefile.in"
+        if let data = FileManager.default.contents(atPath: path.path), var str = String(data: data, encoding: .utf8) {
+            str = str.replacingOccurrences(of: "AM_CCASFLAGS =", with: "#AM_CCASFLAGS=")
+            try! str.write(toFile: path.path, atomically: true, encoding: .utf8)
+        }
+    }
+
+    override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
+        [
+            "--with-included-libtasn1",
+            "--with-included-unistring",
+            "--without-brotli",
+            "--without-idn",
+            "--without-p11-kit",
+            "--without-zlib",
+            "--without-zstd",
+            "--enable-hardware-acceleration",
+            "--disable-openssl-compatibility",
+            "--disable-code-coverage",
+            "--disable-doc",
+            "--disable-maintainer-mode",
+            "--disable-manpages",
+            "--disable-nls",
+            "--disable-rpath",
+            "--disable-doc",
+            "--disable-tests",
+            "--disable-tools",
+            "--disable-full-test-suite",
+            "--with-pic",
+            "--enable-static",
+            "--disable-shared",
+            "--disable-fast-install",
+            "--disable-dependency-tracking",
+            "--host=\(platform.host(arch: arch))",
+            "--prefix=\(thinDir(platform: platform, arch: arch).path)",
+        ]
+    }
 }
 
-private class BuildASS: ZipBaseBuild {
+private class BuildASS: BaseBuild {
     init() {
         super.init(library: .libass)
     }
+
+    override func arguments(platform : PlatformType, arch : ArchType) -> [String] {
+        [
+            "-Dlibunibreak=enabled",
+            "-Dcoretext=enabled",
+            "-Dfontconfig=disabled",
+            "-Ddirectwrite=disabled",
+            "-Dasm=disabled",
+            "-Dtest=false",
+            "-Dprofile=false",
+        ]
+    }
 }
 
-private class BuildUnibreak: ZipBaseBuild {
+
+private class BuildUnibreak: BaseBuild {
     init() {
         super.init(library: .libunibreak)
     }
+
+    override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
+        [
+            "--enable-static",
+            "--disable-shared",
+            "--disable-fast-install",
+            "--disable-dependency-tracking",
+            "--host=\(platform.host(arch: arch))",
+        ]
+    }
 }
 
-private class BuildFreetype: ZipBaseBuild {
+private class BuildFreetype: BaseBuild {
     init() {
         super.init(library: .libfreetype)
     }
+
+    override func arguments(platform : PlatformType, arch : ArchType) -> [String] {
+        [
+            "-Dzlib=enabled",
+            "-Dharfbuzz=disabled", 
+            "-Dbzip2=disabled", 
+            "-Dmmap=disabled",
+            "-Dpng=disabled",
+            "-Dbrotli=disabled",
+        ]
+    }
 }
 
-private class BuildFribidi: ZipBaseBuild {
+
+private class BuildFribidi: BaseBuild {
     init() {
         super.init(library: .libfribidi)
     }
+
+    override func arguments(platform : PlatformType, arch : ArchType) -> [String] {
+        [
+            "-Ddeprecated=false",
+            "-Ddocs=false",
+            "-Dbin=false",
+            "-Dtests=false",
+        ]
+    }
 }
 
-private class BuildHarfbuzz: ZipBaseBuild {
+private class BuildHarfbuzz: BaseBuild {
     init() {
         super.init(library: .libharfbuzz)
+    }
+
+    override func arguments(platform : PlatformType, arch : ArchType) -> [String] {
+        [
+            "-Dglib=disabled",
+            "-Dfreetype=disabled",
+            "-Ddocs=disabled",
+            "-Dtests=disabled",
+        ]
+    }
+}
+
+private class BuildReadline: ZipBaseBuild {
+    init() {
+        super.init(library: .readline)
+    }
+
+    // readline 只是在编译的时候需要用到。外面不需要用到
+    override func frameworks() throws -> [String] {
+        []
     }
 }
 
 
-private class BuildSmbclient: ZipBaseBuild {
+private class BuildSmbclient: BaseBuild {
     init() {
         super.init(library: .libsmbclient)
     }
 
+    override func beforeBuild() throws {
+        try super.beforeBuild()
+
+        // // if use brew version python, you will need to install python-setuptools for distutils dependency error
+        // if Utility.shell("brew list python-setuptools") == nil {
+        //     Utility.shell("brew install python-setuptools")
+        // }
+
+        // install setuptools for distutils dependency
+        if Utility.shell("python -m pip list|grep setuptools") == nil {
+            Utility.shell("python -m pip install setuptools")
+        }
+
+        // Patch Samba ldb to avoid building tests or duplicate sources in objlists.
+        // 1) Stop recursing into ldb_key_value/tests
+        let kvWscript = directoryURL + "lib/ldb/ldb_key_value/wscript_build"
+        if let data = FileManager.default.contents(atPath: kvWscript.path), var str = String(data: data, encoding: .utf8) {
+            str = str.replacingOccurrences(of: "bld.RECURSE('tests')", with: "# bld.RECURSE('tests')  # disabled by MPVKit build")
+            try? str.write(toFile: kvWscript.path, atomically: true, encoding: .utf8)
+        }
+
+    }
+
+    override func flagsDependencelibrarys() -> [Library] {
+        [.gmp, .nettle, .gnutls]
+    }
+
+    override func wafPath() -> String {
+        "buildtools/bin/waf"
+    }
+
+    override func cFlags(platform: PlatformType, arch: ArchType) -> [String] {
+        var cFlags = super.cFlags(platform: platform, arch: arch)
+        cFlags.append("-Wno-error=implicit-function-declaration")
+        // cFlags.append("-malign-double")
+        // cFlags.append("-Werror=cast-align")
+        return cFlags
+    }
+
+    override func ldFlags(platform: PlatformType, arch: ArchType) -> [String] {
+        var ldFlags = super.ldFlags(platform: platform, arch: arch)
+
+        var path = thinDir(library: .nettle, platform: platform, arch: arch)
+        if FileManager.default.fileExists(atPath: path.path) {
+            ldFlags.append("-lhogweed")
+        }
+        path = thinDir(library: .gnutls, platform: platform, arch: arch)
+        if FileManager.default.fileExists(atPath: path.path) {
+            ldFlags.append(contentsOf: ["-framework", "Security", "-framework", "CoreFoundation"])
+        }
+
+        return ldFlags
+    }
+
+    override func environment(platform: PlatformType, arch: ArchType) -> [String: String] {
+        var env = super.environment(platform: platform, arch: arch)
+        let asn1DirectoryURL = URL.currentDirectory + ["../bin", ArchType.hostArch.rawValue]
+        env["PATH"] = asn1DirectoryURL.path + ":" + (directoryURL + "buildtools/bin").path + ":" + (env["PATH"] ?? "")
+        env["PATH"] = "/Library/Frameworks/Python.framework/Versions/Current/bin:" + (env["PATH"] ?? "") // GIT ACTION python path
+        env["PYTHONHASHSEED"] = "1"
+        env["WAF_MAKE"] = "1"
+        return env
+    }
+
+    override func wafBuildArg() -> [String] {
+        ["--targets=smbclient"]
+    }
+
+    override func wafInstallArg() -> [String] {
+        ["--targets=smbclient"]
+    }
+
+    override func build(platform: PlatformType, arch: ArchType) throws {
+        try super.build(platform: platform, arch: arch)
+        try FileManager.default.copyItem(at: directoryURL + "bin/default/source3/libsmb/libsmbclient.a", to: thinDir(platform: platform, arch: arch) + "lib/libsmbclient.a")
+    }
+
+    override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
+        var options = [
+            "--without-cluster-support",
+            "--disable-rpath",
+            "--without-ldap",
+            "--without-pam",
+            "--enable-fhs",
+            "--without-winbind",
+            "--without-ads",
+            "--disable-avahi",
+            "--disable-cups",
+            "--without-gettext",
+            "--without-ad-dc",
+            "--without-acl-support",
+            "--without-utmp",
+            "--disable-iprint",
+            "--nopyc",
+            "--nopyo",
+            "--disable-python",
+            "--disable-symbol-versions",
+            "--without-json",
+            "--without-libarchive",
+            "--without-regedit",
+            "--without-lttng",
+            "--without-gpgme",
+            "--disable-cephfs",
+            "--disable-glusterfs",
+            "--without-syslog",
+            "--without-quotas",
+            "--bundled-libraries=ALL",
+            "--with-static-modules=!vfs_snapper,ALL",
+            "--nonshared-binary=smbtorture,smbd/smbd,client/smbclient",
+            "--builtin-libraries=!smbclient,!smbd_base,!smbstatus,ALL",
+            "--host=\(platform.host(arch: arch))",
+            "--prefix=\(thinDir(platform: platform, arch: arch).path)",
+        ]
+
+        //macOS can detect, but other platforms need configured by cross-answers.txt
+        let crossawsersURL = URL.currentDirectory + "../Sources/BuildScripts/waf-cross-answers/\(arch.rawValue).txt"
+        if platform != .macos && arch != ArchType.hostArch {
+            options += [
+                "--cross-compile",
+                "--cross-answers=\(crossawsersURL.path)",
+            ]
+        }
+
+        return options
+    }
+
 }
 
-private class BuildDav1d: ZipBaseBuild {
+
+
+private class BuildDav1d: BaseBuild {
     init() {
         super.init(library: .libdav1d)
     }
 
-    override func buildALL() throws {
-        try super.buildALL()
+    override func beforeBuild() throws {
+        try super.beforeBuild()
 
-        // // TODO: maccatalyst平台会导致ffmpeg编译失败，暂时删除忽略
-        // if platform == .maccatalyst {
-        //     return
-        // }
+        
+        if Utility.shell("which ninja") == nil {
+            Utility.shell("brew install ninja")
+        }
+        if Utility.shell("which nasm") == nil {
+            Utility.shell("brew install nasm")
+        }
+    }
+
+    override func arguments(platform _: PlatformType, arch _: ArchType) -> [String] {
+        [
+            "-Denable_asm=false",   // disable "No platform load command found" warning after xcode 15
+
+            "-Denable_tests=false",
+            "-Denable_tools=false", 
+            "-Denable_examples=false", 
+            "-Dxxhash_muxer=disabled",
+        ]
     }
 }
 
-private class BuildLittleCms: ZipBaseBuild {
+private class BuildLittleCms: BaseBuild {
     init() {
         super.init(library: .lcms2)
     }
 }
 
-private class BuildUavs3d: ZipBaseBuild {
-    init() throws {
+private class BuildUavs3d: BaseBuild {
+    init() {
         super.init(library: .libuavs3d)
+
+        // force pull latest version from master/main branch
+        self.pullLatestVersion = true
+    }
+
+    override func beforeBuild() throws {
+        try super.beforeBuild()
+
+        // generate version
+        try Utility.launch(path: (directoryURL + "version.sh").path, arguments: [], currentDirectoryURL: directoryURL)
+    }
+
+    override func build(platform: PlatformType, arch: ArchType) throws {
+        // maccatalyst暂时不支持
+        if platform == .maccatalyst {
+            return
+        }
+
+        try super.build(platform: platform, arch: arch)
+    }
+
+    override func arguments(platform : PlatformType, arch : ArchType) -> [String] {
+        [
+            "-DCOMPILE_10BIT=1",
+        ]
     }
 }
 
@@ -875,12 +1398,100 @@ private class BuildDovi: ZipBaseBuild {
     }
 }
 
-private class BuildShaderc: ZipBaseBuild {
-    init() throws {
+
+private class BuildShaderc: BaseBuild {
+    init() {
         super.init(library: .libshaderc)
+        
+    }
+
+    override func beforeBuild() throws {
+        try super.beforeBuild()
+        
+        try! Utility.launch(executableURL: directoryURL + "utils/git-sync-deps", arguments: [], currentDirectoryURL: directoryURL)
+        var path = directoryURL + "third_party/spirv-tools/tools/reduce/reduce.cpp"
+        if let data = FileManager.default.contents(atPath: path.path), var str = String(data: data, encoding: .utf8) {
+            str = str.replacingOccurrences(of: """
+              int res = std::system(nullptr);
+              return res != 0;
+            """, with: """
+              FILE* fp = popen(nullptr, "r");
+              return fp == NULL;
+            """)
+            str = str.replacingOccurrences(of: """
+              int status = std::system(command.c_str());
+            """, with: """
+              FILE* fp = popen(command.c_str(), "r");
+            """)
+            str = str.replacingOccurrences(of: """
+              return status == 0;
+            """, with: """
+              return fp != NULL;
+            """)
+            try! str.write(toFile: path.path, atomically: true, encoding: .utf8)
+        }
+        path = directoryURL + "third_party/spirv-tools/tools/fuzz/fuzz.cpp"
+        if let data = FileManager.default.contents(atPath: path.path), var str = String(data: data, encoding: .utf8) {
+            str = str.replacingOccurrences(of: """
+              int res = std::system(nullptr);
+              return res != 0;
+            """, with: """
+              FILE* fp = popen(nullptr, "r");
+              return fp == NULL;
+            """)
+            str = str.replacingOccurrences(of: """
+              int status = std::system(command.c_str());
+            """, with: """
+              FILE* fp = popen(command.c_str(), "r");
+            """)
+            str = str.replacingOccurrences(of: """
+              return status == 0;
+            """, with: """
+              return fp != NULL;
+            """)
+            try! str.write(toFile: path.path, atomically: true, encoding: .utf8)
+        }
+    }
+
+    override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
+        [
+            "-DSHADERC_SKIP_TESTS=ON",
+            "-DSHADERC_SKIP_EXAMPLES=ON",
+            "-DSHADERC_SKIP_COPYRIGHT_CHECK=ON",
+            "-DENABLE_EXCEPTIONS=ON",
+            "-DENABLE_GLSLANG_BINARIES=OFF",
+            "-DSPIRV_SKIP_EXECUTABLES=ON",
+            "-DSPIRV_TOOLS_BUILD_STATIC=ON",
+            "-DBUILD_SHARED_LIBS=OFF",
+        ]
+    }
+
+    override func frameworks() throws -> [String] {
+        ["libshaderc_combined"]
+    }
+
+    override func packagePkgConfigRelease() throws {
+        try super.packagePkgConfigRelease()
+
+        // change libshaderc_combined.pc to libshaderc.pc as default pkgconfig file
+        // otherwise [libplacebo] will load shaderc failed
+        let releaseDirPath = URL.currentDirectory + ["release"]
+        for platform in BaseBuild.platforms {
+            for arch in architectures(platform) {
+                let destPkgConfigDir = releaseDirPath + [library.rawValue, "pkgconfig-example", platform.rawValue, arch.rawValue]
+                let shadercPC = destPkgConfigDir + "shaderc.pc"
+                let shadercSharedPC = destPkgConfigDir + "shaderc_shared.pc"
+                let shadercCombinedPC = destPkgConfigDir + "shaderc_combined.pc"
+                if !FileManager.default.fileExists(atPath: shadercPC.path) {
+                    continue
+                }
+
+                try FileManager.default.moveItem(at: shadercPC, to: shadercSharedPC)
+                try FileManager.default.moveItem(at: shadercCombinedPC, to: shadercPC)
+            }
+        }
     }
 }
-
 
 private class BuildVulkan: ZipBaseBuild {
     init() {
