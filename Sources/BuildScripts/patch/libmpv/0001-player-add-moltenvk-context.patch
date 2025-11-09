@@ -20,18 +20,42 @@ index 7572769e0e6f280391668c6797d67e37e2dea30f..e6109987a3d38025a5eede04441c03ee
  features += {'vk-khr-display': vulkan.type_name() == 'internal' or
                                 cc.has_function('vkCreateDisplayPlaneSurfaceKHR', prefix: '#include <vulkan/vulkan_core.h>',
                                                 dependencies: [vulkan])}
-diff --git forkSrcPrefix/meson.options forkDstPrefix/meson.options
-index dae0a333ef71b75a6bb36a236de7feebd99bda40..6ed28af20a09501b4997ca81e86bb198e75327fd 100644
---- forkSrcPrefix/meson.options
-+++ forkDstPrefix/meson.options
-@@ -101,6 +101,7 @@ option('gl-dxinterop-d3d9', type: 'feature', value: 'auto', description: 'OpenGL
- option('ios-gl', type: 'feature', value: 'auto', description: 'iOS OpenGL ES interop support')
- option('videotoolbox-gl', type: 'feature', value: 'auto', description: 'Videotoolbox with OpenGL')
- option('videotoolbox-pl', type: 'feature', value: 'auto', description: 'Videotoolbox with libplacebo')
-+option('moltenvk', type: 'feature', value: 'auto', description: 'Moltenvk context')
+diff --git forkSrcPrefix/video/out/gpu/context.c forkDstPrefix/video/out/gpu/context.c
+index 75dd804005ba3a1e36375b47dcc9d9bb756ab867..299841cb256372a04c3d1603f856695ce246ec01 100644
+--- forkSrcPrefix/video/out/gpu/context.c
++++ forkDstPrefix/video/out/gpu/context.c
+@@ -50,6 +50,7 @@ extern const struct ra_ctx_fns ra_ctx_vulkan_xlib;
+ extern const struct ra_ctx_fns ra_ctx_vulkan_android;
+ extern const struct ra_ctx_fns ra_ctx_vulkan_display;
+ extern const struct ra_ctx_fns ra_ctx_vulkan_mac;
++extern const struct ra_ctx_fns ra_ctx_vulkan_moltenvk;
  
- # macOS features
- option('macos-10-15-4-features', type: 'feature', value: 'auto', description: 'macOS 10.15.4 SDK Features')
+ /* Direct3D 11 */
+ extern const struct ra_ctx_fns ra_ctx_d3d11;
+@@ -93,6 +94,9 @@ static const struct ra_ctx_fns *contexts[] = {
+ #if HAVE_X11
+     &ra_ctx_vulkan_xlib,
+ #endif
++#if HAVE_SWIFT && HAVE_MOLTENVK
++     &ra_ctx_vulkan_moltenvk,
++#endif
+ #if HAVE_COCOA && HAVE_SWIFT
+     &ra_ctx_vulkan_mac,
+ #endif
+diff --git forkSrcPrefix/video/out/vulkan/common.h forkDstPrefix/video/out/vulkan/common.h
+index e75cb228f8d99462ccecf7780098ea97ae7cfe02..afc17284773204563f4c90b4860758e61068d460 100644
+--- forkSrcPrefix/video/out/vulkan/common.h
++++ forkDstPrefix/video/out/vulkan/common.h
+@@ -22,6 +22,9 @@
+ #if HAVE_WIN32_DESKTOP
+ #define VK_USE_PLATFORM_WIN32_KHR
+ #endif
++#if HAVE_MOLTENVK
++#include <MoltenVK/mvk_vulkan.h>
++#endif
+ #if HAVE_COCOA
+ #define VK_USE_PLATFORM_METAL_EXT
+ #endif
 diff --git forkSrcPrefix/video/out/vulkan/context_moltenvk.m forkDstPrefix/video/out/vulkan/context_moltenvk.m
 new file mode 100644
 index 0000000000000000000000000000000000000000..445b907f795b24b8df80389394d4ae7b3f94c6e5
@@ -134,39 +158,15 @@ index 0000000000000000000000000000000000000000..445b907f795b24b8df80389394d4ae7b
 +    .init           = moltenvk_init,
 +    .uninit         = moltenvk_uninit,
 +};
-diff --git forkSrcPrefix/video/out/vulkan/common.h forkDstPrefix/video/out/vulkan/common.h
-index e75cb228f8d99462ccecf7780098ea97ae7cfe02..afc17284773204563f4c90b4860758e61068d460 100644
---- forkSrcPrefix/video/out/vulkan/common.h
-+++ forkDstPrefix/video/out/vulkan/common.h
-@@ -22,6 +22,9 @@
- #if HAVE_WIN32_DESKTOP
- #define VK_USE_PLATFORM_WIN32_KHR
- #endif
-+#if HAVE_MOLTENVK
-+#include <MoltenVK/mvk_vulkan.h>
-+#endif
- #if HAVE_COCOA
- #define VK_USE_PLATFORM_METAL_EXT
- #endif
-diff --git forkSrcPrefix/video/out/gpu/context.c forkDstPrefix/video/out/gpu/context.c
-index 75dd804005ba3a1e36375b47dcc9d9bb756ab867..4ab72a00b3dd3539a06129702e41796fd00a8af3 100644
---- forkSrcPrefix/video/out/gpu/context.c
-+++ forkDstPrefix/video/out/gpu/context.c
-@@ -50,6 +50,7 @@ extern const struct ra_ctx_fns ra_ctx_vulkan_xlib;
- extern const struct ra_ctx_fns ra_ctx_vulkan_android;
- extern const struct ra_ctx_fns ra_ctx_vulkan_display;
- extern const struct ra_ctx_fns ra_ctx_vulkan_mac;
-+extern const struct ra_ctx_fns ra_ctx_vulkan_moltenvk;
+diff --git forkSrcPrefix/meson.options forkDstPrefix/meson.options
+index dae0a333ef71b75a6bb36a236de7feebd99bda40..6ed28af20a09501b4997ca81e86bb198e75327fd 100644
+--- forkSrcPrefix/meson.options
++++ forkDstPrefix/meson.options
+@@ -101,6 +101,7 @@ option('gl-dxinterop-d3d9', type: 'feature', value: 'auto', description: 'OpenGL
+ option('ios-gl', type: 'feature', value: 'auto', description: 'iOS OpenGL ES interop support')
+ option('videotoolbox-gl', type: 'feature', value: 'auto', description: 'Videotoolbox with OpenGL')
+ option('videotoolbox-pl', type: 'feature', value: 'auto', description: 'Videotoolbox with libplacebo')
++option('moltenvk', type: 'feature', value: 'auto', description: 'Moltenvk context')
  
- /* Direct3D 11 */
- extern const struct ra_ctx_fns ra_ctx_d3d11;
-@@ -126,6 +127,9 @@ static const struct ra_ctx_fns *contexts[] = {
- 
- // Vulkan contexts (fallbacks):
- #if HAVE_VULKAN
-+#if HAVE_MOLTENVK
-+     &ra_ctx_vulkan_moltenvk,
-+#endif
- #if HAVE_ANDROID
-     &ra_ctx_vulkan_android,
- #endif
+ # macOS features
+ option('macos-10-15-4-features', type: 'feature', value: 'auto', description: 'macOS 10.15.4 SDK Features')

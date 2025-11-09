@@ -1,0 +1,15 @@
+diff --git forkSrcPrefix/osdep/mac/meson.build forkDstPrefix/osdep/mac/meson.build
+index d886e5406a03ad2d46171aba5fb4c56840aac4a8..aebee946a795b39834ffdd558810ef0761392b16 100644
+--- forkSrcPrefix/osdep/mac/meson.build
++++ forkDstPrefix/osdep/mac/meson.build
+@@ -2,8 +2,8 @@
+ bridge = join_paths(source_root, 'osdep/mac/app_bridge_objc.h')
+ module = join_paths(build_root, 'osdep/mac/swift.swiftmodule')
+ 
+-swift_flags = ['-c', '-emit-library', '-static', '-sdk', macos_sdk_path,
+-               '-emit-objc-header', '-parse-as-library']
++swift_flags = ['-frontend', '-c', '-sdk', macos_sdk_path,
++               '-enable-objc-interop', '-emit-objc-header', '-parse-as-library']
+ 
+ if swift_ver.version_compare('>=6.0')
+     swift_flags += ['-swift-version', '5']
