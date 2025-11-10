@@ -36,7 +36,7 @@ index 75dd804005ba3a1e36375b47dcc9d9bb756ab867..299841cb256372a04c3d1603f856695c
  #if HAVE_X11
      &ra_ctx_vulkan_xlib,
  #endif
-+#if HAVE_SWIFT && HAVE_MOLTENVK
++#if HAVE_MOLTENVK
 +     &ra_ctx_vulkan_moltenvk,
 +#endif
  #if HAVE_COCOA && HAVE_SWIFT
