@@ -91,7 +91,7 @@ class ArgumentOptions {
 }
 
 class BaseBuild {
-    static let defaultPath = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    static let defaultPath = "/Library/Frameworks/Python.framework/Versions/Current/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     static var platforms = PlatformType.allCases
     static var options = ArgumentOptions()
     static let splitPlatformGroups = [
@@ -1106,11 +1106,6 @@ enum Utility {
         }
         if !environment.keys.contains("PATH") {
             environment["PATH"] = BaseBuild.defaultPath
-
-            // meson need to use pip version on GITHUB ACTION, use brew version will build failed
-            if ProcessInfo.processInfo.environment.keys.contains("GITHUB_ACTION") {
-                environment["PATH"] = "/Library/Frameworks/Python.framework/Versions/Current/bin:" + environment["PATH"]!
-            }
         }
         task.environment = environment
 
