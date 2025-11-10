@@ -76,7 +76,7 @@ enum Library: String, CaseIterable {
         case .lcms2:
             return "7.349.0"
         case .libplacebo:
-            return "7.349.0"
+            return "7.351.0"
         case .libdovi:
             return "3.3.0"
         case .vulkan:
