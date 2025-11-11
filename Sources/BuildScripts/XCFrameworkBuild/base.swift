@@ -1185,6 +1185,20 @@ enum Utility {
             if let logURL = logURL {
                 // print log when run in GitHub Action
                 if ProcessInfo.processInfo.environment.keys.contains("GITHUB_ACTION") {
+                    // if build FFmpeg failed, print the ffbuild/config.log content
+                    if logURL.path.contains("FFmpeg") {
+                        let ffbuildLogURL = logURL
+                            .deletingPathExtension()
+                            .appendingPathComponent("ffbuild/config.log")
+                        if FileManager.default.fileExists(atPath: ffbuildLogURL.path) {
+                            if let content = String(data: try Data(contentsOf: ffbuildLogURL), encoding: .utf8) {
+                                print("############# \(ffbuildLogURL) CONTENT BEGIN #############")
+                                print(content)
+                                print("#############  \(ffbuildLogURL) CONTENT END #############")
+                            }
+                        }
+                    }
+
                     if let content = String(data: try Data(contentsOf: logURL), encoding: .utf8) {
                         print("############# \(logURL) CONTENT BEGIN #############")
                         print(content)
