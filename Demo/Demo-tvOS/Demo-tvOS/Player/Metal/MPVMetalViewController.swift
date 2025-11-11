@@ -87,8 +87,25 @@ final class MPVMetalViewController: UIViewController {
             let client = unsafeBitCast(ctx, to: MPVMetalViewController.self)
             client.readEvents()
         }, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
+        
+        setupNotification()
     }
     
+    public func setupNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(enterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(enterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    @objc public func enterBackground() {
+        // fix black screen issue when app enter foreground again
+        pause()
+        checkError(mpv_set_option_string(mpv, "vid", "no"))
+    }
+    
+    @objc public func enterForeground() {
+        checkError(mpv_set_option_string(mpv, "vid", "auto"))
+        play()
+    }
     
     func loadFile(
         _ url: URL

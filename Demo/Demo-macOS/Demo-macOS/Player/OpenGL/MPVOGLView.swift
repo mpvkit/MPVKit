@@ -108,6 +108,10 @@ final class MPVOGLView: NSOpenGLView {
         command("loadfile", args: args)
     }
     
+    func seek(relative time: TimeInterval) {
+        command("seek", args: [String(time), "relative"])
+    }
+    
     func getDouble(_ name: String) -> Double {
         guard mpv != nil else { return 0.0 }
         var data = Double()

@@ -62,6 +62,10 @@ struct MPVPlayerView: NSViewControllerRepresentable {
             player?.loadFile(url)
         }
         
+        func seek(relative time: TimeInterval) {
+            player?.seek(relative: time)
+        }
+        
         func propertyChange(mpv: OpaquePointer, propertyName: String, data: Any?) {
             guard let player else { return }
             

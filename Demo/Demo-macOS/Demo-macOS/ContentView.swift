@@ -25,6 +25,7 @@ struct ContentView: View {
                     }
                 }
         }
+        .focusable()
         .overlay {
             HStack {
                 VStack(alignment: .leading, spacing: 12) {
@@ -48,6 +49,11 @@ struct ContentView: View {
                         coordinator.play(URL(string: "https://github.com/mpvkit/video-test/raw/master/resources/pgs_subtitle.mkv")!)
                     } label: {
                         Text("subtitle").frame(maxWidth: .infinity)
+                    }
+                    Button {
+                        coordinator.play(URL(string: "https://framatube.org/static/streaming-playlists/hls/66fcff64-d8f9-49c1-8deb-011b115786de/73451ad8-d30e-4beb-aa92-3dba23ba07c8-720.m3u8")!)
+                    } label: {
+                        Text("hls").frame(maxWidth: .infinity)
                     }
                     Button {
                         coordinator.play(URL(string: "https://github.com/mpvkit/video-test/raw/master/resources/hdr.mkv")!)
@@ -96,6 +102,18 @@ struct ContentView: View {
         .onHover { hover in
             showControlOverlay = hover
         }
+        .onKeyPress(action: { key in
+            debugPrint("key: \(key.characters)")
+            return .handled
+        })
+        .onKeyPress(.leftArrow, action: {
+            coordinator.seek(relative: -10)
+            return .handled
+        })
+        .onKeyPress(.rightArrow, action: {
+            coordinator.seek(relative: 10)
+            return .handled
+        })
         .overlay(overlayView)
         .preferredColorScheme(.dark)
         .ignoresSafeArea()
