@@ -1,6 +1,9 @@
 name: CI Test
 
 on:
+  push:
+    branches:
+      - ci
   workflow_dispatch:
     inputs:
       version:
