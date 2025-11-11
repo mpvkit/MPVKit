@@ -44,4 +44,8 @@ class MPVViewController: NSViewController {
     func pause() {
         self.glView.setFlag("pause", true)
     }
+    
+    func seek(relative time: TimeInterval) {
+        self.glView.seek(relative: time)
+    }
 }

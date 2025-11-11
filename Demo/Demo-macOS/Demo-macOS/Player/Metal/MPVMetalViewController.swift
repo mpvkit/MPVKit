@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import CoreMedia
 import Libmpv
 
 // warning: metal API validation has been disabled to ignore crash when playing HDR videos.
@@ -102,10 +103,10 @@ final class MPVMetalViewController: NSViewController {
         checkError(mpv_set_option_string(mpv, "gpu-context", "moltenvk"))
         checkError(mpv_set_option_string(mpv, "hwdec", "videotoolbox"))
         checkError(mpv_set_option_string(mpv, "ytdl", "no"))
-//        checkError(mpv_set_option_string(mpv, "target-colorspace-hint", "yes")) // HDR passthrough
-//        checkError(mpv_set_option_string(mpv, "tone-mapping-visualize", "yes"))  // only for debugging purposes
-//        checkError(mpv_set_option_string(mpv, "profile", "fast"))   // can fix frame drop in poor device when play 4k
-
+        //        checkError(mpv_set_option_string(mpv, "target-colorspace-hint", "yes")) // HDR passthrough
+        //        checkError(mpv_set_option_string(mpv, "tone-mapping-visualize", "yes"))  // only for debugging purposes
+        //        checkError(mpv_set_option_string(mpv, "profile", "fast"))   // can fix frame drop in poor device when play 4k
+        
         
         checkError(mpv_initialize(mpv))
         
@@ -146,6 +147,10 @@ final class MPVMetalViewController: NSViewController {
     
     func pause() {
         setFlag("pause", true)
+    }
+    
+    func seek(relative time: TimeInterval) {
+        command("seek", args: [String(time), "relative"])
     }
     
     private func getDouble(_ name: String) -> Double {
@@ -194,7 +199,7 @@ final class MPVMetalViewController: NSViewController {
         }
     }
     
-
+    
     
     private func makeCArgs(_ command: String, _ args: [String?]) -> [String?] {
         if !args.isEmpty, args.last == nil {

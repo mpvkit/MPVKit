@@ -61,6 +61,10 @@ struct MPVMetalPlayerView: NSViewControllerRepresentable {
             self.pause = false
         }
         
+        func seek(relative time: TimeInterval) {
+            player?.seek(relative: time)
+        }
+        
         func propertyChange(mpv: OpaquePointer, propertyName: String, data: Any?) {
             guard let player else { return }
             self.onPropertyChange?(player, propertyName, data)
