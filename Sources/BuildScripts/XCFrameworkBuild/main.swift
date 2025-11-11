@@ -50,7 +50,7 @@ enum Library: String, CaseIterable {
         case .libmpv:
             return "v0.40.0"
         case .FFmpeg:
-            return "n7.1.1"
+            return "n8.0"
         case .openssl:
             return "3.2.0"
         case .gnutls:
@@ -654,7 +654,7 @@ private class BuildFFMPEG: BaseBuild {
         "--disable-doc", "--disable-htmlpages", "--disable-manpages", "--disable-podpages", "--disable-txtpages",
         // Component options:
         "--enable-avcodec", "--enable-avformat", "--enable-avutil", "--enable-network", "--enable-swresample", "--enable-swscale",
-        "--disable-devices", "--disable-outdevs", "--disable-indevs", "--disable-postproc",
+        "--disable-devices", "--disable-outdevs", "--disable-indevs",
         // ,"--disable-pthreads"
         // ,"--disable-w32threads"
         // ,"--disable-os2threads"
