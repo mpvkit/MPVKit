@@ -653,13 +653,8 @@ class BaseBuild {
         }
         for framework in frameworks {
             // clean old zip files
-            let directoryContents = try FileManager.default.contentsOfDirectory(atPath: releaseDirPath.path)
-            for item in directoryContents {
-                if item.hasPrefix(framework) && (item.hasSuffix(".xcframework.zip") || item.hasSuffix(".checksum.txt")) {
-                    let itemPath = releaseDirPath.appendingPathComponent(item)
-                    try? FileManager.default.removeItem(at: itemPath)
-                }
-            }
+            try? FileManager.default.removeItem(at: releaseDirPath + [framework + ".xcframework.zip"])
+            try? FileManager.default.removeItem(at: releaseDirPath + [framework + ".xcframework.checksum.txt"])
 
             let XCFrameworkFile =  framework + ".xcframework"
             let zipFile = releaseDirPath + [framework + ".xcframework.zip"]
@@ -670,6 +665,11 @@ class BaseBuild {
             if BaseBuild.options.enableSplitPlatform {
                 for group in BaseBuild.splitPlatformGroups.keys {
                     let XCFrameworkName =  "\(framework)-\(group)"
+                    
+                    // clean old zip files
+                    try? FileManager.default.removeItem(at: releaseDirPath + [XCFrameworkName + ".xcframework.zip"])
+                    try? FileManager.default.removeItem(at: releaseDirPath + [XCFrameworkName + ".xcframework.checksum.txt"])
+                    
                     let XCFrameworkFile =  XCFrameworkName + ".xcframework"
                     let XCFrameworkPath = self.xcframeworkDirectoryURL + ["\(framework)-\(group).xcframework"]
                     if FileManager.default.fileExists(atPath: XCFrameworkPath.path) {
