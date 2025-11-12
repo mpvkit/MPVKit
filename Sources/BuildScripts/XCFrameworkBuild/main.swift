@@ -52,45 +52,45 @@ enum Library: String, CaseIterable {
         case .FFmpeg:
             return "n8.0"
         case .openssl:
-            return "3.2.0"
+            return "3.3.2-xcode26"
         case .gnutls:
-            return "3.8.3"
+            return "3.8.8-xcode26"
         case .nettle:
-            return "3.8.3"
+            return "3.8.8-xcode26"
         case .gmp:
-            return "3.8.3"
+            return "3.8.8-xcode26"
         case .libass:
-            return "0.17.3"
+            return "0.17.3-xcode26"
         case .libunibreak:
-            return "0.17.3"
+            return "0.17.3-xcode26"
         case .libfreetype:
-            return "0.17.3"
+            return "0.17.3-xcode26"
         case .libfribidi:
-            return "0.17.3"
+            return "0.17.3-xcode26"
         case .libharfbuzz:
-            return "0.17.3"
+            return "0.17.3-xcode26"
         case .libsmbclient:
-            return "4.15.13"
+            return "4.15.13-xcode26"
         case .libdav1d:    // AV1 decoding
-            return "1.4.3"
+            return "1.5.2-xcode26"
         case .lcms2:
-            return "7.349.0"
+            return "2.16.0-xcode26"
         case .libplacebo:
-            return "7.351.0-fix"
+            return "7.351.0-xcode26"
         case .libdovi:
-            return "3.3.0"
+            return "3.3.1-xcode26"
         case .vulkan:
-            return "1.4.0-fix"
+            return "1.4.0-xcode26"
         case .libshaderc:  // compiling GLSL (OpenGL Shading Language) shaders into SPIR-V (Standard Portable Intermediate Representation - Vulkan) code
-            return "2025.4.0"
+            return "2025.4.0-xcode26"
         case .libuchardet:
-            return "0.0.8"
+            return "0.0.8-xcode26"
         case .libbluray:
-            return "1.3.4"
+            return "1.3.4-xcode26"
         case .libluajit:
-            return "2.1.0"
+            return "2.1.0-xcode26"
         case .libuavs3d:
-            return "1.2.1"
+            return "1.2.1-xcode26"
         }
     }
 
@@ -121,7 +121,7 @@ enum Library: String, CaseIterable {
         case .libsmbclient:
             return "https://github.com/mpvkit/libsmbclient-build/releases/download/\(self.version)/libsmbclient-all.zip"
         case .lcms2:
-            return "https://github.com/mpvkit/libplacebo-build/releases/download/\(self.version)/lcms2-all.zip"
+            return "https://github.com/mpvkit/lcms2-build/releases/download/\(self.version)/lcms2-all.zip"
         case .libplacebo:
             return "https://github.com/mpvkit/libplacebo-build/releases/download/\(self.version)/libplacebo-all.zip"
         case .libdav1d:
@@ -286,8 +286,8 @@ enum Library: String, CaseIterable {
             return  [
                 .target(
                     name: "lcms2",
-                    url: "https://github.com/mpvkit/libplacebo-build/releases/download/\(self.version)/lcms2.xcframework.zip",
-                    checksum: "https://github.com/mpvkit/libplacebo-build/releases/download/\(self.version)/lcms2.xcframework.checksum.txt"
+                    url: "https://github.com/mpvkit/lcms2-build/releases/download/\(self.version)/lcms2.xcframework.zip",
+                    checksum: "https://github.com/mpvkit/lcms2-build/releases/download/\(self.version)/lcms2.xcframework.checksum.txt"
                 ),
             ]
         case .libplacebo:
