@@ -21,7 +21,6 @@ jobs:
         run: xcodebuild -showsdks
 
       - name: Build macOS
-        id: build
         run: |
           xcodebuild -resolvePackageDependencies \
             -project Demo/Demo-macOS/Demo-macOS.xcodeproj \
@@ -36,7 +35,6 @@ jobs:
             build
 
       - name: Build iOS
-        id: build
         run: |
           xcodebuild -resolvePackageDependencies \
             -project Demo/Demo-iOS/Demo-iOS.xcodeproj \
