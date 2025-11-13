@@ -220,11 +220,10 @@ final class MPVMetalViewController: UIViewController {
                         switch propertyName {
                         case MPVProperty.videoParamsSigPeak:
                             if let sigPeak = UnsafePointer<Double>(OpaquePointer(property.data))?.pointee {
-                                let maxEDRRange = view.window?.screen.potentialEDRHeadroom ?? 1.0
-                                // display screen support HDR and current playing HDR video
-                                self.hdrAvailable = maxEDRRange > 1.0 && sigPeak > 1.0
-                                
                                 DispatchQueue.main.async {
+                                    let maxEDRRange = self.view.window?.screen.potentialEDRHeadroom ?? 1.0
+                                    // display screen support HDR and current playing HDR video
+                                    self.hdrAvailable = maxEDRRange > 1.0 && sigPeak > 1.0
                                     self.playDelegate?.propertyChange(mpv: self.mpv, propertyName: propertyName, data: sigPeak)
                                 }
                             }
