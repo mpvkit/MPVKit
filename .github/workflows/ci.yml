@@ -10,7 +10,7 @@ jobs:
   build:
     permissions:
       contents: write
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
 
