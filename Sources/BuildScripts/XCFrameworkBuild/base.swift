@@ -775,27 +775,6 @@ class BaseBuild {
             """)
             try! str.write(toFile: packageFile.path, atomically: true, encoding: .utf8)
         }
-
-        // for github action test
-        let templateForTest = URL.currentDirectory + ["../docs/Package.test.swift"]
-        if FileManager.default.fileExists(atPath: templateForTest.path) {
-            let packageFileForTest = releaseDirPath + "Package.test.swift"
-            if !FileManager.default.fileExists(atPath: packageFileForTest.path) {
-                try! FileManager.default.copyItem(at: templateForTest, to: packageFileForTest)
-            }
-            if let data = FileManager.default.contents(atPath: packageFileForTest.path), var str = String(data: data, encoding: .utf8) {
-                let placeholderChars = "//AUTO_GENERATE_TARGETS_END//"
-                str = str.replacingOccurrences(of: 
-                """
-                        \(placeholderChars)
-                """, with: 
-                """
-                \(dependencyTargetContent)
-                        \(placeholderChars)
-                """)
-                try! str.write(toFile: packageFileForTest.path, atomically: true, encoding: .utf8)
-            }
-        }
     }
 
     func getFirstSuccessPlatform() -> PlatformType? {

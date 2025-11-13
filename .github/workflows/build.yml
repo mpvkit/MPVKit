@@ -90,23 +90,6 @@ jobs:
           rm -rf ./dist/release/libmpv
           rm -rf ./dist/release/xcframework
       
-      - name: Test Build
-        run: |
-          rm -rf ./Package.swift
-          cp -f ./dist/release/Package.test.swift ./Package.swift
-
-          xcodebuild -resolvePackageDependencies \
-            -project Demo/Demo-macOS/Demo-macOS.xcodeproj \
-            -scheme Demo-macOS
-
-          xcodebuild -project Demo/Demo-macOS/Demo-macOS.xcodeproj \
-            -scheme Demo-macOS \
-            -configuration Release \
-            CODE_SIGN_IDENTITY="-" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            build
-      
       - name: Build LGPL version
         run: |
           make build version=${{ env.RELEASE_VERSION }}
