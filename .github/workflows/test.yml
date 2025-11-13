@@ -1,0 +1,77 @@
+name: Test Build
+
+on:
+  push:
+    branches:
+      - ci
+      - test
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag name (default mpv version)'
+        default: ''
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check version to release
+        uses: jannekem/run-python-script-action@v1
+        with:
+          script: |
+            import re
+
+            def normalize_version(version_string):
+              version_string = re.sub(r'[^.0-9]+|-.+', '', version_string)
+              parts = re.split(r'\.', version_string)
+              major = int(parts[0])
+              minor = int(parts[1]) if len(parts) > 1 else 0
+              patch = int(parts[2]) if len(parts) > 2 else 0
+              return f"{major}.{minor}.{patch}"
+
+            file_path = './Sources/BuildScripts/XCFrameworkBuild/main.swift'
+            with open(file_path, 'r', encoding='utf-8') as file:
+              content = file.read()
+
+            mpvVersion = re.search(r'(case .libmpv[^"]+?)"(.+?)"', content).group(2)
+            ffmpegVersion = re.search(r'(case .FFmpeg[^"]+?)"(.+?)"', content).group(2)
+            libplaceboVersion = re.search(r'(case .libplacebo[^"]+?)"(.+?)"', content).group(2)
+            vulkanVersion = re.search(r'(case .vulkan[^"]+?)"(.+?)"', content).group(2)
+
+            print(f'mpv version: {mpvVersion}')
+            print(f'ffmpeg version: {ffmpegVersion}')
+            releaseVersion = '${{ github.event.inputs.version }}' or normalize_version(mpvVersion)
+            print(f'release version: {releaseVersion}')
+            set_env('BUILD_VERSION', mpvVersion)
+            set_env('RELEASE_VERSION', releaseVersion)
+
+            with open('/tmp/RELEASE_NOTE.txt', 'w', encoding='utf-8') as file:
+              file.write(f'''
+              * mpv version: {mpvVersion} ([changelog](https://github.com/mpv-player/mpv/releases/tag/{mpvVersion}))
+              * ffmpeg version: {ffmpegVersion} ([changelog](https://github.com/FFmpeg/FFmpeg/blob/{ffmpegVersion}/Changelog))
+              * placebo version: v{libplaceboVersion}
+              * MoltenVK version: v{vulkanVersion}
+              ''')
+
+
+      - name: Install dependencies
+        run: |
+          brew install autoconf
+          brew install automake
+          brew install libtool
+          python -m pip install meson==1.4.2
+          brew install ninja
+          brew install rename
+
+      - name: Build GPL version
+        run: |
+          make build enable-gpl version=${{ env.RELEASE_VERSION }} platform=maccatalyst,xros,ios,macos
+
+          cd ./dist/release
+          rename 's/-all\.zip/-GPL-all\.zip/' *-all.zip
+          rename 's/\.xcframework\.zip/-GPL\.xcframework\.zip/' *.xcframework.zip
+          rename 's/\.xcframework\.checksum\.txt/-GPL\.xcframework\.checksum\.txt/' *.xcframework.checksum.txt

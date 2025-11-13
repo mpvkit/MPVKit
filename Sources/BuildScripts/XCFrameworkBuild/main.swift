@@ -4,38 +4,38 @@ do {
     let options = try ArgumentOptions.parse(CommandLine.arguments)
     try Build.performCommand(options)
 
-    // SSL
-    try BuildOpenSSL().buildALL()
-    try BuildGmp().buildALL()
-    try BuildNettle().buildALL()
-    try BuildGnutls().buildALL()
+    // // SSL
+    // try BuildOpenSSL().buildALL()
+    // try BuildGmp().buildALL()
+    // try BuildNettle().buildALL()
+    // try BuildGnutls().buildALL()
 
-    // libass
-    try BuildUnibreak().buildALL()
-    try BuildFreetype().buildALL()
-    try BuildFribidi().buildALL()
-    try BuildHarfbuzz().buildALL()
-    try BuildASS().buildALL()
+    // // libass
+    // try BuildUnibreak().buildALL()
+    // try BuildFreetype().buildALL()
+    // try BuildFribidi().buildALL()
+    // try BuildHarfbuzz().buildALL()
+    // try BuildASS().buildALL()
 
-    // libsmbclient
-    try BuildSmbclient().buildALL()
+    // // libsmbclient
+    // try BuildSmbclient().buildALL()
 
-    // libbluray
-    try BuildBluray().buildALL()
+    // // libbluray
+    // try BuildBluray().buildALL()
     
-    // ffmpeg
-    try BuildUavs3d().buildALL()
-    try BuildDovi().buildALL()
-    try BuildVulkan().buildALL()
-    try BuildShaderc().buildALL()
-    try BuildLittleCms().buildALL()
-    try BuildPlacebo().buildALL()
-    try BuildDav1d().buildALL()
+    // // ffmpeg
+    // try BuildUavs3d().buildALL()
+    // try BuildDovi().buildALL()
+    // try BuildVulkan().buildALL()
+    // try BuildShaderc().buildALL()
+    // try BuildLittleCms().buildALL()
+    // try BuildPlacebo().buildALL()
+    // try BuildDav1d().buildALL()
     try BuildFFMPEG().buildALL()
 
-    // mpv
-    try BuildUchardet().buildALL()
-    try BuildLuaJIT().buildALL()
+    // // mpv
+    // try BuildUchardet().buildALL()
+    // try BuildLuaJIT().buildALL()
     try BuildMPV().buildALL()
 } catch {
     print(error.localizedDescription)
@@ -52,45 +52,45 @@ enum Library: String, CaseIterable {
         case .FFmpeg:
             return "n8.0"
         case .openssl:
-            return "3.3.2-xcode26"
+            return "3.3.2-xcode"
         case .gnutls:
-            return "3.8.8-xcode26"
+            return "3.8.8-xcode"
         case .nettle:
-            return "3.8.8-xcode26"
+            return "3.8.8-xcode"
         case .gmp:
-            return "3.8.8-xcode26"
+            return "3.8.8-xcode"
         case .libass:
-            return "0.17.3-xcode26"
+            return "0.17.3-xcode"
         case .libunibreak:
-            return "0.17.3-xcode26"
+            return "0.17.3-xcode"
         case .libfreetype:
-            return "0.17.3-xcode26"
+            return "0.17.3-xcode"
         case .libfribidi:
-            return "0.17.3-xcode26"
+            return "0.17.3-xcode"
         case .libharfbuzz:
-            return "0.17.3-xcode26"
+            return "0.17.3-xcode"
         case .libsmbclient:
-            return "4.15.13-xcode26"
+            return "4.15.13-xcode"
         case .libdav1d:    // AV1 decoding
-            return "1.5.2-xcode26"
+            return "1.5.2-xcode"
         case .lcms2:
-            return "2.16.0-xcode26"
+            return "2.16.0-xcode"
         case .libplacebo:
-            return "7.351.0-xcode26"
+            return "7.351.0-xcode"
         case .libdovi:
-            return "3.3.1-xcode26"
+            return "3.3.1-xcode"
         case .vulkan:
-            return "1.4.0-xcode26"
+            return "1.4.0-xcode"
         case .libshaderc:  // compiling GLSL (OpenGL Shading Language) shaders into SPIR-V (Standard Portable Intermediate Representation - Vulkan) code
-            return "2025.4.0-xcode26"
+            return "2025.4.0-xcode"
         case .libuchardet:
-            return "0.0.8-xcode26"
+            return "0.0.8-xcode"
         case .libbluray:
-            return "1.3.4-xcode26"
+            return "1.3.4-xcode"
         case .libluajit:
-            return "2.1.0-xcode26"
+            return "2.1.0-xcode"
         case .libuavs3d:
-            return "1.2.1-xcode26"
+            return "1.2.1-xcode"
         }
     }
 
