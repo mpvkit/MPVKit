@@ -76,7 +76,7 @@ enum Library: String, CaseIterable {
         case .lcms2:
             return "2.16.0-xcode"
         case .libplacebo:
-            return "7.351.0-xcode"
+            return "7.351.0"
         case .libdovi:
             return "3.3.1-xcode"
         case .vulkan:
