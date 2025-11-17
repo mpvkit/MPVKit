@@ -78,7 +78,7 @@ enum Library: String, CaseIterable {
         case .libplacebo:
             return "7.351.0-xcode"
         case .libdovi:
-            return "3.3.1-xcode"
+            return "v3.3.0"
         case .vulkan:
             return "1.4.0-xcode"
         case .libshaderc:  // compiling GLSL (OpenGL Shading Language) shaders into SPIR-V (Standard Portable Intermediate Representation - Vulkan) code
