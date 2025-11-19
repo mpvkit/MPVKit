@@ -60,15 +60,15 @@ enum Library: String, CaseIterable {
         case .gmp:
             return "3.8.8-xcode"
         case .libass:
-            return "0.17.3-xcode"
+            return "0.17.4"
         case .libunibreak:
-            return "0.17.3-xcode"
+            return "0.17.4"
         case .libfreetype:
-            return "0.17.3-xcode"
+            return "0.17.4"
         case .libfribidi:
-            return "0.17.3-xcode"
+            return "0.17.4"
         case .libharfbuzz:
-            return "0.17.3-xcode"
+            return "0.17.4"
         case .libsmbclient:
             return "4.15.13-xcode"
         case .libdav1d:    // AV1 decoding
