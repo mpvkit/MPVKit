@@ -70,7 +70,7 @@ jobs:
             print("mpv old version:", mpvOldVersion)
             set_env('MPV_OLD_VERSION', mpvOldVersion)
             mpvNewVersion = '${{ env.MPV_LATEST_VERSION }}'
-            if parse_version(mpvNewVersion) > parse_version(mpvOldVersion):
+            if parse_version(mpvNewVersion) > parse_version(mpvOldVersion) and not mpvOldVersion.startswith(mpvNewVersion):
               content = re.sub(r'(case .libmpv[^"]+?)"(.+?)"', r'\1"${{ env.MPV_LATEST_VERSION }}"', content, count=1)
               set_env('FOUND_NEW_MPV_VERSION', '1')
 
@@ -78,7 +78,7 @@ jobs:
             print("ffmpeg old version:", ffmpegOldVersion)
             set_env('FFMPEG_OLD_VERSION', ffmpegOldVersion)
             ffmpegNewVersion = '${{ env.FFMPEG_LATEST_VERSION }}'
-            if parse_version(ffmpegNewVersion) > parse_version(ffmpegOldVersion):
+            if parse_version(ffmpegNewVersion) > parse_version(ffmpegOldVersion) and not ffmpegOldVersion.startswith(ffmpegNewVersion):
               content = re.sub(r'(case .FFmpeg[^"]+?)"(.+?)"', r'\1"${{ env.FFMPEG_LATEST_VERSION }}"', content, count=1)
               set_env('FOUND_NEW_FFMPEG_VERSION', '1')
 
@@ -199,7 +199,7 @@ jobs:
             print("old version:", oldVersion)
             newVersion = '${{ env.LATEST_VERSION }}'
             print("new version:", newVersion)
-            if parse_version(newVersion) > parse_version(oldVersion):
+            if parse_version(newVersion) > parse_version(oldVersion) and not oldVersion.startswith(newVersion):
               content = re.sub(r'(case .${{ matrix.library.name }}[^"]+?)"(.+?)"', r'\1"${{ env.LATEST_VERSION }}"', content, count=1)
               set_env('FOUND_NEW_VERSION', '1')
               with open(file_path, 'w', encoding='utf-8') as file:
