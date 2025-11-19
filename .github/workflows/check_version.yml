@@ -202,6 +202,11 @@ jobs:
             if parse_version(newVersion) > parse_version(oldVersion) and not oldVersion.startswith(newVersion):
               content = re.sub(r'(case .${{ matrix.library.name }}[^"]+?)"(.+?)"', r'\1"${{ env.LATEST_VERSION }}"', content, count=1)
               set_env('FOUND_NEW_VERSION', '1')
+              # If libass is being updated, also update its dependencies
+              if '${{ matrix.library.name }}' == 'libass':
+                deps = ['libunibreak', 'libfreetype', 'libfribidi', 'libharfbuzz']
+                for dep in deps:
+                  content = re.sub(r'(case .' + dep + r'[^"]+?)"(.+?)"', r'\1"${{ env.LATEST_VERSION }}"', content, count=1)
               with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(content)
 
