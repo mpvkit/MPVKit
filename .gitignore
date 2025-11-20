@@ -119,3 +119,5 @@ dist/
 *.log
 *.xcframework
 Package.resolved
+buildServer.json
+.vscode

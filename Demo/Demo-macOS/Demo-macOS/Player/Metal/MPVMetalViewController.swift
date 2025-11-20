@@ -114,11 +114,11 @@ final class MPVMetalViewController: NSViewController {
         mpv_observe_property(mpv, 0, MPVProperty.videoParamsColormatrix, MPV_FORMAT_STRING)
         mpv_observe_property(mpv, 0, MPVProperty.pausedForCache, MPV_FORMAT_FLAG)
         mpv_set_wakeup_callback(self.mpv, { (ctx) in
-            let client = unsafeBitCast(ctx, to: MPVMetalViewController.self)
-            client.readEvents()
-        }, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
+            guard let client = ctx else { return }
+            let viewController = Unmanaged<MPVMetalViewController>.fromOpaque(client).takeUnretainedValue()
+            viewController.readEvents()
+        }, Unmanaged.passRetained(self).toOpaque())
     }
-    
     
     func loadFile(
         _ url: URL,
@@ -214,7 +214,9 @@ final class MPVMetalViewController: NSViewController {
     }
     
     func readEvents() {
-        queue.async { [self] in
+        queue.async { [weak self] in
+            guard let self else { return }
+
             while self.mpv != nil {
                 let event = mpv_wait_event(self.mpv, 0)
                 if event?.pointee.event_id == MPV_EVENT_NONE {
@@ -261,6 +263,24 @@ final class MPVMetalViewController: NSViewController {
         }
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+        
+        if mpv != nil {
+            mpv_set_wakeup_callback(mpv, nil, nil)
+            
+            // Wait for any pending queue operations to complete
+            queue.sync {
+                if self.mpv != nil {
+                    mpv_terminate_destroy(self.mpv)
+                    self.mpv = nil
+                }
+            }
+            
+            // Release the retained self from wakeup callback
+            Unmanaged.passUnretained(self).release()
+        }
+    }
     
     private func checkError(_ status: CInt) {
         if status < 0 {

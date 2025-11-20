@@ -172,7 +172,9 @@ final class MPVOGLView: NSOpenGLView {
     
     
     func readEvents() {
-        queue.async { [self] in
+        queue.async { [weak self] in
+            guard let self else { return }
+
             while self.mpv != nil {
                 let event = mpv_wait_event(self.mpv, 0)
                 if event!.pointee.event_id == MPV_EVENT_NONE {

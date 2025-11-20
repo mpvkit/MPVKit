@@ -2,6 +2,10 @@ import Foundation
 import GLKit
 import Libmpv
 
+/**
+ Warning: OpenGL rendering can not play 10bit videos correctly on iOS/tvOS.
+ https://github.com/mpv-player/mpv/issues/7846
+ */
 class MPVViewController: GLKViewController {
     var mpv: OpaquePointer!
     var mpvGL: OpaquePointer!
@@ -9,6 +13,14 @@ class MPVViewController: GLKViewController {
     var queue: DispatchQueue = DispatchQueue(label: "mpv", qos: .userInteractive)
     private var defaultFBO: GLint = -1
     var playUrl: URL?
+    
+    var isSimulator: Bool {
+#if targetEnvironment(simulator)
+        return true
+#else
+        return false
+#endif
+    }
     
 
     override func viewDidLoad() {
@@ -55,7 +67,7 @@ class MPVViewController: GLKViewController {
 #endif
         checkError(mpv_set_option_string(mpv, "subs-match-os-language", "yes"))
         checkError(mpv_set_option_string(mpv, "subs-fallback", "yes"))
-        checkError(mpv_set_option_string(mpv, "hwdec", machine == "x86_64" ? "no" : "auto-safe"))
+        checkError(mpv_set_option_string(mpv, "hwdec", isSimulator ? "no" : "videotoolbox"))
         checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
         
         checkError(mpv_initialize(mpv))
@@ -176,7 +188,9 @@ class MPVViewController: GLKViewController {
     
     
     func readEvents() {
-        queue.async { [self] in
+        queue.async { [weak self] in
+            guard let self else { return }
+
             while self.mpv != nil {
                 let event = mpv_wait_event(self.mpv, 0)
                 if event!.pointee.event_id == MPV_EVENT_NONE {
