@@ -1,0 +1,34 @@
+diff --git forkSrcPrefix/libavutil/hwcontext_videotoolbox.c forkDstPrefix/libavutil/hwcontext_videotoolbox.c
+index 102fa485e5cc38e219d7c4f49e93904c654a9494..4a15241b20026b8bd1c9211ed8b015d5dfcfb0b6 100644
+--- forkSrcPrefix/libavutil/hwcontext_videotoolbox.c
++++ forkDstPrefix/libavutil/hwcontext_videotoolbox.c
+@@ -49,7 +49,10 @@ static const struct {
+     { kCVPixelFormatType_420YpCbCr8Planar,              false, AV_PIX_FMT_YUV420P },
+     { kCVPixelFormatType_420YpCbCr8PlanarFullRange,     true,  AV_PIX_FMT_YUV420P },
+     { kCVPixelFormatType_422YpCbCr8,                    false, AV_PIX_FMT_UYVY422 },
+-    { kCVPixelFormatType_32BGRA,                        true,  AV_PIX_FMT_BGRA },
++    // @alexmercerind: |kCVPixelFormatType_32BGRA| must be available without full range, otherwise
++    // |av_map_videotoolbox_format_from_pixfmt2| will be unable to map it (due to change in
++    // |videotoolbox_best_pixel_format|) & H/W acceleration will fail.
++    { kCVPixelFormatType_32BGRA,                        false,  AV_PIX_FMT_BGRA },
+ #ifdef kCFCoreFoundationVersionNumber10_7
+     { kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,  false, AV_PIX_FMT_NV12 },
+     { kCVPixelFormatType_420YpCbCr8BiPlanarFullRange,   true,  AV_PIX_FMT_NV12 },
+diff --git forkSrcPrefix/libavcodec/videotoolbox.c forkDstPrefix/libavcodec/videotoolbox.c
+index ccba2491408d0a3614943c3e220158d22da481f7..5b207d3ca93390405a0d5c16fcb445bf49a889e9 100644
+--- forkSrcPrefix/libavcodec/videotoolbox.c
++++ forkDstPrefix/libavcodec/videotoolbox.c
+@@ -1217,7 +1217,12 @@ static enum AVPixelFormat videotoolbox_best_pixel_format(AVCodecContext *avctx)
+ #endif
+ #if HAVE_KCVPIXELFORMATTYPE_420YPCBCR10BIPLANARVIDEORANGE
+     if (depth > 8) {
+-        return AV_PIX_FMT_P010;
++#if TARGET_OS_IPHONE
++            // @tmm1: iOS doesn't support 10 bit textures in GLES.
++            return AV_PIX_FMT_BGRA;
++#else
++            return AV_PIX_FMT_P010;
++#endif
+     }
+ #endif
+ 
