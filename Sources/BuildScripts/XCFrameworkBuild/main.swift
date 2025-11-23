@@ -31,6 +31,7 @@ do {
     try BuildLittleCms().buildALL()
     try BuildPlacebo().buildALL()
     try BuildDav1d().buildALL()
+    try BuildWhisper().buildALL()
     try BuildFFMPEG().buildALL()
 
     // mpv
@@ -44,7 +45,7 @@ do {
 
 
 enum Library: String, CaseIterable {
-    case libmpv, FFmpeg, libshaderc, vulkan, lcms2, libdovi, openssl, libunibreak, libfreetype, libfribidi, libharfbuzz, libass, libsmbclient, libplacebo, libdav1d, gmp, nettle, gnutls, libuchardet, libbluray, libluajit, libuavs3d
+    case libmpv, FFmpeg, libshaderc, vulkan, lcms2, libdovi, openssl, libunibreak, libfreetype, libfribidi, libharfbuzz, libass, libsmbclient, libplacebo, libdav1d, gmp, nettle, gnutls, libuchardet, libbluray, libluajit, libuavs3d, whisper
     var version: String {
         switch self {
         case .libmpv:
@@ -91,6 +92,8 @@ enum Library: String, CaseIterable {
             return "2.1.0-xcode"
         case .libuavs3d:
             return "1.2.1-xcode"
+        case .whisper:
+            return "1.8.2"
         }
     }
 
@@ -140,6 +143,8 @@ enum Library: String, CaseIterable {
             return "https://github.com/mpvkit/libluajit-build/releases/download/\(self.version)/libluajit-all.zip"
         case .libuavs3d:
             return "https://github.com/mpvkit/libuavs3d-build/releases/download/\(self.version)/libuavs3d-all.zip"
+        case .whisper:
+            return "https://github.com/mpvkit/whisper-build/releases/download/\(self.version)/whisper-all.zip"
         }
     }
 
@@ -362,6 +367,14 @@ enum Library: String, CaseIterable {
                     checksum: "https://github.com/mpvkit/libuavs3d-build/releases/download/\(self.version)/Libuavs3d.xcframework.checksum.txt"
                 ),
             ]
+        case .whisper:
+            return  [
+                .target(
+                    name: "Libwhisper-combined",
+                    url: "https://github.com/mpvkit/whisper-build/releases/download/\(self.version)/Libwhisper-combined.xcframework.zip",
+                    checksum: "https://github.com/mpvkit/whisper-build/releases/download/\(self.version)/Libwhisper-combined.xcframework.checksum.txt"
+                ),
+            ]
         }
     }
 }
@@ -419,6 +432,7 @@ private class BuildMPV: BaseBuild {
             array.append("-Dgl-cocoa=enabled")
             array.append("-Dvideotoolbox-gl=enabled")
             array.append("-Dvideotoolbox-pl=enabled")
+            array.append("-Dmacos-touchbar=disabled")
             array.append("-Dlua=luajit")  // macos show video stats need enable 
         } else {
             array.append("-Dvideotoolbox-gl=disabled")
@@ -607,7 +621,7 @@ private class BuildFFMPEG: BaseBuild {
         //        if platform == .isimulator || platform == .tvsimulator {
         //            arguments.append("--assert-level=1")
         //        }
-        var dependencyLibrary = [Library.gmp, .gnutls, .libfreetype, .libharfbuzz, .libfribidi, .libass, .vulkan, .libshaderc, .lcms2, .libplacebo, .libdav1d, .libuavs3d]
+        var dependencyLibrary = [Library.gmp, .gnutls, .libfreetype, .libharfbuzz, .libfribidi, .libass, .vulkan, .libshaderc, .lcms2, .libplacebo, .libdav1d, .libuavs3d, .whisper]
         if BaseBuild.options.enableGPL {
             dependencyLibrary += [.libsmbclient]
         }
@@ -842,6 +856,12 @@ private class BuildSmbclient: ZipBaseBuild {
         super.init(library: .libsmbclient)
     }
 
+}
+
+private class BuildWhisper: ZipBaseBuild {
+    init() {
+        super.init(library: .whisper)
+    }
 }
 
 private class BuildDav1d: ZipBaseBuild {
