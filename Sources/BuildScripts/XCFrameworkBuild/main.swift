@@ -462,8 +462,14 @@ private class BuildFFMPEG: BaseBuild {
         FileManager.default.createFile(atPath: lldbFile.path, contents: nil, attributes: nil)
         let path = directoryURL + "libavcodec/videotoolbox.c"
         if let data = FileManager.default.contents(atPath: path.path), var str = String(data: data, encoding: .utf8) {
-            str = str.replacingOccurrences(of: "kCVPixelBufferOpenGLESCompatibilityKey", with: "kCVPixelBufferMetalCompatibilityKey")
-            str = str.replacingOccurrences(of: "kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey", with: "kCVPixelBufferMetalCompatibilityKey")
+            var lines = str.components(separatedBy: .newlines)
+            for (index, line) in lines.enumerated() {
+                if line.contains("kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey") {
+                    lines.insert("    CFDictionarySetValue(buffer_attributes, kCVPixelBufferMetalCompatibilityKey, kCFBooleanTrue);", at: index + 2)
+                    break
+                }
+            }
+            str = lines.joined(separator: "\n")
             try? str.write(toFile: path.path, atomically: true, encoding: .utf8)
         }
     }
