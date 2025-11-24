@@ -1,0 +1,59 @@
+diff --git forkSrcPrefix/libavcodec/videotoolbox.c forkDstPrefix/libavcodec/videotoolbox.c
+index ccba2491408d0a3614943c3e220158d22da481f7..ca4dd4b900868f830777d98f25cc6079bb562742 100644
+--- forkSrcPrefix/libavcodec/videotoolbox.c
++++ forkDstPrefix/libavcodec/videotoolbox.c
+@@ -1217,6 +1217,12 @@ static enum AVPixelFormat videotoolbox_best_pixel_format(AVCodecContext *avctx)
+ #endif
+ #if HAVE_KCVPIXELFORMATTYPE_420YPCBCR10BIPLANARVIDEORANGE
+     if (depth > 8) {
++        if (avctx->ios_gl) {
++            // iOS doesn't support 10 bit textures in GLES.
++            av_log(avctx, AV_LOG_WARNING,
++               "iOS GLES 10bit videos fallback.\n");
++            return AV_PIX_FMT_BGRA;
++        }
+         return AV_PIX_FMT_P010;
+     }
+ #endif
+diff --git forkSrcPrefix/libavcodec/avcodec.h forkDstPrefix/libavcodec/avcodec.h
+index 108df5a24e9d661bae12dba0173daef8e4079e10..04178a7230cc2ba4d237a2de70435fa2c42461c4 100644
+--- forkSrcPrefix/libavcodec/avcodec.h
++++ forkDstPrefix/libavcodec/avcodec.h
+@@ -1675,6 +1675,13 @@ typedef struct AVCodecContext {
+      */
+     int skip_alpha;
+ 
++    /**
++     * When play 10bit videos use iOS GLES, fallback to kCVPixelFormatType_32BGRA limited range.
++     * - encoding: unused
++     * - decoding: Set by user.
++     */
++    int ios_gl;
++
+     /**
+      * Number of macroblock rows at the top which are skipped.
+      * - encoding: unused
+diff --git forkSrcPrefix/libavcodec/options_table.h forkDstPrefix/libavcodec/options_table.h
+index 25da169343a63d4f9ce0b067feef2cc8053268e3..c76c32bc3fe11040697784df1a38c4cfc5851de5 100644
+--- forkSrcPrefix/libavcodec/options_table.h
++++ forkDstPrefix/libavcodec/options_table.h
+@@ -377,6 +377,7 @@ static const AVOption avcodec_options[] = {
+ {"ignore",      NULL, 0, AV_OPT_TYPE_CONST, {.i64 = FF_SUB_CHARENC_MODE_IGNORE},      INT_MIN, INT_MAX, S|D, .unit = "sub_charenc_mode"},
+ {"apply_cropping", NULL, OFFSET(apply_cropping), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, V | D },
+ {"skip_alpha", "Skip processing alpha", OFFSET(skip_alpha), AV_OPT_TYPE_BOOL, {.i64 = 0 }, 0, 1, V|D },
++{"ios_gl", "iOS GLES fallback", OFFSET(ios_gl), AV_OPT_TYPE_BOOL, {.i64 = 0 }, 0, 1, V|D },
+ {"field_order", "Field order", OFFSET(field_order), AV_OPT_TYPE_INT, {.i64 = AV_FIELD_UNKNOWN }, 0, 5, V|D|E, .unit = "field_order" },
+ {"progressive", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AV_FIELD_PROGRESSIVE }, 0, 0, V|D|E, .unit = "field_order" },
+ {"tt", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AV_FIELD_TT }, 0, 0, V|D|E, .unit = "field_order" },
+diff --git forkSrcPrefix/libavutil/hwcontext_videotoolbox.c forkDstPrefix/libavutil/hwcontext_videotoolbox.c
+index 102fa485e5cc38e219d7c4f49e93904c654a9494..094117d11e1ee4f306c3b1c8694645a40dc5601b 100644
+--- forkSrcPrefix/libavutil/hwcontext_videotoolbox.c
++++ forkDstPrefix/libavutil/hwcontext_videotoolbox.c
+@@ -50,6 +50,7 @@ static const struct {
+     { kCVPixelFormatType_420YpCbCr8PlanarFullRange,     true,  AV_PIX_FMT_YUV420P },
+     { kCVPixelFormatType_422YpCbCr8,                    false, AV_PIX_FMT_UYVY422 },
+     { kCVPixelFormatType_32BGRA,                        true,  AV_PIX_FMT_BGRA },
++    { kCVPixelFormatType_32BGRA,                        false, AV_PIX_FMT_BGRA },
+ #ifdef kCFCoreFoundationVersionNumber10_7
+     { kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,  false, AV_PIX_FMT_NV12 },
+     { kCVPixelFormatType_420YpCbCr8BiPlanarFullRange,   true,  AV_PIX_FMT_NV12 },
