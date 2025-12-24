@@ -52,13 +52,13 @@ enum Library: String, CaseIterable {
         case .FFmpeg:
             return "n8.0.1"
         case .openssl:
-            return "3.3.2-xcode"
+            return "3.3.5"
         case .gnutls:
-            return "3.8.8-xcode"
+            return "3.8.11"
         case .nettle:
-            return "3.8.8-xcode"
+            return "3.8.11"
         case .gmp:
-            return "3.8.8-xcode"
+            return "3.8.11"
         case .libass:
             return "0.17.4"
         case .libunibreak:
@@ -70,23 +70,23 @@ enum Library: String, CaseIterable {
         case .libharfbuzz:
             return "0.17.4"
         case .libsmbclient:
-            return "4.15.13-xcode"
+            return "4.15.13-2512"
         case .libdav1d:    // AV1 decoding
             return "1.5.2-xcode"
         case .lcms2:
-            return "2.16.0-xcode"
+            return "2.17.0"
         case .libplacebo:
-            return "7.351.0-xcode"
+            return "7.351.0-2512"
         case .libdovi:
-            return "3.3.1-xcode"
+            return "3.3.2"
         case .vulkan:
             return "1.4.1"
         case .libshaderc:  // compiling GLSL (OpenGL Shading Language) shaders into SPIR-V (Standard Portable Intermediate Representation - Vulkan) code
-            return "2025.4.0-xcode"
+            return "2025.5.0"
         case .libuchardet:
             return "0.0.8-xcode"
         case .libbluray:
-            return "1.3.4-xcode"
+            return "1.4.0"
         case .libluajit:
             return "2.1.0-xcode"
         case .libuavs3d:
@@ -462,14 +462,8 @@ private class BuildFFMPEG: BaseBuild {
         FileManager.default.createFile(atPath: lldbFile.path, contents: nil, attributes: nil)
         let path = directoryURL + "libavcodec/videotoolbox.c"
         if let data = FileManager.default.contents(atPath: path.path), var str = String(data: data, encoding: .utf8) {
-            var lines = str.components(separatedBy: .newlines)
-            for (index, line) in lines.enumerated() {
-                if line.contains("kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey") {
-                    lines.insert("    CFDictionarySetValue(buffer_attributes, kCVPixelBufferMetalCompatibilityKey, kCFBooleanTrue);", at: index + 2)
-                    break
-                }
-            }
-            str = lines.joined(separator: "\n")
+            str = str.replacingOccurrences(of: "kCVPixelBufferOpenGLESCompatibilityKey", with: "kCVPixelBufferMetalCompatibilityKey")
+            str = str.replacingOccurrences(of: "kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey", with: "kCVPixelBufferMetalCompatibilityKey")
             try? str.write(toFile: path.path, atomically: true, encoding: .utf8)
         }
     }
