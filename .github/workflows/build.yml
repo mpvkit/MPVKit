@@ -51,6 +51,8 @@ jobs:
               * ffmpeg version: {ffmpegVersion} ([changelog](https://github.com/FFmpeg/FFmpeg/blob/{ffmpegVersion}/Changelog))
               * placebo version: v{libplaceboVersion}
               * MoltenVK version: v{vulkanVersion}
+
+              　　![download](https://img.shields.io/github/downloads/${{ github.repository }}/{releaseVersion}/total?label=Downloads)
               ''')
 
 
