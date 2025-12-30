@@ -1,0 +1,43 @@
+diff --git forkSrcPrefix/audio/out/ao_audiounit.m forkDstPrefix/audio/out/ao_audiounit.m
+index 8d4eb4d..f4cbfc0 100644
+--- forkSrcPrefix/audio/out/ao_audiounit.m
++++ forkDstPrefix/audio/out/ao_audiounit.m
+@@ -29,6 +29,7 @@
+ #import <AudioToolbox/AudioToolbox.h>
+ #import <AVFoundation/AVFoundation.h>
+ #import <mach/mach_time.h>
++#import <TargetConditionals.h>
+
+ struct priv {
+     AudioUnit audio_unit;
+@@ -169,8 +170,25 @@ static bool init_audiounit(struct ao *ao)
+     } else {
+         ao->channels.num = (uint8_t)layout->mNumberChannelDescriptions;
+         for (UInt32 i = 0; i < layout->mNumberChannelDescriptions; i++) {
+-          ao->channels.speaker[i] =
+-              ca_label_to_mp_speaker_id(layout->mChannelDescriptions[i].mChannelLabel);
++          AudioChannelLabel label = layout->mChannelDescriptions[i].mChannelLabel;
++#if TARGET_OS_TV
++          // Debug: always log channel labels on tvOS
++          MP_WARN(ao, "tvOS channel %u: label=0x%x (Unknown=0x%x)\n",
++                  i, label, kAudioChannelLabel_Unknown);
++          // tvOS bug: 8-channel HDMI reports wrong labels for channels 7-8
++          // It reports LeftWide (0x31) and LFE2 (0x33) instead of Side Left/Right
++          // These should be Side Left/Right (LeftSurroundDirect/RightSurroundDirect) for 7.1
++          if (layout->mNumberChannelDescriptions == 8) {
++              // kAudioChannelLabel_LeftWide = 49 (0x31)
++              if (label == 49) {
++                  label = kAudioChannelLabel_LeftSurroundDirect;
++                  MP_WARN(ao, "tvOS: Fixing channel %u LeftWide (0x31) -> Side Left\n", i);
++              }
++              // kAudioChannelLabel_LFE2 = 51 (0x33)
++              else if (label == 51) {
++                  label = kAudioChannelLabel_RightSurroundDirect;
++                  MP_WARN(ao, "tvOS: Fixing channel %u LFE2 (0x33) -> Side Right\n", i);
++              }
++          }
++#endif
++          ao->channels.speaker[i] = ca_label_to_mp_speaker_id(label);
+         }
+         MP_VERBOSE(ao, "using standard channel mapping\n");
+     }
