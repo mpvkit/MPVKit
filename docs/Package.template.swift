@@ -1,10 +1,10 @@
-// swift-tools-version:5.8
+// swift-tools-version:5.9
 
 import PackageDescription
 
 let package = Package(
     name: "MPVKit",
-    platforms: [.macOS(.v11), .iOS(.v14), .tvOS(.v14)],
+    platforms: [.macOS(.v11), .iOS(.v14), .tvOS(.v14), .visionOS(.v1)],
     products: [
         .library(
             name: "MPVKit",
