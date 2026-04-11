@@ -6,6 +6,9 @@ on:
       - develop
     tags:
       - '*'
+  pull_request:
+    branches:
+      - develop
   workflow_dispatch:
 
 jobs:
@@ -44,6 +47,34 @@ jobs:
 
           xcodebuild -project Demo/Demo-iOS/Demo-iOS.xcodeproj \
             -scheme Demo-iOS \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Build tvOS
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project Demo/Demo-tvOS/Demo-tvOS.xcodeproj \
+            -scheme Demo-tvOS
+
+          xcodebuild -project Demo/Demo-tvOS/Demo-tvOS.xcodeproj \
+            -scheme Demo-tvOS \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Build visionOS
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project Demo/Demo-visionOS/Demo-visionOS.xcodeproj \
+            -scheme Demo-visionOS
+
+          xcodebuild -project Demo/Demo-visionOS/Demo-visionOS.xcodeproj \
+            -scheme Demo-visionOS \
             -configuration Release \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO \
