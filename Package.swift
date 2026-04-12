@@ -253,37 +253,37 @@ let package = Package(
 
         .binaryTarget(
             name: "Libavcodec",
-            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.0-n8.1-fix1/Libavcodec.xcframework.zip",
+            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.1/Libavcodec.xcframework.zip",
             checksum: "5bb6c59f1366df98a6553556ee3956f15747e6ae5f03fd2c02b0fc9826b929c4"
         ),
         .binaryTarget(
             name: "Libavdevice",
-            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.0-n8.1-fix1/Libavdevice.xcframework.zip",
+            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.1/Libavdevice.xcframework.zip",
             checksum: "3d0c5547a3560e7dd17ac6df5557bb853fbea8a27c917c4ce938cdc682272f8f"
         ),
         .binaryTarget(
             name: "Libavformat",
-            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.0-n8.1-fix1/Libavformat.xcframework.zip",
+            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.1/Libavformat.xcframework.zip",
             checksum: "cd6b779bfcec207fe647db4ef4a9056083dc3c9e6d27638acd7af24654c03253"
         ),
         .binaryTarget(
             name: "Libavfilter",
-            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.0-n8.1-fix1/Libavfilter.xcframework.zip",
+            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.1/Libavfilter.xcframework.zip",
             checksum: "f7a8cd8fa0ea4671a7aa2d804cb9e55d08541f5a1480ca50b5e6a0cc6da93814"
         ),
         .binaryTarget(
             name: "Libavutil",
-            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.0-n8.1-fix1/Libavutil.xcframework.zip",
+            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.1/Libavutil.xcframework.zip",
             checksum: "f055f2ad5d1186ffc135b505a96d2370fa2ea62f781c52abc0dc0c67db8720e3"
         ),
         .binaryTarget(
             name: "Libswresample",
-            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.0-n8.1-fix1/Libswresample.xcframework.zip",
+            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.1/Libswresample.xcframework.zip",
             checksum: "e0db898e99df793ac02af14fa1bbb319d4a1a23dfffa40c642ea93b8d3ef2f62"
         ),
         .binaryTarget(
             name: "Libswscale",
-            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.0-n8.1-fix1/Libswscale.xcframework.zip",
+            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.1/Libswscale.xcframework.zip",
             checksum: "d22b0f61e942979cb9f36a0df117efbf0cb4060dc1c615c3a48db151eb7ab2b5"
         ),
 
@@ -301,7 +301,7 @@ let package = Package(
 
         .binaryTarget(
             name: "Libmpv",
-            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.0-n8.1-fix1/Libmpv.xcframework.zip",
+            url: "https://github.com/youngc01/MPVKit/releases/download/0.41.1/Libmpv.xcframework.zip",
             checksum: "546d500d4761d2721ebad51ebdeabae57f5aef257265fadd558b014e9fd0edd1"
         ),
         //AUTO_GENERATE_TARGETS_END//
