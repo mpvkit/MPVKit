@@ -1,0 +1,41 @@
+diff --git forkSrcPrefix/audio/out/ao_audiounit.m forkDstPrefix/audio/out/ao_audiounit.m
+index 8d4eb4d..bb6a1bc 100644
+--- forkSrcPrefix/audio/out/ao_audiounit.m
++++ forkDstPrefix/audio/out/ao_audiounit.m
+@@ -148,15 +148,23 @@ static bool init_audiounit(struct ao *ao)
+ 
+     err = au_get_ary(p->audio_unit, kAudioUnitProperty_AudioChannelLayout, kAudioUnitScope_Output,
+                      0, (void**)&layout, &size);
+-    CHECK_CA_ERROR_L(coreaudio_error_audiounit,
+-                     "unable to retrieve audio unit channel layout");
++    if (err != noErr) {
++        // Channel layout query can fail when the HDMI output reports an
++        // unsupported layout (e.g. 32-channel eARC with Continuous Audio).
++        // Fall back to stereo rather than aborting.
++        MP_WARN(ao, "unable to retrieve audio unit channel layout (%d), "
++                    "falling back to stereo\n", (int)err);
++        ao->channels = (struct mp_chmap)MP_CHMAP_INIT_STEREO;
++        goto layout_done;
++    }
+ 
+     MP_VERBOSE(ao, "AU channel layout tag: %x (%x)\n", layout->mChannelLayoutTag, layout->mChannelBitmap);
+ 
+     layout = convert_layout(layout, &size);
+     if (!layout) {
+-        MP_ERR(ao, "unable to convert channel layout to list format\n");
+-        goto coreaudio_error_audiounit;
++        MP_WARN(ao, "unable to convert channel layout, falling back to stereo\n");
++        ao->channels = (struct mp_chmap)MP_CHMAP_INIT_STEREO;
++        goto layout_done;
+     }
+ 
+     for (UInt32 i = 0; i < layout->mNumberChannelDescriptions; i++) {
+@@ -175,6 +183,8 @@ static bool init_audiounit(struct ao *ao)
+         MP_VERBOSE(ao, "using standard channel mapping\n");
+     }
+ 
++layout_done:
++
+     ca_fill_asbd(ao, &asbd);
+     size = sizeof(AudioStreamBasicDescription);
+     err = AudioUnitSetProperty(p->audio_unit,
