@@ -50,7 +50,7 @@ enum Library: String, CaseIterable {
         case .libmpv:
             return "v0.41.0"
         case .FFmpeg:
-            return "n8.1"
+            return "n8.0.1"
         case .openssl:
             return "3.3.5"
         case .gnutls:
@@ -76,7 +76,7 @@ enum Library: String, CaseIterable {
         case .lcms2:
             return "2.17.0"
         case .libplacebo:
-            return "7.360.1"
+            return "7.351.0-2512"
         case .libdovi:
             return "3.3.2"
         case .vulkan:
@@ -372,6 +372,408 @@ private class BuildMPV: BaseBuild {
         super.init(library: .libmpv)
     }
 
+    override func beforeBuild() throws {
+        try super.beforeBuild()
+
+        let audioOut = directoryURL + "audio/out"
+
+        // ============================================================
+        // PATCH GROUP A — ao_audiounit.m (RemoteIO stereo fallback)
+        // ============================================================
+        // On tvOS 26.4+ with Continuous Audio Connection the Dolby MAT
+        // pipe causes kAudioUnitErr_InvalidPropertyValue (-10879) on
+        // channel layout query.  These patches make the failure non-
+        // fatal and add a stereo fallback path.
+        let aoAudioUnit = audioOut + "ao_audiounit.m"
+        let patchAU = directoryURL + "_patch_audiounit.py"
+        let patchAUPy = """
+        import sys
+        fpath = sys.argv[1]
+        with open(fpath, 'r') as f:
+            s = f.read()
+
+        # AU-0: Deactivate session + set stereo preference BEFORE activation
+        old_session = (
+            '[instance setCategory:AVAudioSessionCategoryPlayback withOptions:options error:nil];\\n'
+            '    [instance setMode:AVAudioSessionModeMoviePlayback error:nil];\\n'
+            '    [instance setActive:YES error:nil];\\n'
+            '    [instance setPreferredOutputNumberOfChannels:prefChannels error:nil];'
+        )
+        new_session = (
+            '// Tear down any existing session so the system releases the current\\n'
+            '    // HDMI/Dolby-MAT pipe before we configure our preferences.\\n'
+            '    [instance setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];\\n'
+            '\\n'
+            '    [instance setCategory:AVAudioSessionCategoryPlayback withOptions:options error:nil];\\n'
+            '    [instance setMode:AVAudioSessionModeMoviePlayback error:nil];\\n'
+            '    [instance setPreferredOutputNumberOfChannels:prefChannels error:nil];\\n'
+            '    [instance setActive:YES error:nil];'
+        )
+        s = s.replace(old_session, new_session)
+
+        # AU-1: Make channel layout query failure non-fatal (stereo fallback)
+        old = 'CHECK_CA_ERROR_L(coreaudio_error_audiounit,\\n                     "unable to retrieve audio unit channel layout");'
+        new = (
+            'if (err != noErr) {\\n'
+            '        MP_WARN(ao, "channel layout query failed (%d), falling back to stereo\\\\n", (int)err);\\n'
+            '        ao->channels = (struct mp_chmap)MP_CHMAP_INIT_STEREO;\\n'
+            '        goto au_set_format;\\n'
+            '    }'
+        )
+        s = s.replace(old, new)
+
+        # AU-2: Add au_set_format label
+        s = s.replace('    ca_fill_asbd(ao, &asbd);', 'au_set_format:\\n    ca_fill_asbd(ao, &asbd);', 1)
+
+        # AU-3: Reinitialize audio unit after format/callback setup
+        old_tail = (
+            '    CHECK_CA_ERROR_L(coreaudio_error_audiounit,\\n'
+            '                     "unable to set render callback on audio unit");\\n'
+            '\\n'
+            '    talloc_free(layout);\\n'
+            '\\n'
+            '    return true;'
+        )
+        new_tail = (
+            '    CHECK_CA_ERROR_L(coreaudio_error_audiounit,\\n'
+            '                     "unable to set render callback on audio unit");\\n'
+            '\\n'
+            '    AudioUnitUninitialize(p->audio_unit);\\n'
+            '    err = AudioUnitInitialize(p->audio_unit);\\n'
+            '    CHECK_CA_ERROR_L(coreaudio_error_component,\\n'
+            '                     "unable to reinitialize audio unit after format setup");\\n'
+            '\\n'
+            '    talloc_free(layout);\\n'
+            '\\n'
+            '    return true;'
+        )
+        s = s.replace(old_tail, new_tail)
+
+        with open(fpath, 'w') as f:
+            f.write(s)
+        """
+        try patchAUPy.write(to: patchAU, atomically: true, encoding: .utf8)
+        Utility.shell("python3 '\(patchAU.path)' '\(aoAudioUnit.path)'")
+
+        // ============================================================
+        // PATCH GROUP B — Enable AVFoundation AO on tvOS
+        // ============================================================
+        // The avfoundation AO uses AVSampleBufferAudioRenderer (Apple's
+        // high-level pipeline) instead of RemoteIO, which should handle
+        // Dolby MAT negotiation natively.
+        //
+        // The shared utility files (ao_coreaudio_utils, ao_coreaudio_chmap,
+        // ao_coreaudio_properties) use macOS-only AudioObject* APIs behind
+        // `#if HAVE_COREAUDIO || HAVE_AVFOUNDATION` guards.  On tvOS we
+        // only have HAVE_AVFOUNDATION, so we narrow those guards to
+        // `#if HAVE_COREAUDIO` for AudioObject-dependent code and provide
+        // minimal tvOS stubs where the avfoundation AO needs a symbol.
+        let patchAVF = directoryURL + "_patch_avfoundation.py"
+        let patchAVFPy = """
+        import sys, os
+
+        audio_out = sys.argv[1]
+
+        def patch_file(name, patches):
+            path = os.path.join(audio_out, name)
+            with open(path, 'r') as f:
+                s = f.read()
+            for (old, new) in patches:
+                if old not in s:
+                    print(f"WARNING: patch target not found in {name}: {old[:60]}...")
+                    continue
+                s = s.replace(old, new, 1)
+            with open(path, 'w') as f:
+                f.write(s)
+            print(f"Patched {name}")
+
+        # ------------------------------------------------------------------
+        # B-1: ao_coreaudio_properties.c
+        # Wrap entire body in #if HAVE_COREAUDIO so it compiles to an empty
+        # translation unit on tvOS (all AudioObject* APIs are macOS-only).
+        # ------------------------------------------------------------------
+        patch_file('ao_coreaudio_properties.c', [
+            (
+                '#include "audio/out/ao_coreaudio_properties.h"\\n'
+                '#include "audio/out/ao_coreaudio_utils.h"\\n'
+                '#include "mpv_talloc.h"\\n'
+                '#include "osdep/mac/compat.h"\\n'
+                '\\n'
+                'OSStatus ca_get(',
+                # --->
+                '#include "config.h"\\n'
+                '#if HAVE_COREAUDIO\\n'
+                '#include "audio/out/ao_coreaudio_properties.h"\\n'
+                '#include "audio/out/ao_coreaudio_utils.h"\\n'
+                '#include "mpv_talloc.h"\\n'
+                '#include "osdep/mac/compat.h"\\n'
+                '\\n'
+                'OSStatus ca_get('
+            ),
+            (
+                '    return AudioObjectIsPropertySettable(id, &p_addr, data);\\n'
+                '}',
+                # --->
+                '    return AudioObjectIsPropertySettable(id, &p_addr, data);\\n'
+                '}\\n'
+                '#endif /* HAVE_COREAUDIO */'
+            ),
+        ])
+
+        # ------------------------------------------------------------------
+        # B-2: ao_coreaudio_utils.h
+        # Narrow guards: functions using AudioDeviceID/AudioStreamID are
+        # macOS-only.  ca_get_device_list stays unguarded (tvOS stub in .c).
+        # ------------------------------------------------------------------
+        patch_file('ao_coreaudio_utils.h', [
+            # First guard block (ca_select_device)
+            (
+                '#if HAVE_COREAUDIO || HAVE_AVFOUNDATION\\n'
+                'OSStatus ca_select_device(struct ao *ao, char* name, AudioDeviceID *device);\\n'
+                '#endif',
+                # --->
+                '#if HAVE_COREAUDIO\\n'
+                'OSStatus ca_select_device(struct ao *ao, char* name, AudioDeviceID *device);\\n'
+                '#endif'
+            ),
+            # Second guard block (ca_stream_supports_compressed through
+            # ca_change_physical_format_sync)
+            (
+                '#if HAVE_COREAUDIO || HAVE_AVFOUNDATION\\n'
+                'bool ca_stream_supports_compressed(struct ao *ao, AudioStreamID stream);',
+                # --->
+                '#if HAVE_COREAUDIO\\n'
+                'bool ca_stream_supports_compressed(struct ao *ao, AudioStreamID stream);'
+            ),
+        ])
+
+        # ------------------------------------------------------------------
+        # B-3: ao_coreaudio_utils.c
+        # - Narrow the include guard (properties.h + HostTime.h are macOS)
+        # - Narrow the big function block to HAVE_COREAUDIO
+        # - Add a tvOS-only stub for ca_get_device_list (needed by avfoundation AO)
+        # - Narrow ca_get_latency to use mach_timebase on tvOS
+        # ------------------------------------------------------------------
+        patch_file('ao_coreaudio_utils.c', [
+            # Includes: properties.h and CoreAudio/HostTime.h are macOS-only
+            (
+                '#if HAVE_COREAUDIO || HAVE_AVFOUNDATION\\n'
+                '#include "audio/out/ao_coreaudio_properties.h"\\n'
+                '#include <CoreAudio/HostTime.h>\\n'
+                '#else\\n'
+                '#include <mach/mach_time.h>\\n'
+                '#endif',
+                # --->
+                '#if HAVE_COREAUDIO\\n'
+                '#include "audio/out/ao_coreaudio_properties.h"\\n'
+                '#include <CoreAudio/HostTime.h>\\n'
+                '#else\\n'
+                '#include <mach/mach_time.h>\\n'
+                '#endif'
+            ),
+            # Big function block: ca_is_output_device through ca_select_device
+            (
+                '#if HAVE_COREAUDIO || HAVE_AVFOUNDATION\\n'
+                'static bool ca_is_output_device(',
+                # --->
+                '#if HAVE_COREAUDIO\\n'
+                'static bool ca_is_output_device('
+            ),
+            # After ca_select_device #endif, add tvOS stub for ca_get_device_list
+            (
+                'coreaudio_error:\\n'
+                '    return err;\\n'
+                '}\\n'
+                '#endif\\n'
+                '\\n'
+                'bool check_ca_st(',
+                # --->
+                'coreaudio_error:\\n'
+                '    return err;\\n'
+                '}\\n'
+                '#endif\\n'
+                '\\n'
+                '#if HAVE_AVFOUNDATION && !HAVE_COREAUDIO\\n'
+                '// tvOS stub: no device enumeration available.\\n'
+                'void ca_get_device_list(struct ao *ao, struct ao_device_list *list)\\n'
+                '{\\n'
+                '    (void)ao; (void)list;\\n'
+                '}\\n'
+                '#endif\\n'
+                '\\n'
+                'bool check_ca_st('
+            ),
+            # ca_get_latency: use mach_timebase path for tvOS
+            (
+                'int64_t ca_get_latency(const AudioTimeStamp *ts)\\n'
+                '{\\n'
+                '#if HAVE_COREAUDIO || HAVE_AVFOUNDATION',
+                # --->
+                'int64_t ca_get_latency(const AudioTimeStamp *ts)\\n'
+                '{\\n'
+                '#if HAVE_COREAUDIO'
+            ),
+            # Second big function block: ca_stream_supports_compressed
+            # through ca_change_physical_format_sync
+            (
+                '#if HAVE_COREAUDIO || HAVE_AVFOUNDATION\\n'
+                'bool ca_stream_supports_compressed(',
+                # --->
+                '#if HAVE_COREAUDIO\\n'
+                'bool ca_stream_supports_compressed('
+            ),
+        ])
+
+        # ------------------------------------------------------------------
+        # B-4: ao_coreaudio_chmap.h
+        # Split the guard: keep HAVE_AVFOUNDATION for functions that don't
+        # use AudioDeviceID; narrow to HAVE_COREAUDIO for those that do.
+        # ------------------------------------------------------------------
+        patch_file('ao_coreaudio_chmap.h', [
+            (
+                '#if HAVE_COREAUDIO || HAVE_AVFOUNDATION\\n'
+                'AudioChannelLayout *ca_find_standard_layout(void *talloc_ctx, AudioChannelLayout *l);\\n'
+                'AudioChannelLayout *ca_get_acl(struct ao *ao, size_t *out_layout_size);\\n'
+                'void ca_log_layout(struct ao *ao, int l, AudioChannelLayout *layout);\\n'
+                'bool ca_init_chmap(struct ao *ao, AudioDeviceID device);\\n'
+                'void ca_get_active_chmap(struct ao *ao, AudioDeviceID device, int channel_count,\\n'
+                '                         struct mp_chmap *out_map);\\n'
+                '#endif',
+                # --->
+                '#if HAVE_COREAUDIO || HAVE_AVFOUNDATION\\n'
+                'AudioChannelLayout *ca_find_standard_layout(void *talloc_ctx, AudioChannelLayout *l);\\n'
+                'AudioChannelLayout *ca_get_acl(struct ao *ao, size_t *out_layout_size);\\n'
+                'void ca_log_layout(struct ao *ao, int l, AudioChannelLayout *layout);\\n'
+                '#endif\\n'
+                '\\n'
+                '#if HAVE_COREAUDIO\\n'
+                'bool ca_init_chmap(struct ao *ao, AudioDeviceID device);\\n'
+                'void ca_get_active_chmap(struct ao *ao, AudioDeviceID device, int channel_count,\\n'
+                '                         struct mp_chmap *out_map);\\n'
+                '#endif'
+            ),
+        ])
+
+        # ------------------------------------------------------------------
+        # B-5: ao_coreaudio_chmap.c
+        # Insert a nested #if HAVE_COREAUDIO before ca_query_layout and
+        # close it before the outer #endif so that AudioObject-dependent
+        # functions only compile on macOS.
+        # ------------------------------------------------------------------
+        patch_file('ao_coreaudio_chmap.c', [
+            # Insert #if HAVE_COREAUDIO before ca_query_layout
+            (
+                'static AudioChannelLayout* ca_query_layout(struct ao *ao,\\n'
+                '                                           AudioDeviceID device,',
+                # --->
+                '#if HAVE_COREAUDIO\\n'
+                'static AudioChannelLayout* ca_query_layout(struct ao *ao,\\n'
+                '                                           AudioDeviceID device,'
+            ),
+            # Turn the final #endif into two: one for HAVE_COREAUDIO, one
+            # for HAVE_COREAUDIO || HAVE_AVFOUNDATION.
+            # Match the unique tail of ca_get_active_chmap.
+            # Note: %s\\\\n in Swift → %s\\n in Python → matches literal \\n in C source
+            (
+                '    MP_WARN(ao, "mismatching channels - falling back to %s\\\\n",\\n'
+                '            mp_chmap_to_str(out_map));\\n'
+                '}\\n'
+                '#endif',
+                # --->
+                '    MP_WARN(ao, "mismatching channels - falling back to %s\\\\n",\\n'
+                '            mp_chmap_to_str(out_map));\\n'
+                '}\\n'
+                '#endif /* HAVE_COREAUDIO */\\n'
+                '#endif /* HAVE_COREAUDIO || HAVE_AVFOUNDATION */'
+            ),
+        ])
+
+        # ------------------------------------------------------------------
+        # B-6: ao_avfoundation.m
+        # - Apply same session deactivation/reorder for Dolby MAT
+        # - Guard macOS-only setAudioOutputDeviceUniqueID
+        # ------------------------------------------------------------------
+        patch_file('ao_avfoundation.m', [
+            # Session deactivation/reorder (same pattern as audiounit patch)
+            (
+                '    [instance setCategory:AVAudioSessionCategoryPlayback error:nil];\\n'
+                '    [instance setMode:AVAudioSessionModeMoviePlayback error:nil];\\n'
+                '    [instance setActive:YES error:nil];\\n'
+                '    [instance setPreferredOutputNumberOfChannels:prefChannels error:nil];',
+                # --->
+                '    [instance setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];\\n'
+                '    [instance setCategory:AVAudioSessionCategoryPlayback error:nil];\\n'
+                '    [instance setMode:AVAudioSessionModeMoviePlayback error:nil];\\n'
+                '    [instance setPreferredOutputNumberOfChannels:prefChannels error:nil];\\n'
+                '    [instance setActive:YES error:nil];'
+            ),
+            # Guard macOS-only device selection API
+            (
+                '    if (ao->device && ao->device[0]) {\\n'
+                '        [p->renderer setAudioOutputDeviceUniqueID:(NSString*)cfstr_from_cstr(ao->device)];\\n'
+                '    }',
+                # --->
+                '#if TARGET_OS_OSX\\n'
+                '    if (ao->device && ao->device[0]) {\\n'
+                '        [p->renderer setAudioOutputDeviceUniqueID:(NSString*)cfstr_from_cstr(ao->device)];\\n'
+                '    }\\n'
+                '#endif'
+            ),
+            # Guard macOS-only device listing in the driver struct
+            (
+                '    .list_devs      = ca_get_device_list,',
+                # --->
+                '#if HAVE_COREAUDIO\\n'
+                '    .list_devs      = ca_get_device_list,\\n'
+                '#endif'
+            ),
+        ])
+
+        """
+        try patchAVFPy.write(to: patchAVF, atomically: true, encoding: .utf8)
+        Utility.shell("python3 '\(patchAVF.path)' '\(audioOut.path)'")
+
+        // ------------------------------------------------------------------
+        // B-7: meson.build — compile osdep/utils-mac.c when avfoundation is
+        // enabled but cocoa is not (tvOS).  ao_avfoundation.m calls
+        // cfstr_get_cstr / cfstr_from_cstr which live in utils-mac.c.
+        // ------------------------------------------------------------------
+        let mesonBuild = directoryURL + "meson.build"
+        let patchMeson = directoryURL + "_patch_meson.py"
+        let patchMesonPy = """
+        import sys
+        path = sys.argv[1]
+        with open(path, 'r') as f:
+            s = f.read()
+
+        old = (
+            "if features['avfoundation']\\n"
+            "    dependencies += avfoundation\\n"
+            "    sources += files('audio/out/ao_avfoundation.m')\\n"
+            "endif"
+        )
+        new = (
+            "if features['avfoundation']\\n"
+            "    dependencies += avfoundation\\n"
+            "    sources += files('audio/out/ao_avfoundation.m')\\n"
+            "    if not features['cocoa']\\n"
+            "        sources += files('osdep/utils-mac.c')\\n"
+            "    endif\\n"
+            "endif"
+        )
+
+        if old not in s:
+            print("WARNING: meson.build patch target not found")
+        else:
+            s = s.replace(old, new, 1)
+            with open(path, 'w') as f:
+                f.write(s)
+            print("Patched meson.build: added utils-mac.c for avfoundation without cocoa")
+        """
+        try patchMesonPy.write(to: patchMeson, atomically: true, encoding: .utf8)
+        Utility.shell("python3 '\(patchMeson.path)' '\(mesonBuild.path)'")
+    }
+
     override func flagsDependencelibrarys() -> [Library] {
         if BaseBuild.options.enableGPL {
             return [.gmp, .libsmbclient]
@@ -425,11 +827,14 @@ private class BuildMPV: BaseBuild {
             array.append("-Dvideotoolbox-pl=enabled")
             array.append("-Dswift-build=disabled")
             array.append("-Daudiounit=enabled")
-            array.append("-Davfoundation=disabled")
+            array.append("-Davfoundation=enabled")
             array.append("-Dlua=disabled")
             if platform == .maccatalyst {
                 array.append("-Dcocoa=disabled")
                 array.append("-Dcoreaudio=disabled")
+            } else if platform == .tvos || platform == .tvsimulator {
+                array.append("-Dcoreaudio=disabled")
+                array.append("-Dios-gl=enabled")
             } else if platform == .xros || platform == .xrsimulator {
                 array.append("-Dios-gl=disabled")
             } else {
@@ -636,7 +1041,7 @@ private class BuildFFMPEG: BaseBuild {
         if framework == "Libavcodec" {
             return ["xvmc", "vdpau", "qsv", "dxva2", "d3d11va", "d3d12va"]
         } else if framework == "Libavutil" {
-            return ["hwcontext_vulkan", "hwcontext_vdpau", "hwcontext_vaapi", "hwcontext_qsv", "hwcontext_opencl", "hwcontext_dxva2", "hwcontext_d3d11va", "hwcontext_d3d12va", "hwcontext_cuda", "hwcontext_amf"]
+            return ["hwcontext_vulkan", "hwcontext_vdpau", "hwcontext_vaapi", "hwcontext_qsv", "hwcontext_opencl", "hwcontext_dxva2", "hwcontext_d3d11va", "hwcontext_d3d12va", "hwcontext_cuda"]
         } else {
             return super.frameworkExcludeHeaders(framework)
         }
@@ -666,7 +1071,7 @@ private class BuildFFMPEG: BaseBuild {
         // ,"--disable-rdft"
         // ,"--disable-fft"
         // Hardware accelerators:
-        "--disable-amf", "--disable-d3d11va", "--disable-d3d12va", "--disable-dxva2", "--disable-vaapi", "--disable-vdpau",
+        "--disable-d3d11va", "--disable-d3d12va", "--disable-dxva2", "--disable-vaapi", "--disable-vdpau",
         // Individual component options:
         // ,"--disable-everything"
         // ./configure --list-muxers
