@@ -563,7 +563,9 @@ private class BuildFFMPEG: BaseBuild {
 
 
     override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
-        var arguments = ffmpegConfiguers
+        var arguments = ffmpegConfiguers.filter {
+            $0 != "--enable-gpl" && $0 != "--enable-nonfree"
+        }
         if BaseBuild.options.enableDebug {
             arguments.append("--enable-debug")
             arguments.append("--disable-stripping")

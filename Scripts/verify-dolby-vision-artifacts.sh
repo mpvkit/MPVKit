@@ -50,19 +50,13 @@ pass() {
   echo "PASS: $*"
 }
 
-find_first_file() {
-  local name="$1"
-  find "$root" -type f -name "$name" -print -quit
-}
-
-find_matching_files() {
-  local pattern="$1"
-  find "$root" -type f -name "$pattern" -print
-}
-
 find_standard_matching_files() {
   local pattern="$1"
   find "$root" -type f -name "$pattern" ! -path '*-GPL*' -print
+}
+
+find_standard_paths() {
+  find "$root" "$@" ! -path '*-GPL*' -print
 }
 
 check_config_flag() {
@@ -107,7 +101,7 @@ check_no_nonfree_strings() {
 
 check_libplacebo_dovi_header() {
   local header
-  header="$(find "$root" -type f \( -name 'config.h' -o -name 'config_internal.h' \) -print0 | xargs -0 grep -l 'PL_HAVE_LIBDOVI' 2>/dev/null | head -n 1 || true)"
+  header="$(find "$root" -type f \( -name 'config.h' -o -name 'config_internal.h' \) ! -path '*-GPL*' -print0 | xargs -0 grep -l 'PL_HAVE_LIBDOVI' 2>/dev/null | head -n 1 || true)"
 
   if [[ -z "$header" ]]; then
     fail "no Libplacebo config header containing PL_HAVE_LIBDOVI found under $root"
@@ -135,8 +129,8 @@ check_dovi_symbols() {
   local dovi_libs=()
   local lib
 
-  while IFS= read -r lib; do placebo_libs+=("$lib"); done < <(find "$root" -type f \( -name 'Libplacebo.a' -o -name 'libplacebo.a' -o -name 'Libplacebo' -o -name 'libplacebo' \) -print)
-  while IFS= read -r lib; do dovi_libs+=("$lib"); done < <(find "$root" -type f \( -name 'Libdovi.a' -o -name 'libdovi.a' -o -name 'Libdovi' -o -name 'libdovi' \) -print)
+  while IFS= read -r lib; do placebo_libs+=("$lib"); done < <(find_standard_paths -type f \( -name 'Libplacebo.a' -o -name 'libplacebo.a' -o -name 'Libplacebo' -o -name 'libplacebo' \))
+  while IFS= read -r lib; do dovi_libs+=("$lib"); done < <(find_standard_paths -type f \( -name 'Libdovi.a' -o -name 'libdovi.a' -o -name 'Libdovi' -o -name 'libdovi' \))
 
   if [[ "${#placebo_libs[@]}" -eq 0 ]]; then
     fail "no Libplacebo library found under $root"
