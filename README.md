@@ -46,6 +46,26 @@ make clean
 make help
 ```
 
+
+## Dolby Vision artifact verification
+
+Native Dolby Vision support belongs in the standard `MPVKit` product, not only in `MPVKit-GPL`. Before publishing or consuming a standard release for Dolby Vision playback, verify the resolved artifacts are both LGPL-clean and wired for libdovi:
+
+```bash
+make verify-dv ARTIFACT_ROOT=.build/artifacts
+# or point at unpacked release artifacts
+make verify-dv ARTIFACT_ROOT=dist/release/xcframework
+```
+
+The verification fails unless the standard artifact set satisfies all of these gates:
+
+- FFmpeg config headers report `CONFIG_GPL 0` and `CONFIG_NONFREE 0`.
+- FFmpeg libraries do not expose an obvious nonfree license/configuration string.
+- Libplacebo reports `PL_HAVE_LIBDOVI 1`.
+- Libplacebo references `dovi_*` symbols and Libdovi exports matching symbols.
+
+Keep applications that need a non-GPL dependency surface on the `MPVKit` product. Do not switch them to `MPVKit-GPL` just to get Dolby Vision; instead publish corrected standard artifacts that pass this verification.
+
 ## Make demo app using the local build version
 
 If you want the demo app to use the local build version, you need to modify `Package.swift` to reference the local build xcframework file.
