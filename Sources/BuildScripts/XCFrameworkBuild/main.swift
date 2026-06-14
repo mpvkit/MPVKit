@@ -470,9 +470,9 @@ private class BuildFFMPEG: BaseBuild {
 
     override func flagsDependencelibrarys() -> [Library] {
         if BaseBuild.options.enableGPL {
-            return [.gmp, .nettle, .gnutls, .libsmbclient]
+            return [.gmp, .nettle, .gnutls, .libdovi, .libsmbclient]
         } else {
-            return [.gmp, .nettle, .gnutls]
+            return [.gmp, .nettle, .gnutls, .libdovi]
         }
     }
 
@@ -575,6 +575,9 @@ private class BuildFFMPEG: BaseBuild {
         }
         if BaseBuild.options.enableGPL {
             arguments.append("--enable-gpl")
+        } else {
+            arguments.append("--disable-gpl")
+            arguments.append("--disable-nonfree")
         }
         // arguments += Build.ffmpegConfiguers
         arguments.append("--disable-large-tests")
@@ -607,13 +610,16 @@ private class BuildFFMPEG: BaseBuild {
         //        if platform == .isimulator || platform == .tvsimulator {
         //            arguments.append("--assert-level=1")
         //        }
-        var dependencyLibrary = [Library.gmp, .gnutls, .libfreetype, .libharfbuzz, .libfribidi, .libass, .vulkan, .libshaderc, .lcms2, .libplacebo, .libdav1d, .libuavs3d]
+        var dependencyLibrary = [Library.gmp, .gnutls, .libfreetype, .libharfbuzz, .libfribidi, .libass, .vulkan, .libshaderc, .lcms2, .libplacebo, .libdovi, .libdav1d, .libuavs3d]
         if BaseBuild.options.enableGPL {
             dependencyLibrary += [.libsmbclient]
         }
         for library in dependencyLibrary {
             let path = URL.currentDirectory + [library.rawValue, platform.rawValue, "thin", arch.rawValue]
             if FileManager.default.fileExists(atPath: path.path) {
+                if library == .libdovi && !supportsFFmpegConfigureFlag("--enable-\(library.rawValue)") {
+                    continue
+                }
                 arguments.append("--enable-\(library.rawValue)")
                 if library == .libsmbclient {
                     arguments.append("--enable-protocol=\(library.rawValue)")
@@ -629,6 +635,15 @@ private class BuildFFMPEG: BaseBuild {
         }
         
         return arguments
+    }
+
+    private func supportsFFmpegConfigureFlag(_ flag: String) -> Bool {
+        let configure = directoryURL + "configure"
+        guard let data = FileManager.default.contents(atPath: configure.path),
+              let configureScript = String(data: data, encoding: .utf8) else {
+            return false
+        }
+        return configureScript.contains(flag)
     }
 
 
@@ -647,7 +662,7 @@ private class BuildFFMPEG: BaseBuild {
         "--disable-armv5te", "--disable-armv6", "--disable-armv6t2",
         "--disable-bzlib", "--disable-gray", "--disable-iconv", "--disable-linux-perf",
         "--disable-shared", "--disable-small", "--disable-symver", "--disable-xlib",
-        "--enable-cross-compile", "--enable-libxml2", "--enable-nonfree",
+        "--enable-cross-compile", "--enable-libxml2",
         "--enable-optimizations", "--enable-pic", "--enable-runtime-cpudetect", "--enable-static", "--enable-thumb", "--enable-version3",
         "--pkg-config-flags=--static",
         // Documentation options:
