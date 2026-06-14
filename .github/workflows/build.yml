@@ -145,6 +145,12 @@ jobs:
           sed -i '' "s#\\\(Libswscale-GPL_url)#${LibswscaleGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libswscale-GPL_checksum)#${LibswscaleGPL_checksum}#g" ./Package.swift
 
+      - name: Verify generated package metadata
+        run: |
+          ! rg -n '0\.41\.3' Package.swift
+          rg -n 'Libsmbclient' Package.swift
+          swift package dump-package >/dev/null
+
 
       - name: Push Package.swift
         uses: EndBug/add-and-commit@v9
