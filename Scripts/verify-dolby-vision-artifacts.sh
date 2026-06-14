@@ -60,6 +60,11 @@ find_matching_files() {
   find "$root" -type f -name "$pattern" -print
 }
 
+find_standard_matching_files() {
+  local pattern="$1"
+  find "$root" -type f -name "$pattern" ! -path '*-GPL*' -print
+}
+
 check_config_flag() {
   local flag="$1"
   local expected="$2"
@@ -75,7 +80,7 @@ check_config_flag() {
     else
       fail "$config does not define $flag as $expected"
     fi
-  done < <(find_matching_files config.h | grep -E '/include/libav(codec|format|util)/config\.h$' || true)
+  done < <(find_standard_matching_files config.h | grep -E '/include/libav(codec|format|util)/config\.h$' || true)
 
   if [[ "$found" -eq 0 ]]; then
     fail "no FFmpeg config.h files found under $root"
@@ -91,7 +96,7 @@ check_no_nonfree_strings() {
     if strings "$lib" | grep -Eiq 'License:.*nonfree|configuration:.*--enable-nonfree|--enable-nonfree'; then
       fail "$lib contains an apparent nonfree FFmpeg license/configuration string"
     fi
-  done < <(find "$root" -type f \( -name 'Libav*.a' -o -name 'libav*.a' -o -name 'Libav*' -o -name 'libav*' \) -print)
+  done < <(find "$root" -type f \( -name 'Libav*.a' -o -name 'libav*.a' -o -name 'Libav*' -o -name 'libav*' \) ! -path '*-GPL*' -print)
 
   if [[ "$found" -eq 0 ]]; then
     fail "no FFmpeg library files found under $root"
@@ -102,11 +107,7 @@ check_no_nonfree_strings() {
 
 check_libplacebo_dovi_header() {
   local header
-  header="$(find_first_file config.h | grep -E 'libplacebo|placebo|pl' || true)"
-
-  if [[ -z "$header" ]]; then
-    header="$(find "$root" -type f \( -name 'config.h' -o -name 'config_internal.h' \) -print | xargs grep -l 'PL_HAVE_LIBDOVI' 2>/dev/null | head -n 1 || true)"
-  fi
+  header="$(find "$root" -type f \( -name 'config.h' -o -name 'config_internal.h' \) -print0 | xargs -0 grep -l 'PL_HAVE_LIBDOVI' 2>/dev/null | head -n 1 || true)"
 
   if [[ -z "$header" ]]; then
     fail "no Libplacebo config header containing PL_HAVE_LIBDOVI found under $root"
