@@ -93,6 +93,10 @@ jobs:
       - name: Build LGPL version
         run: |
           make build version=${{ env.RELEASE_VERSION }}
+
+      - name: Verify standard Dolby Vision artifacts
+        run: |
+          Scripts/verify-dolby-vision-artifacts.sh ./dist/release/xcframework
       
       
       - name: Update Package.swift
