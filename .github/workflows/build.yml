@@ -145,10 +145,20 @@ jobs:
           sed -i '' "s#\\\(Libswscale-GPL_url)#${LibswscaleGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libswscale-GPL_checksum)#${LibswscaleGPL_checksum}#g" ./Package.swift
 
+      - name: Point binary target URLs at the fork's release assets
+        run: |
+          # The templating above hardcodes the upstream mpvkit/MPVKit download
+          # host, but the xcframework assets are published to THIS repo's release.
+          # Rewrite the MPVKit framework URLs (GPL + LGPL) to the current repo so
+          # SwiftPM resolves against the fork. External *-build deps are untouched.
+          sed -i '' "s#https://github.com/mpvkit/MPVKit/releases/download#https://github.com/${{ github.repository }}/releases/download#g" ./Package.swift
+
       - name: Verify generated package metadata
         run: |
           ! rg -n '0\.41\.3' Package.swift
           rg -n 'Libsmbclient' Package.swift
+          # Guard: no framework URL may still point at the upstream MPVKit release.
+          ! rg -n 'github\.com/mpvkit/MPVKit/releases' Package.swift
           swift package dump-package >/dev/null
 
 
