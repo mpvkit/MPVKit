@@ -425,11 +425,13 @@ private class BuildMPV: BaseBuild {
             array.append("-Dvideotoolbox-pl=enabled")
             array.append("-Dswift-build=disabled")
             array.append("-Daudiounit=enabled")
-            array.append("-Davfoundation=disabled")
+            // Enable the avfoundation AO (AVSampleBufferAudioRenderer) on iOS/tvOS.
+            // CoreAudio HAL (AudioObject*) is macOS-only, so keep coreaudio off.
+            array.append("-Davfoundation=enabled")
+            array.append("-Dcoreaudio=disabled")
             array.append("-Dlua=disabled")
             if platform == .maccatalyst {
                 array.append("-Dcocoa=disabled")
-                array.append("-Dcoreaudio=disabled")
             } else if platform == .xros || platform == .xrsimulator {
                 array.append("-Dios-gl=disabled")
             } else {
