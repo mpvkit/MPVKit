@@ -60,15 +60,15 @@ enum Library: String, CaseIterable {
         case .gmp:
             return "3.8.11"
         case .libass:
-            return "0.17.4"
+            return "0.17.5"
         case .libunibreak:
-            return "0.17.4"
+            return "0.17.5"
         case .libfreetype:
-            return "0.17.4"
+            return "0.17.5"
         case .libfribidi:
-            return "0.17.4"
+            return "0.17.5"
         case .libharfbuzz:
-            return "0.17.4"
+            return "0.17.5"
         case .libsmbclient:
             return "4.15.13-2512"
         case .libdav1d:    // AV1 decoding
