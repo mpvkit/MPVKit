@@ -458,6 +458,11 @@ private class BuildFFMPEG: BaseBuild {
         if Utility.shell("which sdl2-config") == nil {
             Utility.shell("brew install sdl2")
         }
+        // FFmpeg n9.0+ compiles Vulkan shaders at build time via glslc (spirv_compiler).
+        // Previously spirv_compiler came from runtime libshaderc/libglslang, now removed.
+        if Utility.shell("which glslc") == nil, Utility.shell("which glslangValidator") == nil, Utility.shell("which glslang") == nil {
+            Utility.shell("brew install glslang")
+        }
 
         let lldbFile = URL.currentDirectory + "LLDBInitFile"
         try? FileManager.default.removeItem(at: lldbFile)
@@ -609,7 +614,10 @@ private class BuildFFMPEG: BaseBuild {
         //        if platform == .isimulator || platform == .tvsimulator {
         //            arguments.append("--assert-level=1")
         //        }
-        var dependencyLibrary = [Library.gmp, .gnutls, .libfreetype, .libharfbuzz, .libfribidi, .libass, .vulkan, .libshaderc, .lcms2, .libplacebo, .libdav1d, .libuavs3d]
+        // FFmpeg n9.0 removed --enable-libshaderc/--enable-libglslang (commit 062de19).
+        // Vulkan shaders are now compiled at build time via glslc (spirv_compiler),
+        // so don't pass libshaderc to FFmpeg. libshaderc is still built for libplacebo/mpv.
+        var dependencyLibrary = [Library.gmp, .gnutls, .libfreetype, .libharfbuzz, .libfribidi, .libass, .vulkan, .lcms2, .libplacebo, .libdav1d, .libuavs3d]
         if BaseBuild.options.enableGPL {
             dependencyLibrary += [.libsmbclient]
         }
@@ -723,7 +731,7 @@ private class BuildFFMPEG: BaseBuild {
         "--enable-decoder=amr*", "--enable-decoder=ape", "--enable-decoder=cook",
         "--enable-decoder=dca", "--enable-decoder=dolby_e", "--enable-decoder=eac3*", "--enable-decoder=flac",
         "--enable-decoder=mp1*", "--enable-decoder=mp2*", "--enable-decoder=mp3*", "--enable-decoder=opus",
-        "--enable-decoder=pcm*", "--enable-decoder=sonic",
+        "--enable-decoder=pcm*",
         "--enable-decoder=truehd", "--enable-decoder=tta", "--enable-decoder=vorbis", "--enable-decoder=wma*",
         // 字幕
         "--enable-decoder=ass", "--enable-decoder=ccaption", "--enable-decoder=dvbsub", "--enable-decoder=dvdsub",
