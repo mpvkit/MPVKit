@@ -5,6 +5,8 @@
 [![license](https://img.shields.io/github/license/mpvkit/MPVKit)](https://github.com/mpvkit/MPVKit/main/LICENSE)
 
 > MPVKit is only suitable for learning `libmpv` and will not be maintained too frequently.
+>
+> For production use, you can try [AetherEngine](https://github.com/superuser404notfound/AetherEngine)
 
 `MPVKit` is a collection of tools to use `mpv` in `iOS`, `macOS`, `tvOS` applications.
 
