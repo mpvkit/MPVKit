@@ -6,9 +6,11 @@ do {
 
     // SSL
     try BuildOpenSSL().buildALL()
-    try BuildGmp().buildALL()
-    try BuildNettle().buildALL()
-    try BuildGnutls().buildALL()
+    if !options.enableLGPL21 {
+        try BuildGmp().buildALL()
+        try BuildNettle().buildALL()
+        try BuildGnutls().buildALL()
+    }
 
     // libass
     try BuildUnibreak().buildALL()
@@ -373,7 +375,9 @@ private class BuildMPV: BaseBuild {
     }
 
     override func flagsDependencelibrarys() -> [Library] {
-        if BaseBuild.options.enableGPL {
+        if BaseBuild.options.enableLGPL21 {
+            return []
+        } else if BaseBuild.options.enableGPL {
             return [.gmp, .libsmbclient]
         } else {
             return [.gmp]
@@ -476,7 +480,9 @@ private class BuildFFMPEG: BaseBuild {
     }
 
     override func flagsDependencelibrarys() -> [Library] {
-        if BaseBuild.options.enableGPL {
+        if BaseBuild.options.enableLGPL21 {
+            return []
+        } else if BaseBuild.options.enableGPL {
             return [.gmp, .nettle, .gnutls, .libsmbclient]
         } else {
             return [.gmp, .nettle, .gnutls]
@@ -501,11 +507,11 @@ private class BuildFFMPEG: BaseBuild {
         var ldFlags = super.ldFlags(platform: platform, arch: arch)
 
         var path = thinDir(library: .nettle, platform: platform, arch: arch)
-        if FileManager.default.fileExists(atPath: path.path) {
+        if !BaseBuild.options.enableLGPL21, FileManager.default.fileExists(atPath: path.path) {
             ldFlags.append("-lhogweed")
         }
         path = thinDir(library: .gnutls, platform: platform, arch: arch)
-        if FileManager.default.fileExists(atPath: path.path) {
+        if !BaseBuild.options.enableLGPL21, FileManager.default.fileExists(atPath: path.path) {
             ldFlags.append(contentsOf: ["-framework", "Security", "-framework", "CoreFoundation"])
         }
         if BaseBuild.options.enableGPL {
@@ -571,6 +577,11 @@ private class BuildFFMPEG: BaseBuild {
 
     override func arguments(platform: PlatformType, arch: ArchType) -> [String] {
         var arguments = ffmpegConfiguers
+        if BaseBuild.options.enableLGPL21 {
+            // LGPL-2.1-or-later: no version3 (gmp is LGPLv3), TLS via Secure Transport instead of gnutls
+            arguments.removeAll { $0 == "--enable-version3" }
+            arguments.append("--enable-securetransport")
+        }
         if BaseBuild.options.enableDebug {
             arguments.append("--enable-debug")
             arguments.append("--disable-stripping")
@@ -618,6 +629,9 @@ private class BuildFFMPEG: BaseBuild {
         // Vulkan shaders are now compiled at build time via glslc (spirv_compiler),
         // so don't pass libshaderc to FFmpeg. libshaderc is still built for libplacebo/mpv.
         var dependencyLibrary = [Library.gmp, .gnutls, .libfreetype, .libharfbuzz, .libfribidi, .libass, .vulkan, .lcms2, .libplacebo, .libdav1d, .libuavs3d]
+        if BaseBuild.options.enableLGPL21 {
+            dependencyLibrary.removeAll { $0 == .gmp || $0 == .gnutls }
+        }
         if BaseBuild.options.enableGPL {
             dependencyLibrary += [.libsmbclient]
         }

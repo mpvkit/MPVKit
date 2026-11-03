@@ -34,6 +34,7 @@ class ArgumentOptions {
     var enableDebug: Bool = false
     var enableSplitPlatform: Bool = false
     var enableGPL: Bool = false
+    var enableLGPL21: Bool = false
     var platforms : [PlatformType] = []
     var releaseVersion: String = "0.0.0"
 
@@ -57,6 +58,8 @@ class ArgumentOptions {
                 options.enableDebug = true
             case "enable-gpl":
                 options.enableGPL = true
+            case "enable-lgpl21":
+                options.enableLGPL21 = true
             case "enable-split-platform":
                 options.enableSplitPlatform = true
             default:
@@ -84,6 +87,10 @@ class ArgumentOptions {
                     }
                 }
             }
+        }
+
+        if options.enableLGPL21 && options.enableGPL {
+            throw NSError(domain: "enable-lgpl21 cannot be combined with enable-gpl", code: 1)
         }
 
         return options
