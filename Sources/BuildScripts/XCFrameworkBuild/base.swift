@@ -34,6 +34,7 @@ class ArgumentOptions {
     var enableDebug: Bool = false
     var enableSplitPlatform: Bool = false
     var enableGPL: Bool = false
+    var enableLGPL21: Bool = false
     var platforms : [PlatformType] = []
     var releaseVersion: String = "0.0.0"
 
@@ -57,6 +58,8 @@ class ArgumentOptions {
                 options.enableDebug = true
             case "enable-gpl":
                 options.enableGPL = true
+            case "enable-lgpl21":
+                options.enableLGPL21 = true
             case "enable-split-platform":
                 options.enableSplitPlatform = true
             default:
@@ -84,6 +87,10 @@ class ArgumentOptions {
                     }
                 }
             }
+        }
+
+        if options.enableLGPL21 && options.enableGPL {
+            throw NSError(domain: "enable-lgpl21 cannot be combined with enable-gpl", code: 1)
         }
 
         return options
@@ -784,6 +791,15 @@ class BaseBuild {
         if !FileManager.default.fileExists(atPath: packageFile.path) {
             try! FileManager.default.createDirectory(at: releaseDirPath, withIntermediateDirectories: true, attributes: nil)
             try! FileManager.default.copyItem(at: template, to: packageFile)
+            if BaseBuild.options.enableLGPL21 {
+                try applyLGPL21Manifest(to: packageFile)
+            }
+        }
+
+        // The LGPL-2.1 build's TLS is Secure Transport and it has no GPL product; nothing links OpenSSL or libsmbclient,
+        // so their binaryTargets must not ship.
+        if BaseBuild.options.enableLGPL21 && (library == .openssl || library == .libsmbclient) {
+            return
         }
 
         var dependencyTargetContent = ""
@@ -836,6 +852,53 @@ class BaseBuild {
             """)
             try! str.write(toFile: packageFile.path, atomically: true, encoding: .utf8)
         }
+    }
+
+    /// The LGPL-2.1 build has no gmp/nettle/hogweed/gnutls/openssl, and its TLS (Secure Transport) needs Security.framework.
+    /// The `_FFmpeg` target is rewritten, and the GPL product, targets and binaryTargets are removed (they could not resolve).
+    /// Throws if the template no longer has the text this expects, rather than quietly emitting a manifest that still needs them.
+    private func applyLGPL21Manifest(to packageFile: URL) throws {
+        func missing(_ what: String) -> NSError {
+            return NSError(domain: "enable-lgpl21: docs/Package.template.swift no longer contains \(what); update applyLGPL21Manifest", code: 1)
+        }
+        var str = try String(contentsOf: packageFile, encoding: .utf8)
+        guard let start = str.range(of: "name: \"_FFmpeg\","),
+              let end = str.range(of: "name: \"_MPVKit-GPL\",", range: start.upperBound..<str.endIndex) else {
+            throw missing("the _FFmpeg target")
+        }
+        var block = String(str[start.lowerBound..<end.lowerBound])
+        let replacements = [
+            ("\"gmp\", \"nettle\", \"hogweed\", \"gnutls\", ", ""),
+            ("\"Libssl\", \"Libcrypto\", ", ""),
+            ("                .linkedFramework(\"Metal\"),\n", "                .linkedFramework(\"Metal\"),\n                .linkedFramework(\"Security\"),\n"),
+        ]
+        for (target, replacement) in replacements {
+            guard block.contains(target) else {
+                throw missing("\(target.trimmingCharacters(in: .whitespacesAndNewlines)) in the _FFmpeg target")
+            }
+            block = block.replacingOccurrences(of: target, with: replacement)
+        }
+        str.replaceSubrange(start.lowerBound..<end.lowerBound, with: block)
+
+        // Product: the `.library(` block named "MPVKit-GPL".
+        guard let name = str.range(of: "name: \"MPVKit-GPL\","),
+              let open = str.range(of: ".library(", options: .backwards, range: str.startIndex..<name.lowerBound),
+              let close = str.range(of: "        ),\n", range: name.upperBound..<str.endIndex) else {
+            throw missing("the MPVKit-GPL product")
+        }
+        let lineStart = str.range(of: "\n", options: .backwards, range: str.startIndex..<open.lowerBound)!.upperBound
+        str.removeSubrange(lineStart..<close.upperBound)
+
+        // Targets: everything from the `_MPVKit-GPL` target up to the auto-generated marker.
+        guard let gplName = str.range(of: "name: \"_MPVKit-GPL\","),
+              let gplOpen = str.range(of: ".target(", options: .backwards, range: str.startIndex..<gplName.lowerBound),
+              let marker = str.range(of: "//AUTO_GENERATE_TARGETS_BEGIN//") else {
+            throw missing("the _MPVKit-GPL target or the AUTO_GENERATE_TARGETS_BEGIN marker")
+        }
+        let gplStart = str.range(of: "\n", options: .backwards, range: str.startIndex..<gplOpen.lowerBound)!.upperBound
+        let markerLine = str.range(of: "\n", options: .backwards, range: str.startIndex..<marker.lowerBound)!.upperBound
+        str.removeSubrange(gplStart..<markerLine)
+        try str.write(toFile: packageFile.path, atomically: true, encoding: .utf8)
     }
 
     func getFirstSuccessPlatform() -> PlatformType? {

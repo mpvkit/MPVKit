@@ -1,0 +1,166 @@
+diff --git a/libavformat/tls_securetransport.c b/libavformat/tls_securetransport.c
+index f52fc97..0cde8ea 100644
+--- a/libavformat/tls_securetransport.c
++++ b/libavformat/tls_securetransport.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include <errno.h>
++#include <limits.h>
+ 
+ 
+ #include "avformat.h"
+@@ -30,6 +31,7 @@
+ #include "tls.h"
+ #include "libavcodec/internal.h"
+ #include "libavutil/avstring.h"
++#include "libavutil/base64.h"
+ #include "libavutil/mem.h"
+ #include "libavutil/opt.h"
+ #include "libavutil/parseutils.h"
+@@ -67,6 +69,115 @@ static int print_tls_error(URLContext *h, int ret)
+     return AVERROR(EIO);
+ }
+ 
++#if !HAVE_SECITEMIMPORT
++/**
++ * SecItemImport() is not available on iOS and tvOS, so parse the PEM
++ * CERTIFICATE blocks of a CA file by hand. Other block types are skipped.
++ */
++static int import_ca_pem(URLContext *h, char *path, CFArrayRef *array)
++{
++    static const char begin_tag[] = "-----BEGIN CERTIFICATE-----";
++    static const char end_tag[]   = "-----END CERTIFICATE-----";
++    AVIOContext *s = NULL;
++    CFMutableArrayRef certs = NULL;
++    uint8_t *der = NULL;
++    char *buf = NULL, *b64 = NULL, *p;
++    int64_t size;
++    int ret = 0;
++
++    /* a CA path is always a local file, whatever the stream's whitelist */
++    if ((ret = ffio_open_whitelist(&s, path, AVIO_FLAG_READ,
++                                   &h->interrupt_callback, NULL,
++                                   "file", h->protocol_blacklist)) < 0)
++        goto end;
++
++    if ((size = avio_size(s)) < 0) {
++        ret = size;
++        goto end;
++    }
++
++    if (size == 0 || size >= INT_MAX / 2) {
++        ret = AVERROR_INVALIDDATA;
++        goto end;
++    }
++
++    if (!(buf = av_malloc(size + 1)) || !(b64 = av_malloc(size + 1)) ||
++        !(der = av_malloc(AV_BASE64_DECODE_SIZE(size)))) {
++        ret = AVERROR(ENOMEM);
++        goto end;
++    }
++
++    if ((ret = avio_read(s, buf, size)) < 0)
++        goto end;
++    buf[ret] = '\0';
++
++    if (!(certs = CFArrayCreateMutable(kCFAllocatorDefault, 0,
++                                       &kCFTypeArrayCallBacks))) {
++        ret = AVERROR(ENOMEM);
++        goto end;
++    }
++
++    for (p = buf; (p = strstr(p, begin_tag)); ) {
++        char *body = p + sizeof(begin_tag) - 1;
++        char *end  = strstr(body, end_tag);
++        int len = 0, der_size;
++        CFDataRef data;
++        SecCertificateRef cert;
++
++        if (!end) {
++            ret = AVERROR_INVALIDDATA;
++            goto end;
++        }
++
++        /* base64 decoding stops at whitespace, so strip it first */
++        for (; body < end; body++) {
++            if (!av_isspace(*body))
++                b64[len++] = *body;
++        }
++        b64[len] = '\0';
++
++        if ((der_size = av_base64_decode(der, b64, AV_BASE64_DECODE_SIZE(len))) <= 0) {
++            ret = AVERROR_INVALIDDATA;
++            goto end;
++        }
++
++        data = CFDataCreate(kCFAllocatorDefault, der, der_size);
++        if (!data) {
++            ret = AVERROR(ENOMEM);
++            goto end;
++        }
++        cert = SecCertificateCreateWithData(kCFAllocatorDefault, data);
++        CFRelease(data);
++        if (!cert) {
++            ret = AVERROR_INVALIDDATA;
++            goto end;
++        }
++        CFArrayAppendValue(certs, cert);
++        CFRelease(cert);
++
++        p = end + sizeof(end_tag) - 1;
++    }
++
++    if (CFArrayGetCount(certs) == 0) {
++        ret = AVERROR_INVALIDDATA;
++        goto end;
++    }
++
++    *array = CFRetain(certs);
++    ret = 0;
++
++end:
++    av_free(buf);
++    av_free(b64);
++    av_free(der);
++    if (certs)
++        CFRelease(certs);
++    if (s)
++        avio_close(s);
++    return ret;
++}
++#endif
++
+ static int import_pem(URLContext *h, char *path, CFArrayRef *array)
+ {
+ #if !HAVE_SECITEMIMPORT
+@@ -84,9 +195,11 @@ static int import_pem(URLContext *h, char *path, CFArrayRef *array)
+         goto end;
+     }
+ 
++    /* CA, certificate and key paths are always local files, whatever the
++     * stream's whitelist */
+     if ((ret = ffio_open_whitelist(&s, path, AVIO_FLAG_READ,
+                                    &h->interrupt_callback, NULL,
+-                                   h->protocol_whitelist, h->protocol_blacklist)) < 0)
++                                   "file", h->protocol_blacklist)) < 0)
+         goto end;
+ 
+     if ((ret = avio_size(s)) < 0)
+@@ -136,7 +249,12 @@ static int load_ca(URLContext *h)
+     int ret = 0;
+     CFArrayRef array = NULL;
+ 
+-    if ((ret = import_pem(h, c->tls_shared.ca_file, &array)) < 0)
++#if HAVE_SECITEMIMPORT
++    ret = import_pem(h, c->tls_shared.ca_file, &array);
++#else
++    ret = import_ca_pem(h, c->tls_shared.ca_file, &array);
++#endif
++    if (ret < 0)
+         goto end;
+ 
+     if (!(c->ca_array = CFRetain(array))) {
+-- 
+2.54.0 (Apple Git-157)
+
