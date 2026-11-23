@@ -48,9 +48,9 @@ enum Library: String, CaseIterable {
     var version: String {
         switch self {
         case .libmpv:
-            return "v0.41.0"
+            return "v0.42.0"
         case .FFmpeg:
-            return "n9.0.2"
+            return "n9.1"
         case .openssl:
             return "3.3.5"
         case .gnutls:
